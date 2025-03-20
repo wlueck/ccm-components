@@ -1,0 +1,83 @@
+#main {
+    font-family: Montserrat, sans-serif;
+    font-weight: 100;
+}
+
+.hidden {
+    display: none;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #f0f0f0;
+    margin-bottom: 15px;
+}
+
+.headline {
+    margin: 0;
+}
+
+.user {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    padding: 8px;
+    cursor: pointer;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+
+    &.btn-low-style {
+        background: none;
+        border: none;
+    }
+}
+
+#button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+#deck-options {
+    background-color: darkolivegreen;
+}
+
+#card {
+    border: 2px solid rgba(217, 217, 217);
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+#card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+#card-content {
+    max-width: 50%;
+}
+
+#card-title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+#card-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#card-toggle-btn {
+    font-size: 2em;
+}
+
+#card-decks {
+}
