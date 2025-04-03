@@ -4,8 +4,8 @@
  * @license The MIT License (MIT)
  */
 
-ccm.files["ccm.flash_cards_list.js"] = {
-    name: "flash-cards-list",
+ccm.files["ccm.flash_cards.js"] = {
+    name: "flash-cards",
     //ccm: "https://ccmjs.github.io/ccm/ccm.js",
     ccm: "../libs/ccm-master/ccm.js",
     config: {
