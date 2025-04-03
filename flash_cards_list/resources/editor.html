@@ -1,0 +1,50 @@
+<button id="back-button">zurück</button>
+
+<form id="add-card-deck-form"><br>
+
+    <label for="course">Lehrveranstaltung:</label><br>
+    <select id="course" name="course" required>
+        <option disabled selected value > -- wähle eine Lehrveranstaltung -- </option>
+    </select><br>
+    <button class="btn-link-style" id="add-course-btn">Lehrveranstaltung hinzufügen</button><br>
+    <div id="add-course-container" class="hidden">
+        <h4>Lehrveranstaltung hinzufügen</h4>
+        <label for="add-course-input">Lehrveranstaltung Titel:</label>
+        <input type="text" id="add-course-input" name="add_course" size="40"/>
+        <!--<input id="courseDeadlineInput" name="deadlineInput" type="date" class="hidden"/><br>
+        <textarea id="courseDescripitionInput" name="courseDescripitionInput" cols="25" rows="3" required></textarea><br>-->
+        <button id="submit-course">+</button>
+        <br>
+    </div>
+<br>
+    <label for="name">Titel:</label><br>
+    <input type="text" id="name" name="name" size="40" required/><br><br>
+
+    <label for="description">Beschreibung:</label><br>
+    <textarea id="description" name="description" cols="34" rows="4" required></textarea><br><br>
+
+    <input type="checkbox" id="deadline" name="deadline">
+    <label for="deadline">Deadline</label><br><br>
+    <input id="deadlineInput" name="deadlineInput" type="date" class="hidden"/><br><br>
+
+    <div id="cards_container">
+        <h4>Karten</h4>
+        <div id="cards">
+            <div id="card">
+                <div class="input-group">
+                    <label for="question">Frage:</label>
+                    <textarea id="question" name="question" cols="34" rows="5" required></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="answer">Antwort:</label>
+                    <textarea id="answer" name="answer" cols="34" rows="5" required></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button id="add_card">Karte hinzufügen</button>
+        <br>
+    </div>
+    <br>
+    <button id="submit-deck">Stapel erstellen</button>
+</form>

@@ -10,7 +10,7 @@ ccm.files["ccm.flash_cards.js"] = {
     ccm: "../libs/ccm-master/ccm.js",
     config: {
         store: ["ccm.store", {url:"https://ccm2.inf.h-brs.de", name:"wlueck2s_mycollection"}],
-        cardDecks: [
+        /*cardDecks: [
             {
                 title: "Informatik",
                 description: "Karteikarten zur Vorlesung Informatik inklusive Übungen. Zur Vorbereitung auf die Klausur.",
@@ -48,7 +48,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     }
                 ]
             }
-        ],
+        ],*/
 
         css: ["ccm.load", "../flash_cards/resources/styles.css"],
         html: ["ccm.load", "../flash_cards/resources/template.html"],
@@ -58,27 +58,19 @@ ccm.files["ccm.flash_cards.js"] = {
     },
 
     Instance: function () {
-
+        let user, dataset;
         this.start = async () => {
             this.element.innerHTML = this.html;
 
             this.element.querySelector('#user').append(this.user.root);
-            let user;
-            /*
-            try {
-                user = await this.user.getValue();
-                if (!user) {
-                    console.log("User is not logged in");
-                    return;
-                }
-            } catch (e) {
-                console.log("User is not logged in: ", e);
+            user = await this.user.getValue();
+            if (!user) {
+                alert("Please login");
+                console.log("User is not logged in");
                 return;
             }
-             */
 
-            //const dataset = await this.store.get(user.key);
-            let dataset = await this.store.get("wlueck2s");
+            dataset = await this.store.get(user.key);
             if (!dataset) {
                 console.log("No dataset found");
                 return;

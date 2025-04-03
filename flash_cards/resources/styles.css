@@ -7,6 +7,19 @@
     display: none;
 }
 
+
+button {
+    padding: 8px;
+    cursor: pointer;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+
+    &.btn-low-style {
+        background: none;
+        border: none;
+    }
+}
+
 .header {
     display: flex;
     justify-content: space-between;

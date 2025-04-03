@@ -21,30 +21,6 @@ ccm.files["ccm.flash_cards_editor.js"] = {
 
         this.start = async () => {
 
-            this.element.innerHTML = this.html;
-            this.element.querySelector('#user').append(this.user.root);
-            let user;
-            console.log(this.user)
-
-            try {
-                user = await this.user.getValue();
-                if (!user) {
-                    console.log("User is not logged in");
-                    return;
-                }
-            } catch (e) {
-                console.log("User is not logged in: ", e);
-                return;
-            }
-
-            let dataset = await this.store.get(user.key);
-            if (!dataset) {
-                console.log("No dataset found");
-                return;
-            }
-
-            dataset = dataset.value;
-
             this.element.querySelector("#add_card").addEventListener("click", (event) => {
                 event.preventDefault();
                 addCard();

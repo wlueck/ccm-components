@@ -1,10 +1,31 @@
-#main {
-    font-family: Montserrat, sans-serif;
-    font-weight: 100;
-}
+/* general */
 
 .hidden {
     display: none;
+}
+
+.unseen {
+    visibility: hidden;
+}
+
+button {
+    padding: 8px;
+    cursor: pointer;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+
+    &.btn-low-style {
+        background: none;
+        border: none;
+    }
+}
+
+
+/* main template */
+
+#main {
+    font-family: Montserrat, sans-serif;
+    font-weight: 100;
 }
 
 .header {
@@ -20,64 +41,340 @@
     margin: 0;
 }
 
-.user {
+#user {
     display: flex;
     gap: 10px;
 }
 
-button {
-    padding: 8px;
-    cursor: pointer;
-    border: 1px solid darkgray;
-    border-radius: 5px;
 
-    &.btn-low-style {
-        background: none;
-        border: none;
+.headline-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.sub-headline {
+    margin: 5px 0 0 0;
+}
+
+
+/* list template */
+#list-template {
+
+    #list-button-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #card {
+        border: 2px solid rgba(217, 217, 217);
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    #card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        width: 100%;
+    }
+
+    #card-content {
+        width: 60%;
+    }
+
+    #card-options {
+        width: 10%;
+    }
+
+    #card-title {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    #card-stats {
+        width: 20%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    #card-toggle-btn {
+        font-size: 2em;
+    }
+
+
+    #card-deadline {
+        width: 20%;
+    }
+
+    #card-decks {
+    }
+
+
+    #course-options {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        width: 150px;
+        z-index: 1000;
+    }
+
+    #course-options a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+    }
+
+    #course-options a:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+
+    #deck-options {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        width: 150px;
+        z-index: 1000;
+    }
+
+    #deck-options a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+    }
+
+    #deck-options a:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+
+    #sort-decks-button {
+        position: relative;
+    }
+
+    #sort-decks {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        width: 150px;
+        z-index: 1000;
+        right: 8px;
+        margin-top: 33px;
+    }
+
+    #sort-decks a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+    }
+
+    #sort-decks a:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+    #add-deck-options {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        width: 150px;
+        z-index: 1000;
+        margin-top: 33px;
+    }
+
+    #add-deck-options a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+    }
+
+    #add-deck-options a:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
     }
 }
 
-#button-container {
-    display: flex;
-    justify-content: space-between;
+/* editor template */
+
+#add-card-deck-form {
+
+    & input, & select {
+        padding: 5px;
+    }
+
+    & input[type="checkbox"] {
+        cursor: pointer;
+    }
+
+    & button {
+        padding: 5px;
+    }
+
+    .btn-link-style {
+        background: none;
+        border: none;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    #add-course-btn{
+        /*margin-left: 215px;*/
+    }
+
+    #submit-course {
+        border-radius: 20px;
+        padding: 4px 8px;
+    }
+
+    #delete-card-button {
+        align-self: flex-end;
+        margin-left: 10px;
+        padding: 5px 10px;
+    }
+
+    #cards_container {
+        border: solid 1px black;
+        padding: 5px;
+    }
+
+    #cards {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #card {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .input-group textarea {
+        width: 200px; /
+        resize: vertical;
+    }
+
+    #add-course-container {
+        border: solid 1px black;
+        padding: 5px;
+    }
+
+
 }
 
-#deck-options {
-    background-color: darkolivegreen;
+
+
+/* card template */
+
+#cc{
+
+    #card {
+        width: 700px;
+        height: 400px;
+        /*background-color: #add8e6;*/
+        border: 3px solid #000;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+
+        /* Flexbox für vertikale Ausrichtung */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Abstand zwischen Text und Buttons */
+        align-items: center; /* Horizontale Zentrierung */
+        text-align: center;
+    }
+
+    #question_answer_text {
+        flex-grow: 1; /* Nimmt den freien Platz ein */
+        display: flex; /* Flexbox für Zentrierung */
+        justify-content: center; /* Horizontal zentrieren */
+        align-items: center; /* Vertikal zentrieren */
+        font-size: 18px; /* Schriftgröße */
+        margin: 0; /* Kein zusätzlicher Außenabstand */
+    }
+
+    #card_buttons {
+        display: flex; /* Flexbox für Buttons */
+        justify-content: space-around; /* Gleichmäßiger Abstand zwischen Buttons */
+        width: 100%; /* Buttons nehmen die gesamte Breite ein */
+    }
+
+    #card_buttons button {
+        background: none;
+        border: none;
+        padding: 10px;
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+    .questionStyle {
+        display: none;
+        margin-top: 20px;
+    }
+
+    .answerStyle {
+        display: flex;
+        justify-content: center;
+        width: 90%;
+    }
+
+    #hard {
+        background-color: red;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+
+    #middle {
+        background-color: orange;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 5px 10px 0 10px;
+    }
+
+    #easy {
+        background-color: green;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+
+    .selected-difficulty {
+        border: 3px solid black;
+    }
 }
 
-#card {
-    border: 2px solid rgba(217, 217, 217);
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-#card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-}
-
-#card-content {
-    max-width: 50%;
-}
-
-#card-title {
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-#card-stats {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#card-toggle-btn {
-    font-size: 2em;
-}
-
-#card-decks {
-}
