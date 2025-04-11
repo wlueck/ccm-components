@@ -170,11 +170,11 @@ button {
     }
 
 
-    #sort-decks-button {
+    #sort-courses-button {
         position: relative;
     }
 
-    #sort-decks {
+    #sort-courses {
         position: absolute;
         background-color: white;
         border: 1px solid #ccc;
@@ -187,7 +187,7 @@ button {
         margin-top: 33px;
     }
 
-    #sort-decks a {
+    #sort-courses a {
         display: block;
         padding: 8px 12px;
         text-decoration: none;
@@ -195,7 +195,7 @@ button {
         font-size: 14px;
     }
 
-    #sort-decks a:hover {
+    #sort-courses a:hover {
         background-color: #f0f0f0;
         cursor: pointer;
     }

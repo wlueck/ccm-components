@@ -83,19 +83,19 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             // sort courses
-            this.element.querySelector('#sort-decks-button').addEventListener('click', async () => {
-                const sortDecksContainer = this.element.querySelector("#sort-decks");
+            this.element.querySelector('#sort-courses-button').addEventListener('click', async () => {
+                const sortDecksContainer = this.element.querySelector("#sort-courses");
                 sortDecksContainer.classList.toggle("hidden");
             });
 
-            this.element.querySelector('#sort-decks-title').addEventListener('click', async () => {
+            this.element.querySelector('#sort-courses-title').addEventListener('click', async () => {
                 dataset.sortPreference = 'title';
                 const sortedDecks = dataset.sort((a, b) => a.title.localeCompare(b.title));
                 this.store.set({ key: user.key, value: sortedDecks });
                 this.initListView();
             });
 
-            this.element.querySelector('#sort-decks-deadline').addEventListener('click', async () => {
+            this.element.querySelector('#sort-courses-deadline').addEventListener('click', async () => {
                 dataset.sortPreference = 'deadline';
                 const sortedDecks = dataset.sort((a, b) => {
                     if (!a.deadline) return 1;
@@ -106,14 +106,14 @@ ccm.files["ccm.flash_cards.js"] = {
                 this.initListView();
             });
 
-            this.element.querySelector('#sort-decks-cardCount').addEventListener('click', async () => {
+            this.element.querySelector('#sort-courses-cardCount').addEventListener('click', async () => {
                 dataset.sortPreference = 'cardCount';
                 const sortedDecks = dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
                 this.store.set({ key: user.key, value: sortedDecks });
                 this.initListView();
             });
 
-            this.element.querySelector('#sort-decks-status').addEventListener('click', async () => {
+            this.element.querySelector('#sort-courses-status').addEventListener('click', async () => {
                 dataset.sortPreference = 'status';
                 const sortedDecks = dataset.sort((a, b) => {
                     const statusA = this.getCourseStatus(a);
@@ -324,7 +324,7 @@ ccm.files["ccm.flash_cards.js"] = {
         }
 
         this.fillCourseList = () => {
-            const listContainer = this.element.querySelector('#list-of-card-decks');
+            const listContainer = this.element.querySelector('#list-of-courses');
 
             // Sortierpräferenz anwenden
             if (dataset.sortPreference) {
@@ -380,9 +380,10 @@ ccm.files["ccm.flash_cards.js"] = {
                                                             <div id="card-options">
                                                                 <button id="course-option-btn" class="btn-low-style">...</button>
                                                                 <div id="course-options" class="hidden options">
-                                                                    <a id="edit-course">Lehrveranstaltung bearbeiten</a>
-                                                                    <a id="export-course">Lehrveranstaltung exportieren</a>
-                                                                    <a id="delete-course">Lehrveranstaltung löschen</a>
+                                                                    <a id="sort-deck">Sortieren</a>
+                                                                    <a id="edit-course">Bearbeiten</a>
+                                                                    <a id="export-course">Exportieren</a>
+                                                                    <a id="delete-course">Löschen</a>
                                                                 </div>
                                                             </div>
                                                             </div>
@@ -422,9 +423,9 @@ ccm.files["ccm.flash_cards.js"] = {
                                                                 <div id="card-options">
                                                                     <button id="option-btn" class="btn-low-style">...</button>
                                                                     <div id="deck-options" class="hidden options"> 
-                                                                        <a id="edit-deck">Stapel bearbeiten</a>
-                                                                        <a id="export-deck">Stapel exportieren</a>
-                                                                        <a id="delete-deck">Stapel löschen</a>
+                                                                        <a id="edit-deck">Bearbeiten</a>
+                                                                        <a id="export-deck">Exportieren</a>
+                                                                        <a id="delete-deck">Löschen</a>
                                                                     </div>
                                                                 </div>
                                                                 <div id="card-stats">
