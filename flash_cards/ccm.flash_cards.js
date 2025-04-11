@@ -89,12 +89,14 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             this.element.querySelector('#sort-decks-title').addEventListener('click', async () => {
+                dataset.sortPreference = 'title';
                 const sortedDecks = dataset.sort((a, b) => a.title.localeCompare(b.title));
                 this.store.set({ key: user.key, value: sortedDecks });
                 this.initListView();
             });
 
             this.element.querySelector('#sort-decks-deadline').addEventListener('click', async () => {
+                dataset.sortPreference = 'deadline';
                 const sortedDecks = dataset.sort((a, b) => {
                     if (!a.deadline) return 1;
                     if (!b.deadline) return -1;
@@ -105,12 +107,14 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             this.element.querySelector('#sort-decks-cardCount').addEventListener('click', async () => {
+                dataset.sortPreference = 'cardCount';
                 const sortedDecks = dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
                 this.store.set({ key: user.key, value: sortedDecks });
                 this.initListView();
             });
 
             this.element.querySelector('#sort-decks-status').addEventListener('click', async () => {
+                dataset.sortPreference = 'status';
                 const sortedDecks = dataset.sort((a, b) => {
                     const statusA = this.getCourseStatus(a);
                     const statusB = this.getCourseStatus(b);
@@ -321,6 +325,34 @@ ccm.files["ccm.flash_cards.js"] = {
 
         this.fillCourseList = () => {
             const listContainer = this.element.querySelector('#list-of-card-decks');
+
+            // Sortierpräferenz anwenden
+            if (dataset.sortPreference) {
+                switch (dataset.sortPreference) {
+                    case 'title':
+                        dataset.sort((a, b) => a.title.localeCompare(b.title));
+                        break;
+                    case 'deadline':
+                        dataset.sort((a, b) => {
+                            if (!a.deadline) return 1;
+                            if (!b.deadline) return -1;
+                            return a.deadline.localeCompare(b.deadline);
+                        });
+                        break;
+                    case 'cardCount':
+                        dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
+                        break;
+                    case 'status':
+                        dataset.sort((a, b) => {
+                            const statusA = this.getCourseStatus(a);
+                            const statusB = this.getCourseStatus(b);
+                            return statusB.easyPercent - statusA.easyPercent ||
+                                statusB.mediumPercent - statusA.mediumPercent ||
+                                statusA.hardPercent - statusB.hardPercent;
+                        });
+                        break;
+                }
+            }
 
             for (const course of dataset) {
                 const courseDeadlineHtml = course.deadline ? `<a>Deadline: ${course.deadline}</a>` : '';
