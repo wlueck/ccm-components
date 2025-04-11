@@ -83,11 +83,11 @@ button {
     #card-content {
         width: 60%;
     }
-
+/*
     #card-options {
         width: 10%;
     }
-
+*/
     #card-title {
         font-size: 1.5em;
         font-weight: bold;
@@ -104,6 +104,11 @@ button {
 
     #card-toggle-btn {
         font-size: 2em;
+        padding-bottom: 25px;
+    }
+
+    #card-description {
+        padding: 10px 0;
     }
 
 

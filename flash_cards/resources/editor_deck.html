@@ -8,20 +8,28 @@
     </select><br>
     <button class="btn-link-style" id="add-course-btn">Lehrveranstaltung hinzufügen</button><br>
     <div id="add-course-container" class="hidden">
-        <h4>Lehrveranstaltung hinzufügen</h4>
-        <label for="add-course-input">Lehrveranstaltung Titel:</label>
-        <input type="text" id="add-course-input" name="add_course" size="40"/>
-        <!--<input id="courseDeadlineInput" name="deadlineInput" type="date" class="hidden"/><br>
-        <textarea id="courseDescripitionInput" name="courseDescripitionInput" cols="25" rows="3" required></textarea><br>-->
-        <button id="submit-course">+</button>
-        <br>
+        <div id="add-course-form-small">
+            <h4>Lehrveranstaltung hinzufügen</h4>
+            <label for="add-course-input">Titel:</label>
+            <input type="text" id="add-course-input" name="add_course" size="40"/><br><br>
+
+            <label for="courseDescripitionInput">Beschreibung:</label>
+            <textarea id="courseDescripitionInput" name="courseDescripitionInput" cols="25" rows="3"></textarea><br><br>
+
+            <input type="checkbox" id="courseDeadline" name="courseDeadline">
+            <label for="courseDeadlineInput">Deadline</label><br><br>
+            <input id="courseDeadlineInput" name="courseDeadlineInput" type="date" class="hidden"/><br>
+
+            <button id="submit-course">Hinzufügen</button><br>
+            <br>
+        </div>
     </div>
 <br>
     <label for="name">Titel:</label><br>
     <input type="text" id="name" name="name" size="40" required/><br><br>
 
     <label for="description">Beschreibung:</label><br>
-    <textarea id="description" name="description" cols="34" rows="4" required></textarea><br><br>
+    <textarea id="description" name="description" cols="34" rows="4"></textarea><br><br>
 
     <input type="checkbox" id="deadline" name="deadline">
     <label for="deadline">Deadline</label><br><br>
