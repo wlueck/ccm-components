@@ -380,7 +380,12 @@ ccm.files["ccm.flash_cards.js"] = {
                                                             <div id="card-options">
                                                                 <button id="course-option-btn" class="btn-low-style">...</button>
                                                                 <div id="course-options" class="hidden options">
-                                                                    <a id="sort-deck">Sortieren</a>
+                                                                    <a id="sort-decks">Sortieren</a>
+                                                                        <div id="sort-deck-options" class="hidden options">
+                                                                            <a id="sort-deck-title">Nach Titel</a>
+                                                                            <a id="sort-deck-deadline">Nach Deadline</a>
+                                                                            <a id="sort-deck-cardCount">Nach Anzahl der Karten</a>
+                                                                        </div>                                          
                                                                     <a id="edit-course">Bearbeiten</a>
                                                                     <a id="export-course">Exportieren</a>
                                                                     <a id="delete-course">Löschen</a>
@@ -478,6 +483,35 @@ ccm.files["ccm.flash_cards.js"] = {
                 courseHtml.querySelector("#course-option-btn").addEventListener('click', (event) => {
                     const options = courseHtml.querySelector("#course-options");
                     options.classList.toggle('hidden');
+                });
+
+                courseHtml.querySelector("#sort-decks").addEventListener('click', async () => {
+                    courseHtml.querySelector("#sort-deck-options").classList.toggle("hidden");
+                });
+
+                courseHtml.querySelector("#sort-deck-title").addEventListener('click', async () => {
+                    course.sortPreference = 'title';
+                    course.cardDecks.sort((a, b) => a.title.localeCompare(b.title));
+                    await this.store.set({ key: user.key, value: dataset });
+                    this.initListView();
+                });
+
+                courseHtml.querySelector("#sort-deck-deadline").addEventListener('click', async () => {
+                    course.sortPreference = 'deadline';
+                    course.cardDecks.sort((a, b) => {
+                        if (!a.deadline) return 1;
+                        if (!b.deadline) return -1;
+                        return a.deadline.localeCompare(b.deadline);
+                    });
+                    await this.store.set({ key: user.key, value: dataset });
+                    this.initListView();
+                });
+
+                courseHtml.querySelector("#sort-deck-cardCount").addEventListener('click', async () => {
+                    course.sortPreference = 'cardCount';
+                    course.cardDecks.sort((a, b) => this.getDeckStatus(a).totalCards - this.getDeckStatus(b).totalCards);
+                    await this.store.set({ key: user.key, value: dataset });
+                    this.initListView();
                 });
 
                 courseHtml.querySelector("#edit-course").addEventListener('click', (event) => {

@@ -70,6 +70,7 @@ button {
         border-radius: 5px;
         padding: 10px;
         margin: 10px 0;
+        background-color: #d2e5db;
     }
 
     #card-header {
@@ -88,6 +89,30 @@ button {
         width: 10%;
     }
 */
+
+    #sort-deck-options {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        width: 150px;
+        z-index: 1000;
+    }
+
+    #sort-deck-options a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+    }
+
+    #sort-deck-options a:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
     #card-title {
         font-size: 1.5em;
         font-weight: bold;
@@ -117,6 +142,9 @@ button {
     }
 
     #card-decks {
+        #card {
+            background-color: #fcefd3;
+        }
     }
 
 
