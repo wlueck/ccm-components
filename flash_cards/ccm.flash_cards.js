@@ -514,7 +514,10 @@ ccm.files["ccm.flash_cards.js"] = {
             }
 
             for (const course of dataset) {
-                const courseDeadlineHtml = course.deadline ? `<a>Deadline: ${course.deadline}</a>` : '';
+                const isDeadlineExpired = course.deadline && new Date(course.deadline.split('.').reverse().join('-')) < new Date();
+                const courseDeadlineHtml = course.deadline
+                    ? `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${course.deadline}</a>`
+                    : '';
 
                 const courseStatus = this.getCourseStatus(course);
                 const courseStatusString = courseStatus.easy + ' / ' + courseStatus.medium + ' / ' + courseStatus.hard;
@@ -565,7 +568,10 @@ ccm.files["ccm.flash_cards.js"] = {
                 const courseHtml = this.ccm.helper.html(courseHtmlString);
 
                 for (const deck of course.cardDecks) {
-                    const deckDeadlineHtml = deck.deadline ? `<a>Deadline: ${deck.deadline}</a>` : '';
+                    const isDeckDeadlineExpired = deck.deadline && new Date(deck.deadline.split('.').reverse().join('-')) < new Date();
+                    const deckDeadlineHtml = deck.deadline
+                        ? `<a style="color: ${isDeckDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${deck.deadline}</a>`
+                        : '';
 
                     const deckStatus = this.getDeckStatus(deck);
                     const deckStatusString = deckStatus.easy + ' / ' + deckStatus.medium + ' / ' + deckStatus.hard;
