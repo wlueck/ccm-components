@@ -128,9 +128,9 @@ ccm.files["ccm.flash_cards.js"] = {
 
         }
 
-        this.initEditorDeckView = () => {
+        this.initEditorDeckView = (deckToEdit) => {
             this.element.querySelector("#content").innerHTML = this.html.editor_deck;
-            this.element.querySelector('.headline').innerHTML = "Karteikartenstapel erstellen";
+            this.element.querySelector('.headline').innerHTML = deckToEdit? "Karteikartenstapel bearbeiten" : "Karteikartenstapel erstellen";
             this.element.querySelector('.sub-headline').innerHTML = "";
 
             this.element.querySelector("#back-button").addEventListener("click", (event) => {
@@ -142,6 +142,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 addCard();
             });
 
+            const form = this.element.querySelector("#add-card-deck-form");
             const checkbox = this.element.querySelector('#deadline');
             const textFieldContainer = this.element.querySelector('#deadlineInput');
 
@@ -161,6 +162,56 @@ ccm.files["ccm.flash_cards.js"] = {
                 option.textContent = course.title;
                 courseSelect.append(option);
             });
+
+            if (deckToEdit) {
+                const courseSelect = this.element.querySelector("#course");
+                const selectedCourse = dataset.find(course => course.cardDecks.some(deck => deck.title === deckToEdit.title));
+
+                if (selectedCourse) {
+                    courseSelect.value = selectedCourse.title;
+                }
+
+                form.name.value = deckToEdit.title;
+                form.description.value = deckToEdit.description || '';
+
+                if (deckToEdit.deadline) {
+                    const deadlineCheckbox = this.element.querySelector('#deadline');
+                    const deadlineInput = this.element.querySelector('#deadlineInput');
+
+                    deadlineCheckbox.checked = true;
+                    deadlineInput.classList.remove('hidden');
+
+                    const [day, month, year] = deckToEdit.deadline.split('.');
+                    const dateObj = new Date(year, month-1, day);
+                    deadlineInput.value = dateObj.toISOString().split('T')[0];
+                }
+
+                this.element.querySelector("#question").value = deckToEdit.cards[0].question;
+                this.element.querySelector("#answer").value = deckToEdit.cards[0].answer;
+                deckToEdit.cards.shift();
+
+                //todo mit addcard
+                deckToEdit.cards.forEach(card => {
+                    const htmlCardString = `
+                        <div id="card">
+                            <div class="input-group">
+                                <label for="question">Frage:</label>
+                                <textarea id="question" name="question" cols="34" rows="5">${card.question}</textarea>
+                            </div>
+                            <div class="input-group">
+                                <label for="answer">Antwort:</label>
+                                <textarea id="answer" name="answer" cols="34" rows="5">${card.answer}</textarea>
+                            </div>
+                            <button id="delete-card-button">Karte löschen</button>
+                        </div>`;
+                    const htmlCard = this.ccm.helper.html(htmlCardString);
+                    htmlCard.querySelector("#delete-card-button").addEventListener("click", (event) => {
+                        htmlCard.remove();
+                    });
+                    this.element.querySelector("#cards").append(htmlCard);
+                });
+
+            }
 
             const addCourseBtn = this.element.querySelector("#add-course-btn");
             const addCourseContainer = this.element.querySelector("#add-course-container");
@@ -187,10 +238,15 @@ ccm.files["ccm.flash_cards.js"] = {
             const submitCourseBtn = this.element.querySelector("#submit-course");
             submitCourseBtn.addEventListener("click", async (event) => {
                 event.preventDefault();
+                if (!this.element.querySelector("#add-course-input").value) {
+                    alert("Bitte füllen Sie alle erforderlichen Felder aus!");
+                    return;
+                }
 
                 const deadlineInput = this.element.querySelector("#courseDeadlineInput").value;
-                let formattedDate;
-                if (deadlineInput) {
+                const courseDeadline = this.element.querySelector("#courseDeadline");
+                let formattedDate = '';
+                if (courseDeadline.checked && deadlineInput) {
                     formattedDate = new Intl.DateTimeFormat('de-DE').format(new Date(deadlineInput));
                 }
 
@@ -208,15 +264,27 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
                 dataset.push(newCourse);
                 await this.store.set({key: user.key, value: dataset});
+
+                // close the add course container and reset the input fields
+                addCourseContainer.classList.add("hidden");
+                this.element.querySelector("#add-course-input").value = "";
+                this.element.querySelector("#courseDescripitionInput").value = "";
+                this.element.querySelector("#courseDeadlineInput").value = "";
+                this.element.querySelector("#courseDeadline").checked = false;
+                this.element.querySelector("#courseDeadlineInput").classList.add("hidden");
+
+                // update the course select options
+                const courseSelect = this.element.querySelector("#course");
+                const newOption = document.createElement("option");
+                newOption.value = newCourse.title;
+                newOption.textContent = newCourse.title;
+                courseSelect.append(newOption);
             });
 
 
             const submitButton = this.element.querySelector("#submit-deck");
+            submitButton.innerHTML = deckToEdit? "Ändern" : "Erstellen";
             submitButton.addEventListener("click", async (event) => {
-                await saveDeck(event);
-            });
-
-            const saveDeck = async (event) => {
                 const form = this.element.querySelector("#add-card-deck-form");
                 if (!form.checkValidity()) {
                     event.preventDefault();
@@ -224,14 +292,27 @@ ccm.files["ccm.flash_cards.js"] = {
                     return;
                 }
                 event.preventDefault();
+                if (deckToEdit) await updateDeck(form, deckToEdit);
+                else await saveDeck(form);
+            });
 
+            const saveDeck = async (form) => {
                 const course = form.course.value;
+
+                let formattedDate = '';
+                if (form.deadline.checked) {
+                    const deadlineInput = form.deadlineInput.value;
+                    if (deadlineInput) {
+                        const dateObj = new Date(deadlineInput);
+                        formattedDate = dateObj.toLocaleDateString('de-DE');
+                    }
+                }
 
                 let newDeck = {
                     id: "",
                     title: form.name.value,
                     description: form.description.value,
-                    deadline: form.deadlineInput.value,
+                    deadline: formattedDate,
                     cards: []
                 };
 
@@ -253,41 +334,101 @@ ccm.files["ccm.flash_cards.js"] = {
                         alert("Bitte füllen Sie alle Felder aus!");
                         valid = false;
                     }
+                });
+
+                if (valid) {
+                    const courseIndex = dataset.findIndex(coursel => coursel.title === course);
+                    dataset[courseIndex].cardDecks.push(newDeck);
+                    await this.store.set({key: user.key, value: dataset});
+                    this.initListView();
+                }
+            }
+
+            const updateDeck = async (form, deckToEdit) => {
+                const course = form.course.value;
+
+                let formattedDate = '';
+                if (form.deadline.checked) {
+                    const deadlineInput = form.deadlineInput.value;
+                    if (deadlineInput) {
+                        const dateObj = new Date(deadlineInput);
+                        formattedDate = dateObj.toLocaleDateString('de-DE');
+                    }
+                }
+
+                let updatedDeck = {
+                    id: deckToEdit.id,
+                    title: form.name.value,
+                    description: form.description.value,
+                    deadline: formattedDate,
+                    cards: []
+                };
+
+                if (deckToEdit.title !== updatedDeck.title) {
+                    const decks = dataset.filter(deck => deck.title === course)[0];
+                    if (decks && decks.cardDecks.filter(deck => deck.title === updatedDeck.title).length > 0) {
+                        alert("Ein Stapel mit dem Namen existiert bereits! Wählen Sie Bitte einen anderen Namen.");
+                        return;
+                    }
+                }
+
+                const cards = this.element.querySelectorAll("#card");
+                let valid = true;
+                cards.forEach(card => {
+                    let question = card.querySelector("#question").value;
+                    let answer = card.querySelector("#answer").value;
+
+                    if (question !== "" && answer !== "") {
+                        updatedDeck.cards.push({question: question, answer: answer, status: "hard"});
+                    } else if (question !== "" && answer === "" || question === "" && answer !== "") {
+                        alert("Bitte füllen Sie alle Felder aus!");
+                        valid = false;
+                    }
 
                 });
 
                 if (valid) {
-                    const isNewCourse = dataset.filter(coursel => coursel.title === course).length === 0;
-                    if (isNewCourse) {
-                        this.store.set({key: user.key, value: [...dataset, {title: course, cardDecks: [newDeck]}]});
-                    } else {
-                        const courseIndex = dataset.findIndex(coursel => coursel.title === course);
-                        dataset[courseIndex].cardDecks.push(newDeck);
-                        await this.store.set({key: user.key, value: dataset});
+                    // Find the old course and remove the deck from its cardDecks
+                    const oldCourseIndex = dataset.findIndex(coursel => coursel.cardDecks.some(deck => deck.id === deckToEdit.id));
+                    if (oldCourseIndex !== -1) {
+                        dataset[oldCourseIndex].cardDecks = dataset[oldCourseIndex].cardDecks.filter(deck => deck.id !== deckToEdit.id);
                     }
+
+                    // Find the new course and add the updated deck
+                    const newCourseIndex = dataset.findIndex(coursel => coursel.title === course);
+                    if (newCourseIndex !== -1) {
+                        const deckIndex = dataset[newCourseIndex].cardDecks.findIndex(deck => deck.id === deckToEdit.id);
+                        if (deckIndex !== -1) {
+                            dataset[newCourseIndex].cardDecks[deckIndex] = updatedDeck;
+                        } else {
+                            dataset[newCourseIndex].cardDecks.push(updatedDeck);
+                        }
+                    }
+
+                    await this.store.set({ key: user.key, value: dataset });
                     this.initListView();
                 }
             }
 
             const addCard = () => {
-                const htmlCardString = `
-                    <div id="card">
-                        <div class="input-group">
-                            <label for="question">Frage:</label>
-                            <textarea id="question" name="question" cols="34" rows="5"></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label for="answer">Antwort:</label>
-                            <textarea id="answer" name="answer" cols="34" rows="5"></textarea>
-                        </div>
-                        <button id="delete-card-button">Karte löschen</button>
-                    </div>`;
-                const htmlCard = this.ccm.helper.html(htmlCardString);
-                htmlCard.querySelector("#delete-card-button").addEventListener("click", (event) => {
-                    htmlCard.remove();
-                });
-                this.element.querySelector("#cards").append(htmlCard);
-            }
+            const htmlCardString = `
+                <div id="card">
+                    <div class="input-group">
+                        <label for="question">Frage:</label>
+                        <textarea id="question" name="question" cols="34" rows="5"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="answer">Antwort:</label>
+                        <textarea id="answer" name="answer" cols="34" rows="5"></textarea>
+                    </div>
+                    <button id="delete-card-button">Karte löschen</button>
+                </div>`;
+            const htmlCard = this.ccm.helper.html(htmlCardString);
+            htmlCard.querySelector("#delete-card-button").addEventListener("click", (event) => {
+                htmlCard.remove();
+            });
+            this.element.querySelector("#cards").append(htmlCard);
+        }
         }
 
         this.initEditorCourseView = (courseToEdit) => {
@@ -300,14 +441,14 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             const form = this.element.querySelector("#add-course-form");
+            const deadlineCheckbox = this.element.querySelector('#deadline');
+            const deadlineInput = this.element.querySelector('#deadlineInput');
 
             if (courseToEdit) {
                 form.name.value = courseToEdit.title;
                 form.description.value = courseToEdit.description || '';
 
                 if (courseToEdit.deadline) {
-                    const deadlineCheckbox = this.element.querySelector('#deadline');
-                    const deadlineInput = this.element.querySelector('#deadlineInput');
 
                     deadlineCheckbox.checked = true;
                     deadlineInput.classList.remove('hidden');
@@ -318,13 +459,11 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             }
 
-            const checkbox = this.element.querySelector('#deadline');
-            const textFieldContainer = this.element.querySelector('#deadlineInput');
-            checkbox.addEventListener('change', function (event) {
+            deadlineCheckbox.addEventListener('change', function (event) {
                 if (event.currentTarget.checked) {
-                    textFieldContainer.classList.remove('hidden');
+                    deadlineInput.classList.remove('hidden');
                 } else {
-                    textFieldContainer.classList.add('hidden');
+                    deadlineInput.classList.add('hidden');
                 }
             });
 
@@ -473,7 +612,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     });
 
                     cardDeckHtml.querySelector("#edit-deck").addEventListener('click', (event) => {
-                        //todo edit deck
+                        this.initEditorDeckView(deck);
                     });
 
                     cardDeckHtml.querySelector("#export-deck").addEventListener('click', (event) => {
