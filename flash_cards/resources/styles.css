@@ -93,7 +93,8 @@ button {
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         padding: 5px 0;
         width: 150px;
-        z-index: 1000;
+        left: 150px;
+        top: 0;
     }
 
     #sort-deck-options a {
