@@ -62,24 +62,107 @@ ccm.files["ccm.flash_cards.js"] = {
         }
 
         this.initListViewButtons = () => {
-            this.element.querySelector('#add-deck-button').addEventListener('click', async () => {
+            this.element.querySelector('#add-deck-button').addEventListener('click', () => {
                 this.element.querySelector("#add-deck-options").classList.toggle('hidden');
-                this.element.querySelector('#create-deck').addEventListener('click', async () => {
-                    this.initEditorDeckView();
+            });
+
+            this.element.querySelector('#create-deck').addEventListener('click', () => {
+                this.initEditorDeckView();
+            });
+
+            this.element.querySelector('#import-deck').addEventListener('click', () => {
+                this.element.querySelector("#add-deck-options").classList.toggle('hidden');
+
+                if (document.querySelector('#course-select-dialog')) {
+                    document.querySelector('#course-select-dialog').remove();
+                }
+
+                const courseSelectDialog = document.createElement('div');
+                courseSelectDialog.id = 'course-select-dialog';
+                courseSelectDialog.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 0 20px 20px 20px; border: 1px solid #ccc; border-radius: 5px; z-index: 1000;';
+                courseSelectDialog.innerHTML = `
+                    <h3>Stapel importieren</h3>
+                    <label>Zugehöriger Kurs:</label><br>
+                    <select id="course-select" style="margin: 10px 0; padding: 5px">
+                        ${dataset.map(course => `<option value="${course.title}">${course.title}</option>`).join('')}
+                    </select>
+                    <div style="display: flex; gap: 10px; justify-content: flex-start; margin-top: 15px;">
+                        <button id="confirm-import">Datei auswählen</button>
+                        <button id="cancel-import">Abbrechen</button>
+                    </div>
+                `;
+
+                document.body.appendChild(courseSelectDialog);
+
+                document.querySelector('#cancel-import').addEventListener('click', () => {
+                    courseSelectDialog.remove();
                 });
 
-                this.element.querySelector('#import-deck').addEventListener('click', async () => {
-                    // todo import deck
-                });
+                document.querySelector('#confirm-import').addEventListener('click', () => {
+                    const selectedCourse = document.querySelector('#course-select').value;
+                    courseSelectDialog.remove();
 
-                this.element.querySelector('#create-course').addEventListener('click', async () => {
-                    this.initEditorCourseView();
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.json';
+                    input.onchange = async (event) => {
+                        const file = event.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                            try {
+                                const deck = JSON.parse(e.target.result);
+                                if (!deck.title || !deck.cards || !Array.isArray(deck.cards)) {
+                                    throw new Error('Invalid deck format');
+                                }
+                                const courseIndex = dataset.findIndex(c => c.title === selectedCourse);
+                                if (dataset[courseIndex].cardDecks.some(d => d.title === deck.title)) {
+                                    alert('Ein Stapel mit diesem Namen existiert bereits im ausgewählten Kurs');
+                                    return;
+                                }
+                                dataset[courseIndex].cardDecks.push(deck);
+                                await this.store.set({key: user.key, value: dataset});
+                                this.initListView();
+                            } catch (error) {
+                                alert('Fehler beim Importieren: Ungültiges Dateiformat');
+                            }
+                        };
+                        reader.readAsText(file);
+                    };
+                    input.click();
                 });
+            });
 
-                this.element.querySelector('#import-course').addEventListener('click', async () => {
-                    // todo import course
-                });
+            this.element.querySelector('#create-course').addEventListener('click', () => {
+                this.initEditorCourseView();
+            });
 
+            this.element.querySelector('#import-course').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = async (event) => {
+                    const file = event.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        try {
+                            const course = JSON.parse(e.target.result);
+                            if (!course.title || !course.cardDecks || !Array.isArray(course.cardDecks)) {
+                                throw new Error('Invalid course format');
+                            }
+                            if (dataset.some(c => c.title === course.title)) {
+                                alert('A course with this name already exists');
+                                return;
+                            }
+                            dataset.push(course);
+                            await this.store.set({key: user.key, value: dataset});
+                            this.initListView();
+                        } catch (error) {
+                            alert('Error importing course: Invalid file format');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
             });
 
             // sort courses
@@ -125,7 +208,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 this.store.set({ key: user.key, value: sortedDecks });
                 this.initListView();
             });
-
         }
 
         this.initEditorDeckView = (deckToEdit) => {
@@ -538,7 +620,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                                                             <button id="card-toggle-btn" class="btn-low-style">⌄</button>
 
-                                                            <button>Gesamten Kurs lernen</button>
+                                                            <button id="start-course-btn">Gesamten Kurs lernen</button>
                                                             <div id="card-options">
                                                                 <button id="course-option-btn" class="btn-low-style">...</button>
                                                                 <div id="course-options" class="hidden options">
@@ -622,7 +704,23 @@ ccm.files["ccm.flash_cards.js"] = {
                     });
 
                     cardDeckHtml.querySelector("#export-deck").addEventListener('click', (event) => {
-                        //todo export deck
+                        const deckToExport = {
+                            id: deck.id,
+                            title: deck.title,
+                            description: deck.description,
+                            deadline: deck.deadline,
+                            cards: deck.cards
+                        };
+
+                        const blob = new Blob([JSON.stringify(deckToExport, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${deck.title.replace(/\s+/g, '_')}.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
                     });
 
                     cardDeckHtml.querySelector("#delete-deck").addEventListener('click', (event) => {
@@ -643,6 +741,11 @@ ccm.files["ccm.flash_cards.js"] = {
                     const decks = courseHtml.querySelector('#card-decks');
                     decks.classList.toggle('hidden');
                     toggleCardButton.textContent = decks.classList.contains('hidden') ? '⌄' : '⌃';
+                });
+
+                courseHtml.querySelector("#start-course-btn").addEventListener('click', (event) => {
+                    // todo start course
+                    //this.startCourse();
                 });
 
                 courseHtml.querySelector("#course-option-btn").addEventListener('click', (event) => {
@@ -684,7 +787,22 @@ ccm.files["ccm.flash_cards.js"] = {
                 });
 
                 courseHtml.querySelector("#export-course").addEventListener('click', (event) => {
-                    //todo export deck
+                    const courseToExport = {
+                        title: course.title,
+                        description: course.description,
+                        deadline: course.deadline,
+                        cardDecks: course.cardDecks
+                    };
+
+                    const blob = new Blob([JSON.stringify(courseToExport, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${course.title.replace(/\s+/g, '_')}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
                 });
 
                 courseHtml.querySelector("#delete-course").addEventListener('click', (event) => {
