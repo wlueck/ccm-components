@@ -386,7 +386,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
 
                 let newDeck = {
-                    id: "",
+                    id: this.ccm.helper.generateKey(),
                     title: form.name.value,
                     description: form.description.value,
                     deadline: formattedDate,
@@ -735,7 +735,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 courseHtml.querySelector("#start-course-btn").addEventListener('click', (event) => {
                     // todo start course
-                    //this.startCourse();
+                    this.startCourse(course.title);
                 });
 
                 courseHtml.querySelector("#course-option-btn").addEventListener('click', (event) => {
@@ -917,119 +917,131 @@ ccm.files["ccm.flash_cards.js"] = {
             return calculateStatus(deck.cards);
         };
 
-        this.startDeck = (courseTitle, deck_id) => {
+        this.startDeck = (courseTitle, deckId) => {
             this.element.querySelector("#content").innerHTML = this.html.card;
 
-            const currentCourse = dataset.filter(course => course.title === courseTitle)[0];
-            console.log(currentCourse)
-            const currentCardDeck = dataset.filter(course => course.title === courseTitle)[0].cardDecks.filter(deck => deck.id === deck_id)[0];
-            console.log(currentCardDeck)
+            const currentCourse = dataset.find(course => course.title === courseTitle);
+            const currentCardDeck = currentCourse.cardDecks.find(deck => deck.id === deckId);
 
             this.element.querySelector(".headline").innerHTML = currentCardDeck.title;
-            this.element.querySelector(".sub-headline").innerHTML = "(" + currentCourse.title + ")";
-            this.element.querySelector('#description').innerHTML = currentCardDeck.description;
+            this.element.querySelector(".sub-headline").innerHTML = `(${currentCourse.title})`;
+            this.element.querySelector('#description').innerHTML = currentCardDeck.description || '';
             this.element.querySelector('#max_number_cards').innerHTML = currentCardDeck.cards.length.toString();
 
-            this.element.querySelector("#back-button").addEventListener("click", (event) => {
+            this.element.querySelector("#back-button").addEventListener("click", () => {
                 this.initListView();
             });
 
-            const initShowQuestionButton = (currentCard) => {
-                this.element.querySelector('#question_answer_text').innerHTML = currentCard.question;
-                this.element.querySelector('#turn_around_button').onclick = function () {
-                    initShowAnswerButton(currentCard)
-                };
-                this.element.querySelector('#difficulty_buttons').classList.remove('answerStyle');
-                this.element.querySelector('#difficulty_buttons').classList.add('questionStyle');
+            this.loadCardDeck(currentCourse, currentCardDeck);
+        };
+
+        this.startCourse = (courseTitle) => {
+            this.element.querySelector("#content").innerHTML = this.html.card;
+
+            const currentCourse = dataset.find(course => course.title === courseTitle);
+            const allCards = currentCourse.cardDecks.flatMap(deck => deck.cards.map(card => ({
+                card,
+                deckTitle: deck.title
+            })));
+
+            if (allCards.length === 0) {
+                alert("Dieser Kurs enthält keine Karten!");
+                this.initListView();
+                return;
             }
 
-            const initShowAnswerButton = (currentCard) => {
-                this.element.querySelector('#question_answer_text').innerHTML = currentCard.answer;
-                this.element.querySelector('#turn_around_button').onclick = function () {
-                    initShowQuestionButton(currentCard)
-                };
-                this.element.querySelector('#difficulty_buttons').classList.remove('questionStyle');
-                this.element.querySelector('#difficulty_buttons').classList.add('answerStyle');
-            }
+            this.element.querySelector(".headline").innerHTML = currentCourse.title;
+            this.element.querySelector(".sub-headline").innerHTML = "Gesamter Kurs";
+            this.element.querySelector('#description').innerHTML = currentCourse.description || '';
+            this.element.querySelector('#max_number_cards').innerHTML = allCards.length.toString();
 
-            const loadCard = (cardDeck, cardIndex) => {
-                if (cardIndex === 0) {
-                    this.element.querySelector('#previous_card_button').classList.add("unseen");
-                } else {
-                    this.element.querySelector('#previous_card_button').classList.remove("unseen");
-                }
+            this.element.querySelector("#back-button").addEventListener("click", () => {
+                this.initListView();
+            });
 
-                if (cardIndex === cardDeck.cards.length - 1) {
-                    this.element.querySelector('#next_card_button').classList.add("unseen");
-                } else {
-                    this.element.querySelector('#next_card_button').classList.remove("unseen");
-                }
+            this.loadCardDeck(currentCourse, { cards: allCards, title: currentCourse.title });
+        };
 
-                const currentCard = cardDeck.cards[cardIndex];
-                this.element.querySelector('#current_card_number').innerHTML = (cardIndex + 1).toString()
+        this.loadCardDeck = (course, cardDeck) => {
+            const cards = cardDeck.cards.map(card => card.card ? card : { card, deckTitle: cardDeck.title });
+
+            const updateCardDisplay = (index) => {
+                if (index < 0 || index >= cards.length) return;
+
+                const currentCard = cards[index].card;
+                const deckTitle = cards[index].deckTitle;
+
+                // Update navigation buttons
+                this.element.querySelector('#previous_card_button').classList.toggle("unseen", index === 0);
+                this.element.querySelector('#next_card_button').classList.toggle("unseen", index === cards.length - 1);
+                this.element.querySelector('#current_card_number').innerHTML = (index + 1).toString();
+
+                // Show question initially
                 this.element.querySelector('#question_answer_text').innerHTML = currentCard.question;
-
                 this.element.querySelector('#difficulty_buttons').classList.remove('answerStyle');
                 this.element.querySelector('#difficulty_buttons').classList.add('questionStyle');
 
-                this.element.querySelector('#turn_around_button').onclick = function () {
-                    initShowAnswerButton(currentCard)
+                const difficultyButtons = {
+                    easy: this.element.querySelector('#easy'),
+                    medium: this.element.querySelector('#medium'),
+                    hard: this.element.querySelector('#hard')
                 };
-                this.element.querySelector('#next_card_button').onclick = function () {
-                    loadCard(cardDeck, cardIndex + 1)
-                };
-                this.element.querySelector('#previous_card_button').onclick = function () {
-                    loadCard(cardDeck, cardIndex - 1)
-                };
+                // Reset selected-difficulty class for all difficulty buttons
+                for (const btn of Object.values(difficultyButtons)) {
+                    btn.classList.remove("selected-difficulty");
+                }
 
-                let easyButton = this.element.querySelector('#easy');
-                let mediumButton = this.element.querySelector('#middle');
-                let hardButton = this.element.querySelector('#hard');
-
-                easyButton.onclick = async () => {
-                    easyButton.classList.add("selected-difficulty");
-                    mediumButton.classList.remove("selected-difficulty");
-                    hardButton.classList.remove("selected-difficulty");
-
-                    const courseIndex = dataset.findIndex(course => course.title === courseTitle);
-                    const deckIndex = dataset[courseIndex].cardDecks.findIndex(deck => deck.id === deck_id);
-
-                    dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = "easy";
-                    await this.store.set({key: user.key, value: dataset});
+                // Set up turn around button
+                this.element.querySelector('#turn_around_button').onclick = () => {
+                    if (this.element.querySelector('#question_answer_text').innerHTML === currentCard.question) {
+                        this.element.querySelector('#question_answer_text').innerHTML = currentCard.answer;
+                        this.element.querySelector('#difficulty_buttons').classList.remove('questionStyle');
+                        this.element.querySelector('#difficulty_buttons').classList.add('answerStyle');
+                    } else {
+                        this.element.querySelector('#question_answer_text').innerHTML = currentCard.question;
+                        this.element.querySelector('#difficulty_buttons').classList.remove('answerStyle');
+                        this.element.querySelector('#difficulty_buttons').classList.add('questionStyle');
+                    }
                 };
 
-                mediumButton.onclick = async () => {
-                    mediumButton.classList.add("selected-difficulty");
-                    easyButton.classList.remove("selected-difficulty");
-                    hardButton.classList.remove("selected-difficulty");
+                // Set up navigation buttons
+                this.element.querySelector('#next_card_button').onclick = () => updateCardDisplay(index + 1);
+                this.element.querySelector('#previous_card_button').onclick = () => updateCardDisplay(index - 1);
 
-                    const courseIndex = dataset.findIndex(course => course.title === courseTitle);
-                    const deckIndex = dataset[courseIndex].cardDecks.findIndex(deck => deck.id === deck_id);
+                for (const [difficulty, button] of Object.entries(difficultyButtons)) {
+                    button.onclick = async () => {
+                        // Reset selected-difficulty class for all difficulty buttons
+                        for (const btn of Object.values(difficultyButtons)) {
+                            btn.classList.remove("selected-difficulty");
+                        }
+                        button.classList.add("selected-difficulty");
 
-                    dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = "medium";
-                    await this.store.set({key: user.key, value: dataset});
+                        const courseIndex = dataset.findIndex(c => c.title === course.title);
+                        const deckIndex = cardDeck.title === course.title ? -1 :
+                            dataset[courseIndex].cardDecks.findIndex(d => d.title === deckTitle);
 
-                };
+                        if (deckIndex === -1) {
+                            // Kursmodus: Finde das richtige Deck
+                            const cardIndex = cards.findIndex(c => c.card === currentCard);
+                            cards[cardIndex].card.status = difficulty;
+                        } else {
+                            const cardIndex = dataset[courseIndex].cardDecks[deckIndex].cards.findIndex(c =>
+                                c.question === currentCard.question && c.answer === currentCard.answer);
+                                dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = difficulty;
+                        }
 
-                hardButton.onclick = async () => {
-                    hardButton.classList.add("selected-difficulty");
-                    mediumButton.classList.remove("selected-difficulty");
-                    easyButton.classList.remove("selected-difficulty");
-
-                    const courseIndex = dataset.findIndex(course => course.title === courseTitle);
-                    const deckIndex = dataset[courseIndex].cardDecks.findIndex(deck => deck.id === deck_id);
-
-                    dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = "hard";
-                    await this.store.set({key: user.key, value: dataset});
-
-                };
+                        await this.store.set({ key: user.key, value: dataset });
+                    };
+                }
             };
 
-            const loadCardDeck = (course, cardDeck) => {
-                loadCard(cardDeck, 0);
-            };
-
-            loadCardDeck(currentCourse, currentCardDeck);
-        }
+            if (cards.length > 0) {
+                updateCardDisplay(0);
+            } else {
+                this.element.querySelector('#question_answer_text').innerHTML = "Keine Karten vorhanden";
+                this.element.querySelector('#difficulty_buttons').classList.add('hidden');
+                this.element.querySelector('#turn_around_button').classList.add('hidden');
+            }
+        };
     },
 };
