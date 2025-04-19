@@ -278,8 +278,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     deadlineInput.classList.remove('hidden');
 
                     const [day, month, year] = deckToEdit.deadline.split('.');
-                    const dateObj = new Date(year, month-1, day);
-                    deadlineInput.value = dateObj.toISOString().split('T')[0];
+                    deadlineInput.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                 }
 
                 if (deckToEdit.cards.length > 0) {
@@ -343,13 +342,14 @@ ccm.files["ccm.flash_cards.js"] = {
                 const courseDeadline = this.element.querySelector("#courseDeadline");
                 let formattedDate = '';
                 if (courseDeadline.checked && deadlineInput) {
-                    formattedDate = new Intl.DateTimeFormat('de-DE').format(new Date(deadlineInput));
+                    const [year, month, day] = deadlineInput.split('-');
+                    formattedDate = `${day}.${month}.${year}`;
                 }
 
                 let newCourse = {
                     id: this.ccm.helper.generateKey(),
                     title: this.element.querySelector("#add-course-input").value,
-                    description: this.element.querySelector("#courseDescripitionInput").value,
+                    description: this.element.querySelector("#courseDescriptionInput").value,
                     deadline: formattedDate,
                     cardDecks: []
                 };
@@ -365,7 +365,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 // close the add course container and reset the input fields
                 addCourseContainer.classList.add("hidden");
                 this.element.querySelector("#add-course-input").value = "";
-                this.element.querySelector("#courseDescripitionInput").value = "";
+                this.element.querySelector("#courseDescriptionInput").value = "";
                 this.element.querySelector("#courseDeadlineInput").value = "";
                 this.element.querySelector("#courseDeadline").checked = false;
                 this.element.querySelector("#courseDeadlineInput").classList.add("hidden");
@@ -396,12 +396,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 const courseId = form.course.value;
 
                 let formattedDate = '';
-                if (form.deadline.checked) {
-                    const deadlineInput = form.deadlineInput.value;
-                    if (deadlineInput) {
-                        const dateObj = new Date(deadlineInput);
-                        formattedDate = dateObj.toLocaleDateString('de-DE');
-                    }
+                if (form.deadline.checked && form.deadlineInput.value) {
+                    const [year, month, day] = form.deadlineInput.value.split('-');
+                    formattedDate = `${day}.${month}.${year}`;
                 }
 
                 let newDeck = {
@@ -452,12 +449,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 const courseId = form.course.value;
 
                 let formattedDate = '';
-                if (form.deadline.checked) {
-                    const deadlineInput = form.deadlineInput.value;
-                    if (deadlineInput) {
-                        const dateObj = new Date(deadlineInput);
-                        formattedDate = dateObj.toLocaleDateString('de-DE');
-                    }
+                if (form.deadline.checked && form.deadlineInput.value) {
+                    const [year, month, day] = form.deadlineInput.value.split('-');
+                    formattedDate = `${day}.${month}.${year}`;
                 }
 
                 let updatedDeck = {
@@ -559,8 +553,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     deadlineInput.classList.remove('hidden');
 
                     const [day, month, year] = courseToEdit.deadline.split('.');
-                    const dateObj = new Date(`${year}-${month}-${day}`);
-                    deadlineInput.value = dateObj.toISOString().split('T')[0];
+                    deadlineInput.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                 }
             }
 
@@ -619,9 +612,12 @@ ccm.files["ccm.flash_cards.js"] = {
             }
 
             for (const course of dataset) {
-                const isDeadlineExpired = course.deadline && new Date(course.deadline.split('.').reverse().join('-')) < new Date();
-                const courseDeadlineHtml = course.deadline
-                    ? `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${course.deadline}</a>`
+                const isDeadlineExpired = course.deadline && (() => {
+                    const [day, month, year] = course.deadline.split('.');
+                    return new Date(year, month - 1, day) < new Date();
+                })();
+                const courseDeadlineHtml = course.deadline ?
+                    `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${course.deadline}</a>`
                     : '';
 
                 const courseStatus = this.getCourseStatus(course);
@@ -671,9 +667,12 @@ ccm.files["ccm.flash_cards.js"] = {
                 const courseHtml = this.ccm.helper.html(courseHtmlString);
 
                 for (const deck of course.cardDecks) {
-                    const isDeckDeadlineExpired = deck.deadline && new Date(deck.deadline.split('.').reverse().join('-')) < new Date();
-                    const deckDeadlineHtml = deck.deadline
-                        ? `<a style="color: ${isDeckDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${deck.deadline}</a>`
+                    const isDeckDeadlineExpired = deck.deadline && (() => {
+                        const [day, month, year] = deck.deadline.split('.');
+                        return new Date(year, month - 1, day) < new Date();
+                    })();
+                    const deckDeadlineHtml = deck.deadline ?
+                        `<a style="color: ${isDeckDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${deck.deadline}</a>`
                         : '';
 
                     const deckStatus = this.getDeckStatus(deck);
@@ -868,11 +867,9 @@ ccm.files["ccm.flash_cards.js"] = {
 
         this.addCourse = async (form) => {
             let formattedDate = '';
-            if (form.deadline.checked) {
-                const deadlineInput = form.deadlineInput.value;
-                if (deadlineInput) {
-                    formattedDate = new Intl.DateTimeFormat('de-DE').format(new Date(deadlineInput));
-                }
+            if (form.deadline.checked && form.deadlineInput.value) {
+                const [year, month, day] = form.deadlineInput.value.split('-');
+                formattedDate = `${day}.${month}.${year}`;
             }
 
             let newCourse = {
@@ -895,11 +892,9 @@ ccm.files["ccm.flash_cards.js"] = {
 
         this.updateCourse = async (form, courseToEdit) => {
             let formattedDate = '';
-            if (form.deadline.checked) {
-                const deadlineInput = form.deadlineInput.value;
-                if (deadlineInput) {
-                    formattedDate = new Intl.DateTimeFormat('de-DE').format(new Date(deadlineInput));
-                }
+            if (form.deadline.checked && form.deadlineInput.value) {
+                const [year, month, day] = form.deadlineInput.value.split('-');
+                formattedDate = `${day}.${month}.${year}`;
             }
 
             const updatedCourse = {
