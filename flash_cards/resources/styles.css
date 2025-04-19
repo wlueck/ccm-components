@@ -331,8 +331,8 @@ button {
 #cc{
 
     #card {
-        width: 700px;
-        height: 400px;
+        width: 65%;
+        height: 16em;
         /*background-color: #add8e6;*/
         border: 3px solid #000;
         border-radius: 15px;
