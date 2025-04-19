@@ -10,7 +10,6 @@ ccm.files["ccm.flash_cards.js"] = {
     ccm: "../libs/ccm-master/ccm.js",
     config: {
         store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_mycollection"}],
-
         css: ["ccm.load", "./resources/styles.css"],
         html: {
             main: ["ccm.load", "./resources/main.html"],
@@ -19,7 +18,6 @@ ccm.files["ccm.flash_cards.js"] = {
             editor_course: ["ccm.load", "./resources/editor_course.html"],
             card: ["ccm.load", "./resources/card.html"],
         },
-
         user: ["ccm.start", "../libs/fb02user/ccm.fb02user.js"],
     },
 
@@ -27,7 +25,6 @@ ccm.files["ccm.flash_cards.js"] = {
         let user, dataset;
 
         this.start = async () => {
-
             this.element.innerHTML = this.html.main;
 
             // user initialization
@@ -59,7 +56,7 @@ ccm.files["ccm.flash_cards.js"] = {
             if (hasData) {
                 this.fillCourseList();
             }
-        }
+        };
 
         this.initListViewButtons = () => {
             this.element.querySelector('#add-deck-button').addEventListener('click', () => {
@@ -173,42 +170,42 @@ ccm.files["ccm.flash_cards.js"] = {
 
             this.element.querySelector('#sort-courses-title').addEventListener('click', async () => {
                 dataset.sortPreference = 'title';
-                const sortedDecks = dataset.sort((a, b) => a.title.localeCompare(b.title));
-                this.store.set({ key: user.key, value: sortedDecks });
+                dataset.sort((a, b) => a.title.localeCompare(b.title));
+                await this.store.set({ key: user.key, value: dataset });
                 this.initListView();
             });
 
             this.element.querySelector('#sort-courses-deadline').addEventListener('click', async () => {
                 dataset.sortPreference = 'deadline';
-                const sortedDecks = dataset.sort((a, b) => {
+                dataset.sort((a, b) => {
                     if (!a.deadline) return 1;
                     if (!b.deadline) return -1;
                     return a.deadline.localeCompare(b.deadline);
                 });
-                this.store.set({ key: user.key, value: sortedDecks });
+                await this.store.set({ key: user.key, value: dataset });
                 this.initListView();
             });
 
             this.element.querySelector('#sort-courses-cardCount').addEventListener('click', async () => {
                 dataset.sortPreference = 'cardCount';
-                const sortedDecks = dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
-                this.store.set({ key: user.key, value: sortedDecks });
+                dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
+                await this.store.set({ key: user.key, value: dataset });
                 this.initListView();
             });
 
             this.element.querySelector('#sort-courses-status').addEventListener('click', async () => {
                 dataset.sortPreference = 'status';
-                const sortedDecks = dataset.sort((a, b) => {
+                dataset.sort((a, b) => {
                     const statusA = this.getCourseStatus(a);
                     const statusB = this.getCourseStatus(b);
                     return statusB.easyPercent - statusA.easyPercent ||
                         statusB.mediumPercent - statusA.mediumPercent ||
                         statusA.hardPercent - statusB.hardPercent;
                 });
-                this.store.set({ key: user.key, value: sortedDecks });
+                await this.store.set({ key: user.key, value: dataset });
                 this.initListView();
             });
-        }
+        };
 
         this.initEditorDeckView = (deckToEdit) => {
             this.element.querySelector("#content").innerHTML = this.html.editor_deck;
@@ -670,16 +667,19 @@ ccm.files["ccm.flash_cards.js"] = {
                                                                 <div id="card-content">
                                                                     <div id="card-title">${deck.title}</div>
                                                                     <div id="card-description">${deck.description ?? ''}</div>
-                                                                    <button class="start-deck-btn" data-deck-id="${deck.id}">Starten</button>
-                                                                </div>
-                                                                <div id="card-options">
-                                                                    <button id="option-btn" class="btn-low-style">...</button>
-                                                                    <div id="deck-options" class="hidden options"> 
-                                                                        <a id="edit-deck">Bearbeiten</a>
-                                                                        <a id="export-deck">Exportieren</a>
-                                                                        <a id="delete-deck">Löschen</a>
+                                                                    <div style="display: flex">
+                                                                        <button class="start-deck-btn" data-deck-id="${deck.id}">Starten</button>
+                                                                        <div id="card-options">
+                                                                            <button id="option-btn" class="btn-low-style">...</button>
+                                                                            <div id="deck-options" class="hidden options"> 
+                                                                                <a id="edit-deck">Bearbeiten</a>
+                                                                                <a id="export-deck">Exportieren</a>
+                                                                                <a id="delete-deck">Löschen</a>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
+                                                                
                                                                 <div id="card-stats">
                                                                     <div id="card-stats-chart" style="${deckStatusChartStyle}"></div>
                                                                     <div id="card-stats-text">${deckStatusString}</div>
