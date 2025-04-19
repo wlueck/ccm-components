@@ -650,6 +650,7 @@ ccm.files["ccm.flash_cards.js"] = {
                                             <a id="sort-deck-title">Nach Titel</a>
                                             <a id="sort-deck-deadline">Nach Deadline</a>
                                             <a id="sort-deck-cardCount">Nach Anzahl der Karten</a>
+                                            <a id="sort-deck-status">Nach Status</a>
                                         </div>
                                         <a id="edit-course">Bearbeiten</a>
                                         <a id="export-course">Exportieren</a>
@@ -796,6 +797,19 @@ ccm.files["ccm.flash_cards.js"] = {
                 courseHtml.querySelector("#sort-deck-cardCount").addEventListener('click', async () => {
                     course.sortPreference = 'cardCount';
                     course.cardDecks.sort((a, b) => this.getDeckStatus(a).totalCards - this.getDeckStatus(b).totalCards);
+                    await this.store.set({ key: user.key, value: dataset });
+                    this.initListView();
+                });
+
+                courseHtml.querySelector("#sort-deck-status").addEventListener('click', async () => {
+                    course.sortPreference = 'status';
+                    course.cardDecks.sort((a, b) => {
+                        const statusA = this.getDeckStatus(a);
+                        const statusB = this.getDeckStatus(b);
+                        return statusB.easyPercent - statusA.easyPercent ||
+                            statusB.mediumPercent - statusA.mediumPercent ||
+                            statusA.hardPercent - statusB.hardPercent;
+                    });
                     await this.store.set({ key: user.key, value: dataset });
                     this.initListView();
                 });
