@@ -289,7 +289,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     });
                     this.element.querySelector("#cards").append(htmlCard);
                 });
-
             }
 
             const addCourseBtn = this.element.querySelector("#add-course-btn");
@@ -359,7 +358,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 newOption.textContent = newCourse.title;
                 courseSelect.append(newOption);
             });
-
 
             const submitButton = this.element.querySelector("#submit-deck");
             submitButton.innerHTML = deckToEdit? "Ändern" : "Erstellen";
@@ -463,17 +461,14 @@ ccm.files["ccm.flash_cards.js"] = {
                         alert("Bitte füllen Sie alle Felder aus!");
                         valid = false;
                     }
-
                 });
 
                 if (valid) {
-                    // Find the old course and remove the deck from its cardDecks
                     const oldCourseIndex = dataset.findIndex(coursel => coursel.cardDecks.some(deck => deck.id === deckToEdit.id));
                     if (oldCourseIndex !== -1) {
                         dataset[oldCourseIndex].cardDecks = dataset[oldCourseIndex].cardDecks.filter(deck => deck.id !== deckToEdit.id);
                     }
 
-                    // Find the new course and add the updated deck
                     const newCourseIndex = dataset.findIndex(coursel => coursel.title === course);
                     if (newCourseIndex !== -1) {
                         const deckIndex = dataset[newCourseIndex].cardDecks.findIndex(deck => deck.id === deckToEdit.id);
@@ -490,24 +485,24 @@ ccm.files["ccm.flash_cards.js"] = {
             }
 
             const addCard = () => {
-            const htmlCardString = `
-                <div id="card">
-                    <div class="input-group">
-                        <label for="question">Frage:</label>
-                        <textarea id="question" name="question" cols="34" rows="5"></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label for="answer">Antwort:</label>
-                        <textarea id="answer" name="answer" cols="34" rows="5"></textarea>
-                    </div>
-                    <button id="delete-card-button">Karte löschen</button>
-                </div>`;
-            const htmlCard = this.ccm.helper.html(htmlCardString);
-            htmlCard.querySelector("#delete-card-button").addEventListener("click", (event) => {
-                htmlCard.remove();
-            });
-            this.element.querySelector("#cards").append(htmlCard);
-        }
+                const htmlCardString = `
+                    <div id="card">
+                        <div class="input-group">
+                            <label for="question">Frage:</label>
+                            <textarea id="question" name="question" cols="34" rows="5"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="answer">Antwort:</label>
+                            <textarea id="answer" name="answer" cols="34" rows="5"></textarea>
+                        </div>
+                        <button id="delete-card-button">Karte löschen</button>
+                    </div>`;
+                const htmlCard = this.ccm.helper.html(htmlCardString);
+                htmlCard.querySelector("#delete-card-button").addEventListener("click", (event) => {
+                    htmlCard.remove();
+                });
+                this.element.querySelector("#cards").append(htmlCard);
+            }
         }
 
         this.initEditorCourseView = (courseToEdit) => {
@@ -528,7 +523,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 form.description.value = courseToEdit.description || '';
 
                 if (courseToEdit.deadline) {
-
                     deadlineCheckbox.checked = true;
                     deadlineInput.classList.remove('hidden');
 
@@ -601,48 +595,45 @@ ccm.files["ccm.flash_cards.js"] = {
                 const courseStatus = this.getCourseStatus(course);
                 const courseStatusString = courseStatus.easy + ' / ' + courseStatus.medium + ' / ' + courseStatus.hard;
                 const courseStatusChartStyle = `
-                                    width: 30px; height: 30px;
-                                    background-image: radial-gradient(circle, white 57%, transparent 57%),
-                                    conic-gradient(#b3261e 0% ${courseStatus.hardPercent}%,
-                                                   #e0cd00 ${courseStatus.hardPercent}% ${courseStatus.hardPercent + courseStatus.mediumPercent}%, 
-                                                   #2b6c22 ${courseStatus.hardPercent + courseStatus.mediumPercent}% 100%);
-                                    border-radius: 50%;`;
+                    width: 30px; height: 30px;
+                    background-image: radial-gradient(circle, white 57%, transparent 57%),
+                    conic-gradient(#b3261e 0% ${courseStatus.hardPercent}%,
+                                   #e0cd00 ${courseStatus.hardPercent}% ${courseStatus.hardPercent + courseStatus.mediumPercent}%, 
+                                   #2b6c22 ${courseStatus.hardPercent + courseStatus.mediumPercent}% 100%);
+                    border-radius: 50%;`;
 
                 const courseHtmlString = `<div id="card">
-                                                    <div id="card-header">
-                                                        <div id="card-content">
-                                                            <div id="card-title">${course.title}</div>
-                                                            <div id="card-description">${course.description ?? ''}</div>
-                                                            <div style="display: flex; gap: 10px; align-items: center;">
-
-                                                            <button id="card-toggle-btn" class="btn-low-style">⌄</button>
-
-                                                            <button id="start-course-btn">Gesamten Kurs lernen</button>
-                                                            <div id="card-options">
-                                                                <button id="course-option-btn" class="btn-low-style">...</button>
-                                                                <div id="course-options" class="hidden options">
-                                                                    <a id="sort-decks">Sortieren</a>
-                                                                        <div id="sort-deck-options" class="hidden options">
-                                                                            <a id="sort-deck-title">Nach Titel</a>
-                                                                            <a id="sort-deck-deadline">Nach Deadline</a>
-                                                                            <a id="sort-deck-cardCount">Nach Anzahl der Karten</a>
-                                                                        </div>
-                                                                    <a id="edit-course">Bearbeiten</a>
-                                                                    <a id="export-course">Exportieren</a>
-                                                                    <a id="delete-course">Löschen</a>
-                                                                </div>
-                                                            </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div id="card-stats">
-                                                            <div id="card-stats-chart" style="${courseStatusChartStyle}"></div>
-                                                            <div id="card-stats-text">${courseStatusString}</div>
-                                                        </div>
-                                                        <div id="card-deadline">${courseDeadlineHtml}</div>
-                                                    </div>
-                                                    <div id="card-decks" class="hidden"></div>
-                                                  </div>`;
+                    <div id="card-header">
+                        <div id="card-content">
+                            <div id="card-title">${course.title}</div>
+                            <div id="card-description">${course.description ?? ''}</div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <button id="card-toggle-btn" class="btn-low-style">⌄</button>
+                                <button id="start-course-btn">Gesamten Kurs lernen</button>
+                                <div id="card-options">
+                                    <button id="course-option-btn" class="btn-low-style">...</button>
+                                    <div id="course-options" class="hidden options">
+                                        <a id="sort-decks">Sortieren</a>
+                                        <div id="sort-deck-options" class="hidden options">
+                                            <a id="sort-deck-title">Nach Titel</a>
+                                            <a id="sort-deck-deadline">Nach Deadline</a>
+                                            <a id="sort-deck-cardCount">Nach Anzahl der Karten</a>
+                                        </div>
+                                        <a id="edit-course">Bearbeiten</a>
+                                        <a id="export-course">Exportieren</a>
+                                        <a id="delete-course">Löschen</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="card-stats">
+                            <div id="card-stats-chart" style="${courseStatusChartStyle}"></div>
+                            <div id="card-stats-text">${courseStatusString}</div>
+                        </div>
+                        <div id="card-deadline">${courseDeadlineHtml}</div>
+                    </div>
+                    <div id="card-decks" class="hidden"></div>
+                </div>`;
 
                 const courseHtml = this.ccm.helper.html(courseHtmlString);
 
@@ -655,38 +646,37 @@ ccm.files["ccm.flash_cards.js"] = {
                     const deckStatus = this.getDeckStatus(deck);
                     const deckStatusString = deckStatus.easy + ' / ' + deckStatus.medium + ' / ' + deckStatus.hard;
                     const deckStatusChartStyle = `
-                                    width: 30px; height: 30px;
-                                    background-image: radial-gradient(circle, white 57%, transparent 57%),
-                                    conic-gradient(#b3261e 0% ${deckStatus.hardPercent}%,
-                                                   #e0cd00 ${deckStatus.hardPercent}% ${deckStatus.hardPercent + deckStatus.mediumPercent}%, 
-                                                   #2b6c22 ${deckStatus.hardPercent + deckStatus.mediumPercent}% 100%);
-                                    border-radius: 50%;`;
+                        width: 30px; height: 30px;
+                        background-image: radial-gradient(circle, white 57%, transparent 57%),
+                        conic-gradient(#b3261e 0% ${deckStatus.hardPercent}%,
+                                       #e0cd00 ${deckStatus.hardPercent}% ${deckStatus.hardPercent + deckStatus.mediumPercent}%, 
+                                       #2b6c22 ${deckStatus.hardPercent + deckStatus.mediumPercent}% 100%);
+                        border-radius: 50%;`;
 
                     const cardDecksHtmlString = `<div id="card">
-                                                            <div id="card-header">
-                                                                <div id="card-content">
-                                                                    <div id="card-title">${deck.title}</div>
-                                                                    <div id="card-description">${deck.description ?? ''}</div>
-                                                                    <div style="display: flex">
-                                                                        <button class="start-deck-btn" data-deck-id="${deck.id}">Starten</button>
-                                                                        <div id="card-options">
-                                                                            <button id="option-btn" class="btn-low-style">...</button>
-                                                                            <div id="deck-options" class="hidden options"> 
-                                                                                <a id="edit-deck">Bearbeiten</a>
-                                                                                <a id="export-deck">Exportieren</a>
-                                                                                <a id="delete-deck">Löschen</a>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                <div id="card-stats">
-                                                                    <div id="card-stats-chart" style="${deckStatusChartStyle}"></div>
-                                                                    <div id="card-stats-text">${deckStatusString}</div>
-                                                                </div>
-                                                                    <div id="card-deadline">${deckDeadlineHtml}</div>
-                                                            </div>
-                                                        </div>`;
+                        <div id="card-header">
+                            <div id="card-content">
+                                <div id="card-title">${deck.title}</div>
+                                <div id="card-description">${deck.description ?? ''}</div>
+                                <div style="display: flex">
+                                    <button class="start-deck-btn" data-deck-id="${deck.id}">Starten</button>
+                                    <div id="card-options">
+                                        <button id="option-btn" class="btn-low-style">...</button>
+                                        <div id="deck-options" class="hidden options"> 
+                                            <a id="edit-deck">Bearbeiten</a>
+                                            <a id="export-deck">Exportieren</a>
+                                            <a id="delete-deck">Löschen</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="card-stats">
+                                <div id="card-stats-chart" style="${deckStatusChartStyle}"></div>
+                                <div id="card-stats-text">${deckStatusString}</div>
+                            </div>
+                            <div id="card-deadline">${deckDeadlineHtml}</div>
+                        </div>
+                    </div>`;
 
                     const cardDeckHtml = this.ccm.helper.html(cardDecksHtmlString);
 
