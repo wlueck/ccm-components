@@ -111,7 +111,9 @@ ccm.files["ccm.flash_cards.js"] = {
                                 if (!deck.title || !deck.cards || !Array.isArray(deck.cards)) {
                                     throw new Error('Invalid deck format');
                                 }
-                                const courseIndex = dataset.findIndex(c => c.title === selectedCourse);
+                                deck.id = deck.id || this.ccm.helper.generateKey();
+                                deck.cards.forEach(card => card.id = card.id || this.ccm.helper.generateKey());
+                                const courseIndex = dataset.findIndex(c => c.id === selectedCourse.id);
                                 if (dataset[courseIndex].cardDecks.some(d => d.title === deck.title)) {
                                     alert('Ein Stapel mit diesem Namen existiert bereits im ausgewählten Kurs');
                                     return;
@@ -146,6 +148,11 @@ ccm.files["ccm.flash_cards.js"] = {
                             if (!course.title || !course.cardDecks || !Array.isArray(course.cardDecks)) {
                                 throw new Error('Invalid course format');
                             }
+                            course.id = course.id || this.ccm.helper.generateKey();
+                            course.cardDecks.forEach(deck => {
+                                deck.id = deck.id || this.ccm.helper.generateKey();
+                                deck.cards.forEach(card => card.id = card.id || this.ccm.helper.generateKey());
+                            });
                             if (dataset.some(c => c.title === course.title)) {
                                 alert('A course with this name already exists');
                                 return;
@@ -369,11 +376,11 @@ ccm.files["ccm.flash_cards.js"] = {
                     return;
                 }
                 event.preventDefault();
-                if (deckToEdit) await updateDeck(form, deckToEdit);
-                else await saveDeck(form);
+                if (deckToEdit) await this.updateDeck(form, deckToEdit);
+                else await this.saveDeck(form);
             });
 
-            const saveDeck = async (form) => {
+            this.saveDeck = async (form) => {
                 const course = form.course.value;
 
                 let formattedDate = '';
@@ -406,7 +413,12 @@ ccm.files["ccm.flash_cards.js"] = {
                     let answer = card.querySelector("#answer").value;
 
                     if (question !== "" && answer !== "") {
-                        newDeck.cards.push({question: question, answer: answer, status: "hard"});
+                        newDeck.cards.push({
+                            id: this.ccm.helper.generateKey(),
+                            question: question,
+                            answer: answer,
+                            status: "hard"
+                        });
                     } else if (question !== "" && answer === "" || question === "" && answer !== "") {
                         alert("Bitte füllen Sie alle Felder aus!");
                         valid = false;
@@ -419,9 +431,9 @@ ccm.files["ccm.flash_cards.js"] = {
                     await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 }
-            }
+            };
 
-            const updateDeck = async (form, deckToEdit) => {
+            this.updateDeck = async (form, deckToEdit) => {
                 const course = form.course.value;
 
                 let formattedDate = '';
@@ -456,7 +468,12 @@ ccm.files["ccm.flash_cards.js"] = {
                     let answer = card.querySelector("#answer").value;
 
                     if (question !== "" && answer !== "") {
-                        updatedDeck.cards.push({question: question, answer: answer, status: "hard"});
+                        updatedDeck.cards.push({
+                            id: this.ccm.helper.generateKey(),
+                            question: question,
+                            answer: answer,
+                            status: deckToEdit.cards.find(c => c.id === cardId)?.status || "hard"
+                        });
                     } else if (question !== "" && answer === "" || question === "" && answer !== "") {
                         alert("Bitte füllen Sie alle Felder aus!");
                         valid = false;
@@ -482,7 +499,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     await this.store.set({ key: user.key, value: dataset });
                     this.initListView();
                 }
-            }
+            };
 
             const addCard = () => {
                 const htmlCardString = `
@@ -719,7 +736,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                         const confirmDelete = confirm(`Möchtest du das Deck "${deckTitle}" wirklich löschen?`);
                         if (confirmDelete) {
-                            this.deleteDeck(courseTitle, deckTitle);
+                            this.deleteDeck(course.id, deck.id);
                         }
                     });
 
@@ -796,11 +813,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 });
 
                 courseHtml.querySelector("#delete-course").addEventListener('click', (event) => {
-                    const courseTitle = course.title;
-
                     const confirmDelete = confirm(`Möchtest du die Lehrveranstaltung "${courseTitle}" wirklich löschen?`);
                     if (confirmDelete) {
-                        this.deleteCourse(courseTitle);
+                        this.deleteCourse(course.id);
                     }
                 });
 
@@ -808,24 +823,20 @@ ccm.files["ccm.flash_cards.js"] = {
             }
         }
 
-        this.deleteDeck = async (courseTitle, deckTitle) => {
-            const course = dataset.find(course => course.title === courseTitle);
+        this.deleteDeck = async (courseId, deckId) => {
+            const course = dataset.find(course => course.id === courseId);
             if (!course) {
                 console.error("Lehrveranstaltung nicht gefunden");
                 return;
             }
-
-            course.cardDecks = course.cardDecks.filter(deck => deck.title !== deckTitle);
-
+            course.cardDecks = course.cardDecks.filter(deck => deck.id !== deckId);
             await this.store.set({ key: user.key, value: dataset });
-
             this.initListView();
         };
 
-        this.deleteCourse = async (courseTitle) => {
-            dataset = dataset.filter(course => course.title !== courseTitle);
+        this.deleteCourse = async (courseId) => {
+            dataset = dataset.filter(course => course.id !== courseId);
             await this.store.set({ key: user.key, value: dataset });
-
             this.initListView();
         };
 
@@ -833,13 +844,13 @@ ccm.files["ccm.flash_cards.js"] = {
             let formattedDate = '';
             if (form.deadline.checked) {
                 const deadlineInput = form.deadlineInput.value;
-
                 if (deadlineInput) {
                     formattedDate = new Intl.DateTimeFormat('de-DE').format(new Date(deadlineInput));
                 }
             }
 
             let newCourse = {
+                id: this.ccm.helper.generateKey(),
                 title: form.name.value,
                 description: form.description.value,
                 deadline: formattedDate,
@@ -854,19 +865,19 @@ ccm.files["ccm.flash_cards.js"] = {
             dataset.push(newCourse);
             await this.store.set({key: user.key, value: dataset});
             this.initListView();
-        }
+        };
 
         this.updateCourse = async (form, courseToEdit) => {
             let formattedDate = '';
             if (form.deadline.checked) {
                 const deadlineInput = form.deadlineInput.value;
-
                 if (deadlineInput) {
                     formattedDate = new Intl.DateTimeFormat('de-DE').format(new Date(deadlineInput));
                 }
             }
 
             const updatedCourse = {
+                id: courseToEdit.id,
                 title: form.name.value,
                 description: form.description.value,
                 deadline: formattedDate,
@@ -881,11 +892,11 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             }
 
-            const courseIndex = dataset.findIndex(course => course.title === courseToEdit.title);
+            const courseIndex = dataset.findIndex(course => course.id === courseToEdit.id);
             dataset[courseIndex] = updatedCourse;
             await this.store.set({key: user.key, value: dataset});
             this.initListView();
-        }
+        };
 
         const calculateStatus = (cards) => {
             let countEasy = cards.filter(card => card.status === 'easy').length;
@@ -917,10 +928,10 @@ ccm.files["ccm.flash_cards.js"] = {
             return calculateStatus(deck.cards);
         };
 
-        this.startDeck = (courseTitle, deckId) => {
+        this.startDeck = (courseId, deckId) => {
             this.element.querySelector("#content").innerHTML = this.html.card;
 
-            const currentCourse = dataset.find(course => course.title === courseTitle);
+            const currentCourse = dataset.find(course => course.id === courseId);
             const currentCardDeck = currentCourse.cardDecks.find(deck => deck.id === deckId);
 
             this.element.querySelector(".headline").innerHTML = currentCardDeck.title;
@@ -935,10 +946,10 @@ ccm.files["ccm.flash_cards.js"] = {
             this.loadCardDeck(currentCourse, currentCardDeck);
         };
 
-        this.startCourse = (courseTitle) => {
+        this.startCourse = (courseId) => {
             this.element.querySelector("#content").innerHTML = this.html.card;
 
-            const currentCourse = dataset.find(course => course.title === courseTitle);
+            const currentCourse = dataset.find(course => course.id === courseId);
             const allCards = currentCourse.cardDecks.flatMap(deck => deck.cards.map(card => ({
                 card,
                 deckTitle: deck.title
@@ -1008,7 +1019,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 this.element.querySelector('#next_card_button').onclick = () => updateCardDisplay(index + 1);
                 this.element.querySelector('#previous_card_button').onclick = () => updateCardDisplay(index - 1);
 
-                for (const [difficulty, button] of Object.entries(difficultyButtons)) {
+                for (const difficulty of Object.keys(difficultyButtons)) {
+                    const button = difficultyButtons[difficulty];
                     button.onclick = async () => {
                         // Reset selected-difficulty class for all difficulty buttons
                         for (const btn of Object.values(difficultyButtons)) {
@@ -1016,18 +1028,18 @@ ccm.files["ccm.flash_cards.js"] = {
                         }
                         button.classList.add("selected-difficulty");
 
-                        const courseIndex = dataset.findIndex(c => c.title === course.title);
+                        const courseIndex = dataset.findIndex(c => c.id === course.id);
                         const deckIndex = cardDeck.title === course.title ? -1 :
-                            dataset[courseIndex].cardDecks.findIndex(d => d.title === deckTitle);
+                            dataset[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
 
                         if (deckIndex === -1) {
-                            // Kursmodus: Finde das richtige Deck
-                            const cardIndex = cards.findIndex(c => c.card === currentCard);
+                            // Kursmodus: Finde die Karte anhand der ID
+                            const cardIndex = cards.findIndex(c => c.card.id === currentCard.id);
                             cards[cardIndex].card.status = difficulty;
                         } else {
-                            const cardIndex = dataset[courseIndex].cardDecks[deckIndex].cards.findIndex(c =>
-                                c.question === currentCard.question && c.answer === currentCard.answer);
-                                dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = difficulty;
+                            // Deckmodus: Finde die Karte anhand der ID
+                            const cardIndex = dataset[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
+                            dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = difficulty;
                         }
 
                         await this.store.set({ key: user.key, value: dataset });
