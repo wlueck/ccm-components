@@ -28,7 +28,7 @@ button {
     font-weight: 100;
 }
 
-.header {
+#header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -37,23 +37,17 @@ button {
     margin-bottom: 15px;
 }
 
-.headline {
+#headline {
     margin: 0;
+}
+
+#sub-headline {
+    margin: 5px 0 0 0;
 }
 
 #user {
     display: flex;
     gap: 10px;
-}
-
-
-.headline-wrapper {
-    display: flex;
-    flex-direction: column;
-}
-
-.sub-headline {
-    margin: 5px 0 0 0;
 }
 
 
