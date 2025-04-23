@@ -86,9 +86,8 @@ button {
         position: relative;
     }
 
-    // todo check
     #sort-courses-options {
-        right: 8px;
+        right: 8px !important;
     }
 
 

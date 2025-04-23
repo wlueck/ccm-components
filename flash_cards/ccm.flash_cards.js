@@ -60,7 +60,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
         this.initListViewButtons = () => {
             this.element.querySelector('#add-deck-course-button').addEventListener('click', () => {
-                this.element.querySelector("#add-deck-course.options").classList.toggle('hidden');
+                this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
             });
 
             this.element.querySelector('#create-deck').addEventListener('click', () => {
