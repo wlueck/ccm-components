@@ -302,27 +302,26 @@ button {
         padding: 20px;
         box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
 
-        /* Flexbox für vertikale Ausrichtung */
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* Abstand zwischen Text und Buttons */
-        align-items: center; /* Horizontale Zentrierung */
+        justify-content: space-between;
+        align-items: center;
         text-align: center;
     }
 
     #question_answer_text {
-        flex-grow: 1; /* Nimmt den freien Platz ein */
-        display: flex; /* Flexbox für Zentrierung */
-        justify-content: center; /* Horizontal zentrieren */
-        align-items: center; /* Vertikal zentrieren */
-        font-size: 18px; /* Schriftgröße */
-        margin: 0; /* Kein zusätzlicher Außenabstand */
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        margin: 0;
     }
 
     #card_buttons {
-        display: flex; /* Flexbox für Buttons */
-        justify-content: space-around; /* Gleichmäßiger Abstand zwischen Buttons */
-        width: 100%; /* Buttons nehmen die gesamte Breite ein */
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
     }
 
     #card_buttons button {
