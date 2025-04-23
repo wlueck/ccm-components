@@ -48,8 +48,8 @@ ccm.files["ccm.flash_cards.js"] = {
 
         this.initListView = (hasData = true) => {
             this.element.querySelector("#content").innerHTML = this.html.list;
-            this.element.querySelector('.headline').innerHTML = "Karteikarten";
-            this.element.querySelector('.sub-headline').innerHTML = "";
+            this.element.querySelector('#headline').innerHTML = "Karteikarten";
+            this.element.querySelector('#sub-headline').innerHTML = "";
 
             this.initListViewButtons();
 
@@ -59,8 +59,8 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.initListViewButtons = () => {
-            this.element.querySelector('#add-deck-button').addEventListener('click', () => {
-                this.element.querySelector("#add-deck-options").classList.toggle('hidden');
+            this.element.querySelector('#add-deck-course-button').addEventListener('click', () => {
+                this.element.querySelector("#add-deck-course.options").classList.toggle('hidden');
             });
 
             this.element.querySelector('#create-deck').addEventListener('click', () => {
@@ -68,7 +68,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             this.element.querySelector('#import-deck').addEventListener('click', () => {
-                this.element.querySelector("#add-deck-options").classList.toggle('hidden');
+                this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
 
                 if (document.querySelector('#course-select-dialog')) {
                     document.querySelector('#course-select-dialog').remove();
@@ -181,7 +181,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             // sort courses
             this.element.querySelector('#sort-courses-button').addEventListener('click', async () => {
-                const sortDecksContainer = this.element.querySelector("#sort-courses");
+                const sortDecksContainer = this.element.querySelector("#sort-courses-options");
                 sortDecksContainer.classList.toggle("hidden");
             });
 
@@ -226,8 +226,8 @@ ccm.files["ccm.flash_cards.js"] = {
 
         this.initEditorDeckView = (deckToEdit) => {
             this.element.querySelector("#content").innerHTML = this.html.editor_deck;
-            this.element.querySelector('.headline').innerHTML = deckToEdit ? "Karteikartenstapel bearbeiten" : "Karteikartenstapel erstellen";
-            this.element.querySelector('.sub-headline').innerHTML = "";
+            this.element.querySelector('#headline').innerHTML = deckToEdit ? "Karteikartenstapel bearbeiten" : "Karteikartenstapel erstellen";
+            this.element.querySelector('#sub-headline').innerHTML = "";
 
             this.element.querySelector("#back-button").addEventListener("click", (event) => {
                 this.initListView();
@@ -533,8 +533,8 @@ ccm.files["ccm.flash_cards.js"] = {
 
         this.initEditorCourseView = (courseToEdit) => {
             this.element.querySelector("#content").innerHTML = this.html.editor_course;
-            this.element.querySelector('.headline').innerHTML = courseToEdit ? "Lehrveranstaltung bearbeiten" : "Lehrveranstaltung erstellen";
-            this.element.querySelector('.sub-headline').innerHTML = "";
+            this.element.querySelector('#headline').innerHTML = courseToEdit ? "Lehrveranstaltung bearbeiten" : "Lehrveranstaltung erstellen";
+            this.element.querySelector('#sub-headline').innerHTML = "";
 
             this.element.querySelector("#back-button").addEventListener("click", (event) => {
                 this.initListView();
@@ -967,8 +967,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 return;
             }
 
-            this.element.querySelector(".headline").innerHTML = currentCardDeck.title;
-            this.element.querySelector(".sub-headline").innerHTML = `(${currentCourse.title})`;
+            this.element.querySelector("#headline").innerHTML = currentCardDeck.title;
+            this.element.querySelector("#sub-headline").innerHTML = `(${currentCourse.title})`;
             this.element.querySelector('#description').innerHTML = currentCardDeck.description || '';
             this.element.querySelector('#max_number_cards').innerHTML = currentCardDeck.cards.length.toString();
 
@@ -998,8 +998,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 return;
             }
 
-            this.element.querySelector(".headline").innerHTML = currentCourse.title;
-            this.element.querySelector(".sub-headline").innerHTML = "Gesamter Kurs";
+            this.element.querySelector("#headline").innerHTML = currentCourse.title;
+            this.element.querySelector("#sub-headline").innerHTML = "Gesamter Kurs";
             this.element.querySelector('#description').innerHTML = currentCourse.description || '';
             this.element.querySelector('#max_number_cards').innerHTML = allCards.length.toString();
 

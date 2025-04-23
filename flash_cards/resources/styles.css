@@ -56,25 +56,41 @@ button {
         justify-content: space-between;
     }
 
-    #card {
-        border: 2px solid rgba(217, 217, 217);
-        border-radius: 5px;
-        padding: 10px;
-        margin: 10px 0;
-        background-color: #d2e5db;
+    .dropdown-menu {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        width: 150px;
+        z-index: 1000;
+        margin-top: 33px;
     }
 
-    #card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        width: 100%;
+    .dropdown-menu a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
     }
 
-    #card-content {
-        width: 60%;
+    .dropdown-menu a:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
     }
+
+
+    #sort-courses-button {
+        position: relative;
+    }
+
+    // todo check
+    #sort-courses-options {
+        right: 8px;
+    }
+
 
     #sort-deck-options {
         position: absolute;
@@ -99,39 +115,6 @@ button {
     #sort-deck-options a:hover {
         background-color: #f0f0f0;
         cursor: pointer;
-    }
-    #card-title {
-        font-size: 1.5em;
-        font-weight: bold;
-    }
-
-    #card-stats {
-        width: 20%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    #card-toggle-btn {
-        font-size: 2em;
-        padding-bottom: 25px;
-    }
-
-    #card-description {
-        padding: 10px 0;
-    }
-
-
-    #card-deadline {
-        width: 20%;
-    }
-
-    #card-decks {
-        #card {
-            background-color: #fcefd3;
-        }
     }
 
     #course-options {
@@ -158,7 +141,6 @@ button {
         cursor: pointer;
     }
 
-
     #deck-options {
         position: absolute;
         background-color: white;
@@ -184,59 +166,56 @@ button {
     }
 
 
-    #sort-courses-button {
-        position: relative;
+    #card {
+        border: 2px solid rgba(217, 217, 217);
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #d2e5db;
     }
 
-    #sort-courses {
-        position: absolute;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        padding: 5px 0;
-        width: 150px;
-        z-index: 1000;
-        right: 8px;
-        margin-top: 33px;
+    #card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
     }
 
-    #sort-courses a {
-        display: block;
-        padding: 8px 12px;
-        text-decoration: none;
-        color: #333;
-        font-size: 14px;
+    #card-content {
+        width: 60%;
     }
 
-    #sort-courses a:hover {
-        background-color: #f0f0f0;
-        cursor: pointer;
+    #card-toggle-btn {
+        font-size: 2em;
+        padding-bottom: 25px;
     }
 
-    #add-deck-options {
-        position: absolute;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        padding: 5px 0;
-        width: 150px;
-        z-index: 1000;
-        margin-top: 33px;
+    #card-description {
+        padding: 10px 0;
     }
 
-    #add-deck-options a {
-        display: block;
-        padding: 8px 12px;
-        text-decoration: none;
-        color: #333;
-        font-size: 14px;
+    #card-deadline {
+        width: 20%;
     }
 
-    #add-deck-options a:hover {
-        background-color: #f0f0f0;
-        cursor: pointer;
+    #card-decks {
+        #card {
+            background-color: #fcefd3;
+        }
+    }
+
+    #card-title {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    #card-stats {
+        width: 20%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 }
 /*endregion */
