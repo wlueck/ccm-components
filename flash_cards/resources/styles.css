@@ -1,5 +1,4 @@
-/* general */
-
+/*region general */
 .hidden {
     display: none;
 }
@@ -19,10 +18,9 @@ button {
         border: none;
     }
 }
+/*endregion */
 
-
-/* main template */
-
+/*region main template */
 #main {
     font-family: Montserrat, sans-serif;
     font-weight: 100;
@@ -49,11 +47,10 @@ button {
     display: flex;
     gap: 10px;
 }
+/*endregion */
 
-
-/* list template */
+/*region list template */
 #list-template {
-
     #list-button-container {
         display: flex;
         justify-content: space-between;
@@ -136,7 +133,6 @@ button {
             background-color: #fcefd3;
         }
     }
-
 
     #course-options {
         position: absolute;
@@ -243,11 +239,10 @@ button {
         cursor: pointer;
     }
 }
+/*endregion */
 
-/* editor template */
-
+/*region editor template */
 #add-card-deck-form {
-
     & input, & select {
         padding: 5px;
     }
@@ -314,16 +309,11 @@ button {
         border: solid 1px black;
         padding: 5px;
     }
-
-
 }
+/*endregion */
 
-
-
-/* card template */
-
-#cc{
-
+/*region card template */
+#cc {
     #card {
         width: 65%;
         height: 16em;
@@ -400,4 +390,4 @@ button {
         border: 3px solid black;
     }
 }
-
+/*endregion */
