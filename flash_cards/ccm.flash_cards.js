@@ -115,7 +115,8 @@ ccm.files["ccm.flash_cards.js"] = {
                             try {
                                 const deck = JSON.parse(e.target.result);
                                 if (!deck.title || !deck.cards || !Array.isArray(deck.cards)) {
-                                    throw new Error('Invalid deck format');
+                                    alert('Ungültiges Dateiformat: Titel oder Karten fehlen');
+                                    return;
                                 }
                                 deck.id = deck.id || this.ccm.helper.generateKey();
                                 deck.cards.forEach(card => {
@@ -159,7 +160,8 @@ ccm.files["ccm.flash_cards.js"] = {
                         try {
                             const course = JSON.parse(e.target.result);
                             if (!course.title || !course.cardDecks || !Array.isArray(course.cardDecks)) {
-                                throw new Error('Invalid course format');
+                                alert('Ungültiges Dateiformat: Titel oder Karten fehlen');
+                                return;
                             }
                             course.id = course.id || this.ccm.helper.generateKey();
                             course.cardDecks.forEach(deck => {
@@ -235,7 +237,7 @@ ccm.files["ccm.flash_cards.js"] = {
             this.element.querySelector('#headline').innerHTML = deckToEdit ? "Karteikartenstapel bearbeiten" : "Karteikartenstapel erstellen";
             this.element.querySelector('#sub-headline').innerHTML = "";
 
-            this.element.querySelector("#back-button").addEventListener("click", (event) => {
+            this.element.querySelector("#back-button").addEventListener("click", () => {
                 this.initListView();
             });
 
@@ -307,7 +309,7 @@ ccm.files["ccm.flash_cards.js"] = {
                             <input type="hidden" name="card-id" value="${card.id}">
                         </div>`;
                     const htmlCard = this.ccm.helper.html(htmlCardString);
-                    htmlCard.querySelector("#delete-card-button").addEventListener("click", (event) => {
+                    htmlCard.querySelector("#delete-card-button").addEventListener("click", () => {
                         htmlCard.remove();
                     });
                     this.element.querySelector("#cards").append(htmlCard);
@@ -530,7 +532,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         <button id="delete-card-button">Karte löschen</button>
                     </div>`;
                 const htmlCard = this.ccm.helper.html(htmlCardString);
-                htmlCard.querySelector("#delete-card-button").addEventListener("click", (event) => {
+                htmlCard.querySelector("#delete-card-button").addEventListener("click", () => {
                     htmlCard.remove();
                 });
                 this.element.querySelector("#cards").append(htmlCard);
@@ -542,7 +544,7 @@ ccm.files["ccm.flash_cards.js"] = {
             this.element.querySelector('#headline').innerHTML = courseToEdit ? "Lehrveranstaltung bearbeiten" : "Lehrveranstaltung erstellen";
             this.element.querySelector('#sub-headline').innerHTML = "";
 
-            this.element.querySelector("#back-button").addEventListener("click", (event) => {
+            this.element.querySelector("#back-button").addEventListener("click", () => {
                 this.initListView();
             });
 
@@ -675,7 +677,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 for (const deck of course.cardDecks) {
                     const isDeckDeadlineExpired = deck.deadline && (() => {
                         const [day, month, year] = deck.deadline.split('.');
-                        return new Date(year, month - 1, day) < new Date();
+                        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)) < new Date();
                     })();
                     const deckDeadlineHtml = deck.deadline ?
                         `<a style="color: ${isDeckDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${deck.deadline}</a>`
@@ -718,20 +720,20 @@ ccm.files["ccm.flash_cards.js"] = {
 
                     const cardDeckHtml = this.ccm.helper.html(cardDecksHtmlString);
 
-                    cardDeckHtml.querySelector(".start-deck-btn").addEventListener('click', async (event) => {
+                    cardDeckHtml.querySelector(".start-deck-btn").addEventListener('click', async () => {
                         await this.startDeck(course.id, deck.id);
                     });
 
-                    cardDeckHtml.querySelector("#option-btn").addEventListener('click', (event) => {
+                    cardDeckHtml.querySelector("#option-btn").addEventListener('click', () => {
                         const options = cardDeckHtml.querySelector("#deck-options");
                         options.classList.toggle('hidden');
                     });
 
-                    cardDeckHtml.querySelector("#edit-deck").addEventListener('click', (event) => {
+                    cardDeckHtml.querySelector("#edit-deck").addEventListener('click', () => {
                         this.initEditorDeckView(deck);
                     });
 
-                    cardDeckHtml.querySelector("#export-deck").addEventListener('click', (event) => {
+                    cardDeckHtml.querySelector("#export-deck").addEventListener('click', () => {
                         const deckToExport = {
                             id: deck.id,
                             title: deck.title,
@@ -751,10 +753,10 @@ ccm.files["ccm.flash_cards.js"] = {
                         URL.revokeObjectURL(url);
                     });
 
-                    cardDeckHtml.querySelector("#delete-deck").addEventListener('click', (event) => {
+                    cardDeckHtml.querySelector("#delete-deck").addEventListener('click', async () => {
                         const confirmDelete = confirm(`Möchtest du das Deck "${deck.title}" wirklich löschen?`);
                         if (confirmDelete) {
-                            this.deleteDeck(course.id, deck.id);
+                            await this.deleteDeck(course.id, deck.id);
                         }
                     });
 
@@ -762,17 +764,17 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
 
                 const toggleCardButton = courseHtml.querySelector('#card-toggle-btn');
-                toggleCardButton.addEventListener('click', (event) => {
+                toggleCardButton.addEventListener('click', () => {
                     const decks = courseHtml.querySelector('#card-decks');
                     decks.classList.toggle('hidden');
                     toggleCardButton.textContent = decks.classList.contains('hidden') ? '⌄' : '⌃';
                 });
 
-                courseHtml.querySelector("#start-course-btn").addEventListener('click', (event) => {
+                courseHtml.querySelector("#start-course-btn").addEventListener('click', () => {
                     this.startCourse(course.id);
                 });
 
-                courseHtml.querySelector("#course-option-btn").addEventListener('click', (event) => {
+                courseHtml.querySelector("#course-option-btn").addEventListener('click', () => {
                     const options = courseHtml.querySelector("#course-options");
                     options.classList.toggle('hidden');
                 });
@@ -819,11 +821,11 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 });
 
-                courseHtml.querySelector("#edit-course").addEventListener('click', (event) => {
+                courseHtml.querySelector("#edit-course").addEventListener('click', () => {
                     this.initEditorCourseView(course);
                 });
 
-                courseHtml.querySelector("#export-course").addEventListener('click', (event) => {
+                courseHtml.querySelector("#export-course").addEventListener('click', () => {
                     const courseToExport = {
                         id: course.id,
                         title: course.title,
@@ -843,10 +845,10 @@ ccm.files["ccm.flash_cards.js"] = {
                     URL.revokeObjectURL(url);
                 });
 
-                courseHtml.querySelector("#delete-course").addEventListener('click', (event) => {
+                courseHtml.querySelector("#delete-course").addEventListener('click', async () => {
                     const confirmDelete = confirm(`Möchtest du die Lehrveranstaltung "${course.title}" wirklich löschen?`);
                     if (confirmDelete) {
-                        this.deleteCourse(course.id);
+                        await this.deleteCourse(course.id);
                     }
                 });
 
@@ -1117,7 +1119,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 if (index < 0 || index >= cards.length) return;
 
                 const currentCard = cards[index].card;
-                const deckTitle = cards[index].deckTitle;
 
                 // Update navigation buttons
                 this.element.querySelector('#previous_card_button').classList.toggle("unseen", index === 0);
