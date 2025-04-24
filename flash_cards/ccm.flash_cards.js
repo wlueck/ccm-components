@@ -39,26 +39,40 @@ ccm.files["ccm.flash_cards.js"] = {
             dataset = await this.store.get(user.key);
             if (!dataset) {
                 console.log("No dataset found");
-                this.initListView(false);
-            } else {
-                dataset = dataset.value;
-                this.initListView();
+                await this.store.set({key: user.key, value: []});
+                dataset = await this.store.get(user.key);
             }
+
+            dataset = dataset.value;
+            this.initListView();
         };
 
-        this.initListView = (hasData = true) => {
+        this.initListView = () => {
             this.element.querySelector("#content").innerHTML = this.html.list;
             this.element.querySelector('#headline').innerHTML = "Karteikarten";
             this.element.querySelector('#sub-headline').innerHTML = "";
+            this.initAddDeckCourseButtons();
 
-            this.initListViewButtons();
-
-            if (hasData) {
-                this.fillCourseList();
+            if (dataset.length === 0) {
+                this.element.querySelector("#sort-courses-button").classList.add('hidden');
+                this.element.querySelector("#list-of-courses").innerHTML = `
+                    <div style="padding-left: 20px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
+                        <p style="margin-bottom: 15px;">Noch keine Lehrveranstaltungen und Karteikartenstapeltapel vorhanden.</p>
+                        <p>Klicke auf <strong>Hinzufügen</strong>, um:</p>
+                        <ul style="padding-left:10px; margin: 5px 0;">
+                            <li>einen neuen Karteikartenstapel zu erstellen</li>
+                            <li>einen bestehenden Stapel zu importieren</li>
+                            <li>eine neue Lehrveranstaltung anzulegen</li>
+                            <li>eine Lehrveranstaltung zu importieren</li>
+                        </ul>
+                    </div>`;
+                return;
             }
+            this.initSortCoursesButtons();
+            this.fillCourseList();
         };
 
-        this.initListViewButtons = () => {
+        this.initAddDeckCourseButtons = () => {
             this.element.querySelector('#add-deck-course-button').addEventListener('click', () => {
                 this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
             });
@@ -186,8 +200,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 };
                 input.click();
             });
+        };
 
-            // sort courses
+        this.initSortCoursesButtons = () => {
             this.element.querySelector('#sort-courses-button').addEventListener('click', async () => {
                 const sortDecksContainer = this.element.querySelector("#sort-courses-options");
                 sortDecksContainer.classList.toggle("hidden");
@@ -196,7 +211,7 @@ ccm.files["ccm.flash_cards.js"] = {
             this.element.querySelector('#sort-courses-title').addEventListener('click', async () => {
                 dataset.sortPreference = 'title';
                 dataset.sort((a, b) => a.title.localeCompare(b.title));
-                await this.store.set({ key: user.key, value: dataset });
+                await this.store.set({key: user.key, value: dataset});
                 this.initListView();
             });
 
@@ -207,14 +222,14 @@ ccm.files["ccm.flash_cards.js"] = {
                     if (!b.deadline) return -1;
                     return a.deadline.localeCompare(b.deadline);
                 });
-                await this.store.set({ key: user.key, value: dataset });
+                await this.store.set({key: user.key, value: dataset});
                 this.initListView();
             });
 
             this.element.querySelector('#sort-courses-cardCount').addEventListener('click', async () => {
                 dataset.sortPreference = 'cardCount';
                 dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
-                await this.store.set({ key: user.key, value: dataset });
+                await this.store.set({key: user.key, value: dataset});
                 this.initListView();
             });
 
@@ -227,10 +242,10 @@ ccm.files["ccm.flash_cards.js"] = {
                         statusB.mediumPercent - statusA.mediumPercent ||
                         statusA.hardPercent - statusB.hardPercent;
                 });
-                await this.store.set({ key: user.key, value: dataset });
+                await this.store.set({key: user.key, value: dataset});
                 this.initListView();
             });
-        };
+        }
 
         this.initEditorDeckView = (deckToEdit) => {
             this.element.querySelector("#content").innerHTML = this.html.editor_deck;
@@ -513,7 +528,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         return;
                     }
 
-                    await this.store.set({ key: user.key, value: dataset });
+                    await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 }
             };
@@ -742,7 +757,7 @@ ccm.files["ccm.flash_cards.js"] = {
                             cards: deck.cards
                         };
 
-                        const blob = new Blob([JSON.stringify(deckToExport, null, 2)], { type: 'application/json' });
+                        const blob = new Blob([JSON.stringify(deckToExport, null, 2)], {type: 'application/json'});
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
@@ -786,7 +801,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 courseHtml.querySelector("#sort-deck-title").addEventListener('click', async () => {
                     course.sortPreference = 'title';
                     course.cardDecks.sort((a, b) => a.title.localeCompare(b.title));
-                    await this.store.set({ key: user.key, value: dataset });
+                    await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 });
 
@@ -797,14 +812,14 @@ ccm.files["ccm.flash_cards.js"] = {
                         if (!b.deadline) return -1;
                         return a.deadline.localeCompare(b.deadline);
                     });
-                    await this.store.set({ key: user.key, value: dataset });
+                    await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 });
 
                 courseHtml.querySelector("#sort-deck-cardCount").addEventListener('click', async () => {
                     course.sortPreference = 'cardCount';
                     course.cardDecks.sort((a, b) => this.getDeckStatus(a).totalCards - this.getDeckStatus(b).totalCards);
-                    await this.store.set({ key: user.key, value: dataset });
+                    await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 });
 
@@ -817,7 +832,7 @@ ccm.files["ccm.flash_cards.js"] = {
                             statusB.mediumPercent - statusA.mediumPercent ||
                             statusA.hardPercent - statusB.hardPercent;
                     });
-                    await this.store.set({ key: user.key, value: dataset });
+                    await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 });
 
@@ -834,7 +849,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         cardDecks: course.cardDecks
                     };
 
-                    const blob = new Blob([JSON.stringify(courseToExport, null, 2)], { type: 'application/json' });
+                    const blob = new Blob([JSON.stringify(courseToExport, null, 2)], {type: 'application/json'});
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
@@ -863,13 +878,13 @@ ccm.files["ccm.flash_cards.js"] = {
                 return;
             }
             course.cardDecks = course.cardDecks.filter(deck => deck.id !== deckId);
-            await this.store.set({ key: user.key, value: dataset });
+            await this.store.set({key: user.key, value: dataset});
             this.initListView();
         };
 
         this.deleteCourse = async (courseId) => {
             dataset = dataset.filter(course => course.id !== courseId);
-            await this.store.set({ key: user.key, value: dataset });
+            await this.store.set({key: user.key, value: dataset});
             this.initListView();
         };
 
@@ -888,7 +903,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 cardDecks: []
             };
 
-            const existingCourse = dataset.find(course => course.title === newCourse.title);
+            const existingCourse = dataset?.find(course => course.title === newCourse.title);
             if (existingCourse) {
                 alert("Ein Kurs mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
                 return;
@@ -1067,13 +1082,13 @@ ccm.files["ccm.flash_cards.js"] = {
                             break;
                         case 'status':
                             filteredCards.sort((a, b) => {
-                                const statusOrder = { hard: 0, medium: 1, easy: 2 };
+                                const statusOrder = {hard: 0, medium: 1, easy: 2};
                                 return statusOrder[a.status] - statusOrder[b.status];
                             });
                             break;
                     }
 
-                    const tempDeck = { ...deck, cards: filteredCards };
+                    const tempDeck = {...deck, cards: filteredCards};
                     learningModeDialogElement.remove();
                     overlay.remove();
                     resolve(tempDeck);
@@ -1109,11 +1124,11 @@ ccm.files["ccm.flash_cards.js"] = {
                 this.initListView();
             });
 
-            this.loadCardDeck(currentCourse, { cards: allCards, title: currentCourse.title });
+            this.loadCardDeck(currentCourse, {cards: allCards, title: currentCourse.title});
         };
 
         this.loadCardDeck = (course, cardDeck) => {
-            const cards = cardDeck.cards.map(card => card.card ? card : { card, deckTitle: cardDeck.title });
+            const cards = cardDeck.cards.map(card => card.card ? card : {card, deckTitle: cardDeck.title});
 
             const updateCardDisplay = (index) => {
                 if (index < 0 || index >= cards.length) return;
@@ -1178,7 +1193,7 @@ ccm.files["ccm.flash_cards.js"] = {
                             dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = difficulty;
                         }
 
-                        await this.store.set({ key: user.key, value: dataset });
+                        await this.store.set({key: user.key, value: dataset});
                     };
                 }
             };
