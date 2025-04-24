@@ -625,7 +625,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     return new Date(year, month - 1, day) < new Date();
                 })();
                 const courseDeadlineHtml = course.deadline ?
-                    `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${course.deadline}</a>`
+                    `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: <br> ${course.deadline}</a>`
                     : '';
 
                 const courseStatus = this.getCourseStatus(course);
@@ -680,7 +680,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)) < new Date();
                     })();
                     const deckDeadlineHtml = deck.deadline ?
-                        `<a style="color: ${isDeckDeadlineExpired ? 'red' : 'inherit'};">Deadline: ${deck.deadline}</a>`
+                        `<a style="color: ${isDeckDeadlineExpired ? 'red' : 'inherit'};">Deadline: <br> ${deck.deadline}</a>`
                         : '';
 
                     const deckStatus = this.getDeckStatus(deck);
