@@ -18,6 +18,28 @@ button {
         border: none;
     }
 }
+
+.modal-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 0 20px 20px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
 /*endregion */
 
 /*region main template */
@@ -240,10 +262,6 @@ button {
         cursor: pointer;
     }
 
-    #add-course-btn{
-        /*margin-left: 215px;*/
-    }
-
     #submit-course {
         border-radius: 20px;
         padding: 4px 8px;
@@ -279,7 +297,7 @@ button {
     }
 
     .input-group textarea {
-        width: 200px; /
+        width: 200px;
         resize: vertical;
     }
 

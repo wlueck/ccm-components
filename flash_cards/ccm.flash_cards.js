@@ -70,34 +70,40 @@ ccm.files["ccm.flash_cards.js"] = {
             this.element.querySelector('#import-deck').addEventListener('click', () => {
                 this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
 
-                if (document.querySelector('#course-select-dialog')) {
-                    document.querySelector('#course-select-dialog').remove();
+                if (this.element.querySelector('#course-select-dialog')) {
+                    this.element.querySelector('#course-select-dialog').remove();
                 }
 
-                const courseSelectDialog = document.createElement('div');
-                courseSelectDialog.id = 'course-select-dialog';
-                courseSelectDialog.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 0 20px 20px 20px; border: 1px solid #ccc; border-radius: 5px; z-index: 1000;';
-                courseSelectDialog.innerHTML = `
-                    <h3>Stapel importieren</h3>
-                    <label>Zugehöriger Kurs:</label><br>
-                    <select id="course-select" style="margin: 10px 0; padding: 5px">
-                        ${dataset.map(course => `<option value="${course.id}">${course.title}</option>`).join('')}
-                    </select>
-                    <div style="display: flex; gap: 10px; justify-content: flex-start; margin-top: 15px;">
-                        <button id="confirm-import">Datei auswählen</button>
-                        <button id="cancel-import">Abbrechen</button>
+                const overlay = document.createElement('div');
+                overlay.className = 'overlay';
+                this.element.querySelector("#main").appendChild(overlay);
+
+                const courseSelectDialog = `
+                    <div id="course-select-dialog" class="modal-dialog">
+                        <h3>Stapel importieren</h3>
+                        <label>Zugehöriger Kurs:</label><br>
+                        <select id="course-select" style="margin: 10px 0; padding: 5px">
+                            ${dataset.map(course => `<option value="${course.id}">${course.title}</option>`).join('')}
+                        </select>
+                        <div style="display: flex; gap: 10px; justify-content: flex-start; margin-top: 15px;">
+                            <button id="confirm-import">Datei auswählen</button>
+                            <button id="cancel-import">Abbrechen</button>
+                        </div>
                     </div>
                 `;
 
-                document.body.appendChild(courseSelectDialog);
+                const courseSelectDialogElement = this.ccm.helper.html(courseSelectDialog);
+                this.element.querySelector("#main").appendChild(courseSelectDialogElement);
 
-                document.querySelector('#cancel-import').addEventListener('click', () => {
-                    courseSelectDialog.remove();
+                this.element.querySelector('#cancel-import').addEventListener('click', () => {
+                    courseSelectDialogElement.remove();
+                    overlay.remove();
                 });
 
-                document.querySelector('#confirm-import').addEventListener('click', () => {
-                    const selectedCourseId = document.querySelector('#course-select').value;
-                    courseSelectDialog.remove();
+                this.element.querySelector('#confirm-import').addEventListener('click', () => {
+                    const selectedCourseId = this.element.querySelector('#course-select').value;
+                    courseSelectDialogElement.remove();
+                    overlay.remove();
 
                     const input = document.createElement('input');
                     input.type = 'file';
@@ -712,8 +718,8 @@ ccm.files["ccm.flash_cards.js"] = {
 
                     const cardDeckHtml = this.ccm.helper.html(cardDecksHtmlString);
 
-                    cardDeckHtml.querySelector(".start-deck-btn").addEventListener('click', (event) => {
-                        this.startDeck(course.id, deck.id);
+                    cardDeckHtml.querySelector(".start-deck-btn").addEventListener('click', async (event) => {
+                        await this.startDeck(course.id, deck.id);
                     });
 
                     cardDeckHtml.querySelector("#option-btn").addEventListener('click', (event) => {
@@ -953,9 +959,7 @@ ccm.files["ccm.flash_cards.js"] = {
             return calculateStatus(deck.cards);
         };
 
-        this.startDeck = (courseId, deckId) => {
-            this.element.querySelector("#content").innerHTML = this.html.card;
-
+        this.startDeck = async (courseId, deckId) => {
             const currentCourse = dataset.find(course => course.id === courseId);
             if (!currentCourse) {
                 console.error("Kurs nicht gefunden");
@@ -967,16 +971,112 @@ ccm.files["ccm.flash_cards.js"] = {
                 return;
             }
 
-            this.element.querySelector("#headline").innerHTML = currentCardDeck.title;
-            this.element.querySelector("#sub-headline").innerHTML = `(${currentCourse.title})`;
-            this.element.querySelector('#description').innerHTML = currentCardDeck.description || '';
-            this.element.querySelector('#max_number_cards').innerHTML = currentCardDeck.cards.length.toString();
+            const selectedDeck = await this.showLearningModeModal(currentCourse, currentCardDeck);
+            if (selectedDeck) {
+                this.element.querySelector("#content").innerHTML = this.html.card;
 
-            this.element.querySelector("#back-button").addEventListener("click", () => {
-                this.initListView();
+                this.element.querySelector("#headline").innerHTML = currentCardDeck.title;
+                this.element.querySelector("#sub-headline").innerHTML = `(${currentCourse.title})`;
+                this.element.querySelector('#description').innerHTML = currentCardDeck.description || '';
+                this.element.querySelector('#max_number_cards').innerHTML = selectedDeck.cards.length.toString();
+
+                this.element.querySelector("#back-button").addEventListener("click", () => {
+                    this.initListView();
+                });
+
+                this.loadCardDeck(currentCourse, selectedDeck);
+            }
+        };
+
+        this.showLearningModeModal = (course, deck) => {
+            if (this.element.querySelector('#learning-mode-dialog')) {
+                this.element.querySelector('#learning-mode-dialog').remove();
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            this.element.querySelector("#main").appendChild(overlay);
+
+            const learningModeDialog = `
+                <div id="learning-mode-dialog" class="modal-dialog">
+                    <h3>Lernmodus wählen</h3>
+                    <div>
+                        <label>Karten sortieren nach:</label><br>
+                        <select id="card-order" style="margin: 10px 0; padding: 5px; width: 200px;">
+                            <option value="original">Originalreihenfolge</option>
+                            <option value="random">Zufällig</option>
+                            <option value="status">Schwierigkeitsgrad</option>
+                        </select>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <label>Karten auswählen:</label><br>
+                        <select id="card-selection" style="margin: 10px 0; padding: 5px; width: 200px;">
+                            <option value="all">Alle Karten</option>
+                            <option value="hard">Nur schwere Karten</option>
+                            <option value="medium-hard">Mittel und schwere Karten</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+                        <button id="start-learning">Lernen beginnen</button>
+                        <button id="cancel-learning">Abbrechen</button>
+                    </div>
+                </div>
+            `;
+
+            const learningModeDialogElement = this.ccm.helper.html(learningModeDialog);
+            this.element.querySelector("#main").appendChild(learningModeDialogElement);
+
+            return new Promise((resolve) => {
+                this.element.querySelector('#cancel-learning').addEventListener('click', () => {
+                    learningModeDialogElement.remove();
+                    overlay.remove();
+                    resolve(false);
+                });
+
+                this.element.querySelector('#start-learning').addEventListener('click', () => {
+                    const orderMode = this.element.querySelector('#card-order').value;
+                    const selectionMode = this.element.querySelector('#card-selection').value;
+
+                    let filteredCards = [...deck.cards];
+
+                    // Apply card selection filter
+                    switch (selectionMode) {
+                        case 'hard':
+                            filteredCards = filteredCards.filter(card => card.status === 'hard');
+                            break;
+                        case 'medium-hard':
+                            filteredCards = filteredCards.filter(card => card.status === 'hard' || card.status === 'medium');
+                            break;
+                    }
+
+                    // Check if there are cards to learn
+                    if (filteredCards.length === 0) {
+                        alert("Keine Karten zum Lernen gefunden!");
+                        learningModeDialogElement.remove();
+                        overlay.remove();
+                        resolve(false);
+                        return;
+                    }
+
+                    // Apply ordering
+                    switch (orderMode) {
+                        case 'random':
+                            filteredCards.sort(() => Math.random() - 0.5);
+                            break;
+                        case 'status':
+                            filteredCards.sort((a, b) => {
+                                const statusOrder = { hard: 0, medium: 1, easy: 2 };
+                                return statusOrder[a.status] - statusOrder[b.status];
+                            });
+                            break;
+                    }
+
+                    const tempDeck = { ...deck, cards: filteredCards };
+                    learningModeDialogElement.remove();
+                    overlay.remove();
+                    resolve(tempDeck);
+                });
             });
-
-            this.loadCardDeck(currentCourse, currentCardDeck);
         };
 
         this.startCourse = (courseId) => {
