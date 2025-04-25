@@ -95,7 +95,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 const courseSelectDialog = `
                     <div id="course-select-dialog" class="modal-dialog">
                         <h3>Stapel importieren</h3>
-                        <label>Zugehöriger Kurs:</label><br>
+                        <label>Zugehörige Lehrveranstaltung:</label><br>
                         <select id="course-select" style="margin: 10px 0; padding: 5px">
                             ${dataset.map(course => `<option value="${course.id}">${course.title}</option>`).join('')}
                         </select>
@@ -139,11 +139,11 @@ ccm.files["ccm.flash_cards.js"] = {
                                 });
                                 const courseIndex = dataset.findIndex(c => c.id === selectedCourseId);
                                 if (courseIndex === -1) {
-                                    alert('Kurs nicht gefunden');
+                                    alert('Lehrveranstaltung nicht gefunden');
                                     return;
                                 }
                                 if (dataset[courseIndex].cardDecks.some(d => d.title === deck.title)) {
-                                    alert('Ein Stapel mit diesem Namen existiert bereits im ausgewählten Kurs');
+                                    alert('Ein Stapel mit diesem Namen existiert bereits in der ausgewählten Lehrveranstaltung');
                                     return;
                                 }
                                 dataset[courseIndex].cardDecks.push(deck);
@@ -186,7 +186,7 @@ ccm.files["ccm.flash_cards.js"] = {
                                 });
                             });
                             if (dataset.some(c => c.title === course.title)) {
-                                alert('Ein Kurs mit diesem Namen existiert bereits');
+                                alert('Eine Lehrveranstaltung mit diesem Namen existiert bereits');
                                 return;
                             }
                             dataset.push(course);
@@ -379,7 +379,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 const existingCourse = dataset.find(course => course.title === newCourse.title);
                 if (existingCourse) {
-                    alert("Ein Kurs mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
+                    alert("Eine Lehrveranstaltung mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
                     return;
                 }
                 dataset.push(newCourse);
@@ -434,7 +434,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 const courseIndex = dataset.findIndex(course => course.id === courseId);
                 if (courseIndex === -1) {
-                    alert("Kurs nicht gefunden");
+                    alert("Lehrveranstaltung nicht gefunden");
                     return;
                 }
                 if (dataset[courseIndex].cardDecks.some(deck => deck.title === newDeck.title)) {
@@ -487,7 +487,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 const courseIndex = dataset.findIndex(course => course.id === courseId);
                 if (courseIndex === -1) {
-                    alert("Kurs nicht gefunden");
+                    alert("Lehrveranstaltung nicht gefunden");
                     return;
                 }
                 if (deckToEdit.title !== updatedDeck.title && dataset[courseIndex].cardDecks.some(deck => deck.title === updatedDeck.title)) {
@@ -524,7 +524,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     if (courseIndex !== -1) {
                         dataset[courseIndex].cardDecks.push(updatedDeck);
                     } else {
-                        console.error("Neuer Kurs nicht gefunden");
+                        console.error("Neue Lehrveranstaltung nicht gefunden");
                         return;
                     }
 
@@ -660,7 +660,7 @@ ccm.files["ccm.flash_cards.js"] = {
                             <div id="card-description">${course.description ?? ''}</div>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <button id="card-toggle-btn" class="btn-low-style">⌄</button>
-                                <button id="start-course-btn">Gesamten Kurs lernen</button>
+                                <button id="start-course-btn">Gesamte Lehrveranstaltung lernen</button>
                                 <div id="card-options">
                                     <button id="course-option-btn" class="btn-low-style">...</button>
                                     <div id="course-options" class="hidden options">
@@ -905,7 +905,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             const existingCourse = dataset?.find(course => course.title === newCourse.title);
             if (existingCourse) {
-                alert("Ein Kurs mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
+                alert("Eine Lehrveranstaltung mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
                 return;
             }
             dataset.push(newCourse);
@@ -931,14 +931,14 @@ ccm.files["ccm.flash_cards.js"] = {
             if (courseToEdit.title !== updatedCourse.title) {
                 const existingCourse = dataset.find(course => course.title === updatedCourse.title);
                 if (existingCourse) {
-                    alert("Ein Kurs mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
+                    alert("Eine Lehrveranstaltung mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
                     return;
                 }
             }
 
             const courseIndex = dataset.findIndex(course => course.id === courseToEdit.id);
             if (courseIndex === -1) {
-                console.error("Kurs nicht gefunden");
+                console.error("Lehrveranstaltung nicht gefunden");
                 return;
             }
             dataset[courseIndex] = updatedCourse;
@@ -979,7 +979,7 @@ ccm.files["ccm.flash_cards.js"] = {
         this.startDeck = async (courseId, deckId) => {
             const currentCourse = dataset.find(course => course.id === courseId);
             if (!currentCourse) {
-                console.error("Kurs nicht gefunden");
+                console.error("Lehrveranstaltung nicht gefunden");
                 return;
             }
             const currentCardDeck = currentCourse.cardDecks.find(deck => deck.id === deckId);
@@ -1101,7 +1101,8 @@ ccm.files["ccm.flash_cards.js"] = {
 
             const currentCourse = dataset.find(course => course.id === courseId);
             if (!currentCourse) {
-                console.error("Kurs nicht gefunden");
+                console.error("Lehrveranstaltung nicht gefunden");
+                this.initListView();
                 return;
             }
             const allCards = currentCourse.cardDecks.flatMap(deck => deck.cards.map(card => ({
@@ -1110,13 +1111,13 @@ ccm.files["ccm.flash_cards.js"] = {
             })));
 
             if (allCards.length === 0) {
-                alert("Dieser Kurs enthält keine Karten!");
+                alert("Diese Lehrveranstaltung enthält keine Karten!");
                 this.initListView();
                 return;
             }
 
             this.element.querySelector("#headline").innerHTML = currentCourse.title;
-            this.element.querySelector("#sub-headline").innerHTML = "Gesamter Kurs";
+            this.element.querySelector("#sub-headline").innerHTML = "Gesamte Lehrveranstaltung";
             this.element.querySelector('#description').innerHTML = currentCourse.description || '';
             this.element.querySelector('#max_number_cards').innerHTML = allCards.length.toString();
 
@@ -1185,7 +1186,7 @@ ccm.files["ccm.flash_cards.js"] = {
                             dataset[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
 
                         if (deckIndex === -1) {
-                            // Kursmodus: Finde das richtige Deck
+                            // Lehrveranstaltung-Modus: Finde das richtige Deck
                             const cardIndex = cards.findIndex(c => c.card.id === currentCard.id);
                             cards[cardIndex].card.status = difficulty;
                         } else {
