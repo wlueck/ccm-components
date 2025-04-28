@@ -6,8 +6,8 @@
 
 ccm.files["ccm.flash_cards.js"] = {
     name: "flash-cards",
-    //ccm: "https://ccmjs.github.io/ccm/ccm.js",
-    ccm: "../libs/ccm-master/ccm.js",
+    ccm: "https://ccmjs.github.io/ccm/ccm.js",
+    //ccm: "../libs/ccm-master/ccm.js",
     config: {
         store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_mycollection"}],
         css: ["ccm.load", "./resources/styles.css"],
@@ -18,15 +18,44 @@ ccm.files["ccm.flash_cards.js"] = {
             editor_course: ["ccm.load", "./resources/editor_course.html"],
             card: ["ccm.load", "./resources/card.html"],
         },
-        user: ["ccm.start", "../libs/fb02user/ccm.fb02user.js"],
+        //user: ["ccm.start", "../libs/fb02user/ccm.fb02user.js"],
+        "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"]
+        //"user": [ "ccm.instance", "https://ccmjs.github.io/akless-components/user/versions/ccm.user-9.7.1.js" ]
     },
 
     Instance: function () {
         let user, dataset;
 
+        this.init = async () => {
+            if (this.user) this.user.onchange = this.start;
+        }
+
         this.start = async () => {
             this.element.innerHTML = this.html.main;
 
+            if (this.user) {
+                this.element.querySelector('#user').append(this.user.root);
+                this.user.start();
+            }
+
+            user = await this.user.getValue();
+            if (!user) {
+                alert("Please log in to continue.");
+                console.log("User is not logged in");
+                return;
+            }
+
+            dataset = await this.store.get(user.key);
+            if (!dataset) {
+                console.log("No dataset found");
+                await this.store.set({key: user.key, value: []});
+                dataset = await this.store.get(user.key);
+            }
+
+            dataset = dataset.value;
+            this.initListView();
+
+            /*
             // user initialization
             this.element.querySelector('#user').append(this.user.root);
             user = await this.user.getValue();
@@ -45,6 +74,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             dataset = dataset.value;
             this.initListView();
+             */
         };
 
         this.initListView = () => {
