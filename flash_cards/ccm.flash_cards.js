@@ -248,9 +248,11 @@ ccm.files["ccm.flash_cards.js"] = {
             this.element.querySelector('#sort-courses-deadline').addEventListener('click', async () => {
                 dataset.sortPreference = 'deadline';
                 dataset.sort((a, b) => {
-                    if (!a.deadline) return 1;
-                    if (!b.deadline) return -1;
-                    return a.deadline.localeCompare(b.deadline);
+                    const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
+                    const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
+                    if (!dateA) return 1;
+                    if (!dateB) return -1;
+                    return dateA - dateB;
                 });
                 await this.store.set({key: user.key, value: dataset});
                 this.initListView();
@@ -644,9 +646,11 @@ ccm.files["ccm.flash_cards.js"] = {
                         break;
                     case 'deadline':
                         dataset.sort((a, b) => {
-                            if (!a.deadline) return 1;
-                            if (!b.deadline) return -1;
-                            return a.deadline.localeCompare(b.deadline);
+                            const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
+                            const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
+                            if (!dateA) return 1;
+                            if (!dateB) return -1;
+                            return dateA - dateB;
                         });
                         break;
                     case 'cardCount':
@@ -838,9 +842,11 @@ ccm.files["ccm.flash_cards.js"] = {
                 courseHtml.querySelector("#sort-deck-deadline").addEventListener('click', async () => {
                     course.sortPreference = 'deadline';
                     course.cardDecks.sort((a, b) => {
-                        if (!a.deadline) return 1;
-                        if (!b.deadline) return -1;
-                        return a.deadline.localeCompare(b.deadline);
+                        const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
+                        const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
+                        if (!dateA) return 1;
+                        if (!dateB) return -1;
+                        return dateA - dateB;
                     });
                     await this.store.set({key: user.key, value: dataset});
                     this.initListView();
