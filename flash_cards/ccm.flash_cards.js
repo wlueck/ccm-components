@@ -98,6 +98,16 @@ ccm.files["ccm.flash_cards.js"] = {
                     </div>`;
                 return;
             }
+
+            this.element.querySelectorAll("#sort-courses-options a").forEach(el => {
+                let a = el.querySelector("span");
+                if (el.id === `sort-courses-${dataset.sortPreference}`) {
+                    a.classList.remove('hidden');
+                } else {
+                    a.classList.add('hidden');
+                }
+            });
+
             this.initSortCoursesButtons();
             this.fillCourseList();
         };
@@ -700,10 +710,10 @@ ccm.files["ccm.flash_cards.js"] = {
                                     <div id="course-options" class="hidden options">
                                         <a id="sort-decks">Sortieren</a>
                                         <div id="sort-deck-options" class="hidden options">
-                                            <a id="sort-deck-title">Nach Titel</a>
-                                            <a id="sort-deck-deadline">Nach Deadline</a>
-                                            <a id="sort-deck-cardCount">Nach Anzahl der Karten</a>
-                                            <a id="sort-deck-status">Nach Status</a>
+                                            <a id="sort-deck-title">Nach Titel${course.sortPreference === 'title' ? ' <span>✔</span>' : ''}</a>
+                                            <a id="sort-deck-deadline">Nach Deadline${course.sortPreference === 'deadline' ? ' <span>✔</span>' : ''}</a>
+                                            <a id="sort-deck-cardCount">Nach Anzahl der Karten${course.sortPreference === 'cardCount' ? ' <span>✔</span>' : ''}</a>
+                                            <a id="sort-deck-status">Nach Status${course.sortPreference === 'status' ? ' <span>✔</span>' : ''}</a>
                                         </div>
                                         <a id="edit-course">Bearbeiten</a>
                                         <a id="export-course">Exportieren</a>
