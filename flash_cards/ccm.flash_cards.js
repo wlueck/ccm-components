@@ -103,7 +103,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             this.element.querySelectorAll("#sort-courses-options a").forEach(el => {
                 let a = el.querySelector("span");
-                if (el.id === `sort-courses-${dataset.courses.sortPreference}`) {
+                if (el.id === `sort-courses-${dataset.sortPreference}`) {
                     a.classList.remove('hidden');
                 } else {
                     a.classList.add('hidden');
