@@ -85,7 +85,7 @@ ccm.files["ccm.flash_cards.js"] = {
             this.element.querySelector('#sub-headline').innerHTML = "";
             this.initAddDeckCourseButtons();
 
-            if (dataset.length === 0) {
+            if (dataset.courses.length === 0) {
                 this.element.querySelector("#sort-courses-button").classList.add('hidden');
                 this.element.querySelector("#list-of-courses").innerHTML = `
                     <div style="padding-left: 20px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
@@ -103,7 +103,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             this.element.querySelectorAll("#sort-courses-options a").forEach(el => {
                 let a = el.querySelector("span");
-                if (el.id === `sort-courses-${dataset.sortPreference}`) {
+                if (el.id === `sort-courses-${dataset.courses.sortPreference}`) {
                     a.classList.remove('hidden');
                 } else {
                     a.classList.add('hidden');
@@ -139,7 +139,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         <h3>Stapel importieren</h3>
                         <label>Zugehörige Lehrveranstaltung:</label><br>
                         <select id="course-select" style="margin: 10px 0; padding: 5px">
-                            ${dataset.map(course => `<option value="${course.id}">${course.title}</option>`).join('')}
+                            ${dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join('')}
                         </select>
                         <div style="display: flex; gap: 10px; justify-content: flex-start; margin-top: 15px;">
                             <button id="confirm-import">Datei auswählen</button>
@@ -177,18 +177,19 @@ ccm.files["ccm.flash_cards.js"] = {
                                 deck.id = deck.id || this.ccm.helper.generateKey();
                                 deck.cards.forEach(card => {
                                     card.id = card.id || this.ccm.helper.generateKey();
-                                    card.status = card.status || "hard";
+                                    card.currentStatus = card.currentStatus || "hard";
+                                    card.status = card.status || [];
                                 });
-                                const courseIndex = dataset.findIndex(c => c.id === selectedCourseId);
+                                const courseIndex = dataset.courses.findIndex(c => c.id === selectedCourseId);
                                 if (courseIndex === -1) {
                                     alert('Lehrveranstaltung nicht gefunden');
                                     return;
                                 }
-                                if (dataset[courseIndex].cardDecks.some(d => d.title === deck.title)) {
+                                if (dataset.courses[courseIndex].cardDecks.some(d => d.title === deck.title)) {
                                     alert('Ein Stapel mit diesem Namen existiert bereits in der ausgewählten Lehrveranstaltung');
                                     return;
                                 }
-                                dataset[courseIndex].cardDecks.push(deck);
+                                dataset.courses[courseIndex].cardDecks.push(deck);
                                 await this.store.set({key: user.key, value: dataset});
                                 this.initListView();
                             } catch (error) {
@@ -224,14 +225,15 @@ ccm.files["ccm.flash_cards.js"] = {
                                 deck.id = deck.id || this.ccm.helper.generateKey();
                                 deck.cards.forEach(card => {
                                     card.id = card.id || this.ccm.helper.generateKey();
-                                    card.status = card.status || "hard";
+                                    card.currentStatus = card.currentStatus || "hard";
+                                    card.status = card.status || [];
                                 });
                             });
-                            if (dataset.some(c => c.title === course.title)) {
+                            if (dataset.courses.some(c => c.title === course.title)) {
                                 alert('Eine Lehrveranstaltung mit diesem Namen existiert bereits');
                                 return;
                             }
-                            dataset.push(course);
+                            dataset.courses.push(course);
                             await this.store.set({key: user.key, value: dataset});
                             this.initListView();
                         } catch (error) {
@@ -252,14 +254,14 @@ ccm.files["ccm.flash_cards.js"] = {
 
             this.element.querySelector('#sort-courses-title').addEventListener('click', async () => {
                 dataset.sortPreference = 'title';
-                dataset.sort((a, b) => a.title.localeCompare(b.title));
+                dataset.courses.sort((a, b) => a.title.localeCompare(b.title));
                 await this.store.set({key: user.key, value: dataset});
                 this.initListView();
             });
 
             this.element.querySelector('#sort-courses-deadline').addEventListener('click', async () => {
                 dataset.sortPreference = 'deadline';
-                dataset.sort((a, b) => {
+                dataset.courses.sort((a, b) => {
                     const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
                     const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
                     if (!dateA) return 1;
@@ -272,14 +274,14 @@ ccm.files["ccm.flash_cards.js"] = {
 
             this.element.querySelector('#sort-courses-cardCount').addEventListener('click', async () => {
                 dataset.sortPreference = 'cardCount';
-                dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
+                dataset.courses.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
                 await this.store.set({key: user.key, value: dataset});
                 this.initListView();
             });
 
             this.element.querySelector('#sort-courses-status').addEventListener('click', async () => {
                 dataset.sortPreference = 'status';
-                dataset.sort((a, b) => {
+                dataset.courses.sort((a, b) => {
                     const statusA = this.getCourseStatus(a);
                     const statusB = this.getCourseStatus(b);
                     return statusB.easyPercent - statusA.easyPercent ||
@@ -319,7 +321,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             const courseSelect = this.element.querySelector("#course");
 
-            dataset.forEach(course => {
+            dataset.courses.forEach(course => {
                 const option = document.createElement("option");
                 option.value = course.id;
                 option.textContent = course.title;
@@ -328,7 +330,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             if (deckToEdit) {
                 const courseSelect = this.element.querySelector("#course");
-                const selectedCourse = dataset.find(course => course.cardDecks.some(deck => deck.id === deckToEdit.id));
+                const selectedCourse = dataset.courses.find(course => course.cardDecks.some(deck => deck.id === deckToEdit.id));
 
                 if (selectedCourse) {
                     courseSelect.value = selectedCourse.id;
@@ -421,12 +423,12 @@ ccm.files["ccm.flash_cards.js"] = {
                     cardDecks: []
                 };
 
-                const existingCourse = dataset.find(course => course.title === newCourse.title);
+                const existingCourse = dataset.courses.find(course => course.title === newCourse.title);
                 if (existingCourse) {
                     alert("Eine Lehrveranstaltung mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
                     return;
                 }
-                dataset.push(newCourse);
+                dataset.courses.push(newCourse);
                 await this.store.set({key: user.key, value: dataset});
 
                 // close the add course container and reset the input fields
@@ -478,12 +480,12 @@ ccm.files["ccm.flash_cards.js"] = {
                     cards: []
                 };
 
-                const courseIndex = dataset.findIndex(course => course.id === courseId);
+                const courseIndex = dataset.courses.findIndex(course => course.id === courseId);
                 if (courseIndex === -1) {
                     alert("Lehrveranstaltung nicht gefunden");
                     return;
                 }
-                if (dataset[courseIndex].cardDecks.some(deck => deck.title === newDeck.title)) {
+                if (dataset.courses[courseIndex].cardDecks.some(deck => deck.title === newDeck.title)) {
                     alert("Ein Stapel mit dem Namen existiert bereits! Wählen Sie einen anderen Namen.");
                     return;
                 }
@@ -499,7 +501,8 @@ ccm.files["ccm.flash_cards.js"] = {
                             id: this.ccm.helper.generateKey(),
                             question: question,
                             answer: answer,
-                            status: "hard"
+                            currentStatus: "hard",
+                            status: []
                         });
                     } else if (question !== "" || answer !== "") {
                         alert("Bitte füllen Sie beide Felder (Frage und Antwort) aus!");
@@ -508,7 +511,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 });
 
                 if (valid) {
-                    dataset[courseIndex].cardDecks.push(newDeck);
+                    dataset.courses[courseIndex].cardDecks.push(newDeck);
                     await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 }
@@ -531,12 +534,12 @@ ccm.files["ccm.flash_cards.js"] = {
                     cards: []
                 };
 
-                const courseIndex = dataset.findIndex(course => course.id === courseId);
+                const courseIndex = dataset.courses.findIndex(course => course.id === courseId);
                 if (courseIndex === -1) {
                     alert("Lehrveranstaltung nicht gefunden");
                     return;
                 }
-                if (deckToEdit.title !== updatedDeck.title && dataset[courseIndex].cardDecks.some(deck => deck.title === updatedDeck.title)) {
+                if (deckToEdit.title !== updatedDeck.title && dataset.courses[courseIndex].cardDecks.some(deck => deck.title === updatedDeck.title)) {
                     alert("Ein Stapel mit dem Namen existiert bereits! Wählen Sie einen anderen Namen.");
                     return;
                 }
@@ -553,7 +556,8 @@ ccm.files["ccm.flash_cards.js"] = {
                             id: cardId,
                             question: question,
                             answer: answer,
-                            status: deckToEdit.cards.find(c => c.id === cardId)?.status || "hard"
+                            currentStatus: deckToEdit.cards.find(c => c.id === cardId)?.currentStatus || "hard",
+                            status: deckToEdit.cards.find(c => c.id === cardId)?.status || []
                         });
                     } else if (question !== "" || answer !== "") {
                         alert("Bitte füllen Sie beide Felder (Frage und Antwort) aus!");
@@ -562,13 +566,13 @@ ccm.files["ccm.flash_cards.js"] = {
                 });
 
                 if (valid) {
-                    const oldCourseIndex = dataset.findIndex(coursel => coursel.cardDecks.some(deck => deck.id === deckToEdit.id));
+                    const oldCourseIndex = dataset.courses.findIndex(coursel => coursel.cardDecks.some(deck => deck.id === deckToEdit.id));
                     if (oldCourseIndex !== -1) {
-                        dataset[oldCourseIndex].cardDecks = dataset[oldCourseIndex].cardDecks.filter(deck => deck.id !== deckToEdit.id);
+                        dataset.courses[oldCourseIndex].cardDecks = dataset.courses[oldCourseIndex].cardDecks.filter(deck => deck.id !== deckToEdit.id);
                     }
 
                     if (courseIndex !== -1) {
-                        dataset[courseIndex].cardDecks.push(updatedDeck);
+                        dataset.courses[courseIndex].cardDecks.push(updatedDeck);
                     } else {
                         console.error("Neue Lehrveranstaltung nicht gefunden");
                         return;
@@ -658,10 +662,10 @@ ccm.files["ccm.flash_cards.js"] = {
             if (dataset.sortPreference) {
                 switch (dataset.sortPreference) {
                     case 'title':
-                        dataset.sort((a, b) => a.title.localeCompare(b.title));
+                        dataset.courses.sort((a, b) => a.title.localeCompare(b.title));
                         break;
                     case 'deadline':
-                        dataset.sort((a, b) => {
+                        dataset.courses.sort((a, b) => {
                             const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
                             const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
                             if (!dateA) return 1;
@@ -670,10 +674,10 @@ ccm.files["ccm.flash_cards.js"] = {
                         });
                         break;
                     case 'cardCount':
-                        dataset.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
+                        dataset.courses.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
                         break;
                     case 'status':
-                        dataset.sort((a, b) => {
+                        dataset.courses.sort((a, b) => {
                             const statusA = this.getCourseStatus(a);
                             const statusB = this.getCourseStatus(b);
                             return statusB.easyPercent - statusA.easyPercent ||
@@ -684,7 +688,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             }
 
-            for (const course of dataset) {
+            for (const course of dataset.courses) {
                 const isDeadlineExpired = course.deadline && (() => {
                     const [day, month, year] = course.deadline.split('.');
                     return new Date(year, month - 1, day) < new Date();
@@ -924,7 +928,7 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.deleteDeck = async (courseId, deckId) => {
-            const course = dataset.find(course => course.id === courseId);
+            const course = dataset.courses.find(course => course.id === courseId);
             if (!course) {
                 console.error("Lehrveranstaltung nicht gefunden");
                 return;
@@ -935,7 +939,7 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.deleteCourse = async (courseId) => {
-            dataset = dataset.filter(course => course.id !== courseId);
+            dataset.courses = dataset.courses.filter(course => course.id !== courseId);
             await this.store.set({key: user.key, value: dataset});
             this.initListView();
         };
@@ -955,12 +959,12 @@ ccm.files["ccm.flash_cards.js"] = {
                 cardDecks: []
             };
 
-            const existingCourse = dataset?.find(course => course.title === newCourse.title);
+            const existingCourse = dataset.courses?.find(course => course.title === newCourse.title);
             if (existingCourse) {
                 alert("Eine Lehrveranstaltung mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
                 return;
             }
-            dataset.push(newCourse);
+            dataset.courses.push(newCourse);
             await this.store.set({key: user.key, value: dataset});
             this.initListView();
         };
@@ -981,27 +985,27 @@ ccm.files["ccm.flash_cards.js"] = {
             };
 
             if (courseToEdit.title !== updatedCourse.title) {
-                const existingCourse = dataset.find(course => course.title === updatedCourse.title);
+                const existingCourse = dataset.courses.find(course => course.title === updatedCourse.title);
                 if (existingCourse) {
                     alert("Eine Lehrveranstaltung mit diesem Namen existiert bereits! Bitte wählen Sie einen anderen Namen.");
                     return;
                 }
             }
 
-            const courseIndex = dataset.findIndex(course => course.id === courseToEdit.id);
+            const courseIndex = dataset.courses.findIndex(course => course.id === courseToEdit.id);
             if (courseIndex === -1) {
                 console.error("Lehrveranstaltung nicht gefunden");
                 return;
             }
-            dataset[courseIndex] = updatedCourse;
+            dataset.courses[courseIndex] = updatedCourse;
             await this.store.set({key: user.key, value: dataset});
             this.initListView();
         };
 
         const calculateStatus = (cards) => {
-            let countEasy = cards.filter(card => card.status === 'easy').length;
-            let countMedium = cards.filter(card => card.status === 'medium').length;
-            let countHard = cards.filter(card => card.status === 'hard').length;
+            let countEasy = cards.filter(card => card.currentStatus === 'easy').length;
+            let countMedium = cards.filter(card => card.currentStatus === 'medium').length;
+            let countHard = cards.filter(card => card.currentStatus === 'hard').length;
 
             const totalCards = countEasy + countMedium + countHard;
             const easyPercent = totalCards > 0 ? (countEasy / totalCards) * 100 : 0;
@@ -1029,7 +1033,7 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.startDeck = async (courseId, deckId) => {
-            const currentCourse = dataset.find(course => course.id === courseId);
+            const currentCourse = dataset.courses.find(course => course.id === courseId);
             if (!currentCourse) {
                 console.error("Lehrveranstaltung nicht gefunden");
                 return;
@@ -1111,10 +1115,10 @@ ccm.files["ccm.flash_cards.js"] = {
                     // Apply card selection filter
                     switch (selectionMode) {
                         case 'hard':
-                            filteredCards = filteredCards.filter(card => card.status === 'hard');
+                            filteredCards = filteredCards.filter(card => card.currentStatus === 'hard');
                             break;
                         case 'medium-hard':
-                            filteredCards = filteredCards.filter(card => card.status === 'hard' || card.status === 'medium');
+                            filteredCards = filteredCards.filter(card => card.currentStatus === 'hard' || card.currentStatus === 'medium');
                             break;
                     }
 
@@ -1135,7 +1139,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         case 'status':
                             filteredCards.sort((a, b) => {
                                 const statusOrder = {hard: 0, medium: 1, easy: 2};
-                                return statusOrder[a.status] - statusOrder[b.status];
+                                return statusOrder[a.currentStatus] - statusOrder[b.currentStatus];
                             });
                             break;
                     }
@@ -1151,7 +1155,7 @@ ccm.files["ccm.flash_cards.js"] = {
         this.startCourse = (courseId) => {
             this.element.querySelector("#content").innerHTML = this.html.card;
 
-            const currentCourse = dataset.find(course => course.id === courseId);
+            const currentCourse = dataset.courses.find(course => course.id === courseId);
             if (!currentCourse) {
                 console.error("Lehrveranstaltung nicht gefunden");
                 this.initListView();
@@ -1233,17 +1237,19 @@ ccm.files["ccm.flash_cards.js"] = {
                         }
                         button.classList.add("selected-difficulty");
 
-                        const courseIndex = dataset.findIndex(c => c.id === course.id);
+                        const courseIndex = dataset.courses.findIndex(c => c.id === course.id);
                         const deckIndex = cardDeck.title === course.title ? -1 :
-                            dataset[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
+                            dataset.courses[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
 
                         if (deckIndex === -1) {
-                            // Lehrveranstaltung-Modus: Finde das richtige Deck
+                            // Modus: gesamte Lehrveranstaltung
                             const cardIndex = cards.findIndex(c => c.card.id === currentCard.id);
-                            cards[cardIndex].card.status = difficulty;
+                            cards[cardIndex].card.currentStatus = difficulty;
+                            cards[cardIndex].card.status.push(difficulty);
                         } else {
-                            const cardIndex = dataset[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
-                            dataset[courseIndex].cardDecks[deckIndex].cards[cardIndex].status = difficulty;
+                            const cardIndex = dataset.courses[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
+                            dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].currentStatus = difficulty;
+                            dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].status.push(difficulty);
                         }
 
                         await this.store.set({key: user.key, value: dataset});
