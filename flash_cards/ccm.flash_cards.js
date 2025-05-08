@@ -460,6 +460,15 @@ ccm.files["ccm.flash_cards.js"] = {
                 if (deckToEdit) await this.updateDeck(form, deckToEdit);
                 else await this.saveDeck(form);
             });
+            const cancelButton = this.element.querySelector(".cancel");
+            cancelButton.addEventListener("click", (event) => {
+                event.preventDefault();
+                const confirmCancel = confirm(`Möchten Sie die Änderungen wirklich verwerfen?`);
+                if (confirmCancel) {
+                    this.initListView();
+                }
+            });
+
             const saveHint = this.element.querySelector(".save-hint");
             deckToEdit ? saveHint.classList.add("hidden") : saveHint.classList.remove("hidden");
 
@@ -650,6 +659,14 @@ ccm.files["ccm.flash_cards.js"] = {
                 event.preventDefault();
                 if (courseToEdit) await this.updateCourse(form, courseToEdit);
                 else await this.addCourse(form);
+            });
+            const cancelButton = this.element.querySelector(".cancel");
+            cancelButton.addEventListener("click", (event) => {
+                event.preventDefault();
+                const confirmCancel = confirm(`Möchten Sie die Änderungen wirklich verwerfen?`);
+                if (confirmCancel) {
+                    this.initListView();
+                }
             });
             const saveHint = this.element.querySelector(".save-hint");
             courseToEdit ? saveHint.classList.add("hidden") : saveHint.classList.remove("hidden");
