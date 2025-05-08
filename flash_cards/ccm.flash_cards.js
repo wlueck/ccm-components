@@ -458,6 +458,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 if (deckToEdit) await this.updateDeck(form, deckToEdit);
                 else await this.saveDeck(form);
             });
+            const saveHint = this.element.querySelector(".save-hint");
+            deckToEdit ? saveHint.classList.add("hidden") : saveHint.classList.remove("hidden");
 
             this.saveDeck = async (form) => {
                 const courseId = form.course.value;
@@ -645,6 +647,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 if (courseToEdit) await this.updateCourse(form, courseToEdit);
                 else await this.addCourse(form);
             });
+            const saveHint = this.element.querySelector(".save-hint");
+            courseToEdit ? saveHint.classList.add("hidden") : saveHint.classList.remove("hidden");
         };
 
         this.fillCourseList = () => {
