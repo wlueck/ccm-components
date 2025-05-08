@@ -9,16 +9,18 @@ ccm.files["ccm.flash_cards.js"] = {
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     //ccm: "../libs/ccm-master/ccm.js",
     config: {
-        store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_mycollection"}],
-        css: ["ccm.load", "./resources/styles.css"],
-        html: {
-            main: ["ccm.load", "./resources/main.html"],
-            list: ["ccm.load", "./resources/list.html"],
-            editor_deck: ["ccm.load", "./resources/editor_deck.html"],
-            editor_course: ["ccm.load", "./resources/editor_course.html"],
-            card: ["ccm.load", "./resources/card.html"],
+        "store": ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_mycollection"}],
+        "css": ["ccm.load", "./resources/styles.css"],
+        "html": {
+            "main": ["ccm.load", "./resources/main.html"],
+            "list": ["ccm.load", "./resources/list.html"],
+            "editor_deck": ["ccm.load", "./resources/editor_deck.html"],
+            "editor_course": ["ccm.load", "./resources/editor_course.html"],
+            "card": ["ccm.load", "./resources/card.html"],
         },
         //user: ["ccm.start", "../libs/fb02user/ccm.fb02user.js"],
+
+        //"user": ["ccm.start", "../libs/fb02user/ccm.fb02user.js"],
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"]
         //"user": [ "ccm.instance", "https://ccmjs.github.io/akless-components/user/versions/ccm.user-9.7.1.js" ]
     },
