@@ -40,6 +40,10 @@ button {
     z-index: 1000;
 }
 
+.save-hint {
+    font-size: 14px;
+    color: #555;
+}
 /*endregion */
 
 /*region main template */
