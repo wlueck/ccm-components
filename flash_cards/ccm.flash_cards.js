@@ -77,6 +77,16 @@ ccm.files["ccm.flash_cards.js"] = {
             dataset = dataset.value;
             this.initListView();
              */
+
+            // close dropdowns when clicking outside
+            this.element.addEventListener('click', (event) => {
+                const dropdowns = this.element.querySelectorAll('.dropdown-menu, .options');
+                dropdowns.forEach(dropdown => {
+                    if (!dropdown.contains(event.target) && !dropdown.previousElementSibling.contains(event.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+            });
         };
 
         this.initListView = () => {
