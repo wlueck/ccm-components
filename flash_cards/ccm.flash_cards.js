@@ -168,9 +168,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 dataset.courses.sort((a, b) => {
                     const statusA = this.getCourseStatus(a);
                     const statusB = this.getCourseStatus(b);
-                    return statusB.easyPercent - statusA.easyPercent ||
+                    return statusB.hardPercent - statusA.hardPercent ||
                         statusB.mediumPercent - statusA.mediumPercent ||
-                        statusA.hardPercent - statusB.hardPercent;
+                        statusA.easyPercent - statusB.easyPercent;
                 });
                 await this.store.set({key: user.key, value: dataset});
                 this.initListView();
@@ -612,9 +612,9 @@ ccm.files["ccm.flash_cards.js"] = {
                         dataset.courses.sort((a, b) => {
                             const statusA = this.getCourseStatus(a);
                             const statusB = this.getCourseStatus(b);
-                            return statusB.easyPercent - statusA.easyPercent ||
+                            return statusB.hardPercent - statusA.hardPercent ||
                                 statusB.mediumPercent - statusA.mediumPercent ||
-                                statusA.hardPercent - statusB.hardPercent;
+                                statusA.easyPercent - statusB.easyPercent;
                         });
                         break;
                 }
@@ -818,9 +818,9 @@ ccm.files["ccm.flash_cards.js"] = {
                     course.cardDecks.sort((a, b) => {
                         const statusA = this.getDeckStatus(a);
                         const statusB = this.getDeckStatus(b);
-                        return statusB.easyPercent - statusA.easyPercent ||
+                        return statusB.hardPercent - statusA.hardPercent ||
                             statusB.mediumPercent - statusA.mediumPercent ||
-                            statusA.hardPercent - statusB.hardPercent;
+                            statusA.easyPercent - statusB.easyPercent;
                     });
                     await this.store.set({key: user.key, value: dataset});
                     this.initListView();
@@ -1108,9 +1108,9 @@ ccm.files["ccm.flash_cards.js"] = {
                             filteredCards.sort((a, b) => {
                                 const statusA = this.getDeckStatus(a);
                                 const statusB = this.getDeckStatus(b);
-                                return statusB.easyPercent - statusA.easyPercent ||
+                                return statusB.hardPercent - statusA.hardPercent ||
                                     statusB.mediumPercent - statusA.mediumPercent ||
-                                    statusA.hardPercent - statusB.hardPercent;
+                                    statusA.easyPercent - statusB.easyPercent;
                             });
                             break;
                     }
