@@ -175,7 +175,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             });
         }
-// todo
+
         this.initEditorDeckView = (deckToEdit) => {
             this.element.querySelector("#content").innerHTML = this.html.editor_deck;
             this.element.querySelector('#headline').innerHTML = deckToEdit ? "Karteikartenstapel bearbeiten" : "Karteikartenstapel erstellen";
@@ -185,25 +185,19 @@ ccm.files["ccm.flash_cards.js"] = {
                 this.initListView();
             });
 
-            this.element.querySelector("#add-card").addEventListener("click", (event) => {
-                event.preventDefault();
-                addCard();
-            });
-
             const form = this.element.querySelector("#add-card-deck-form");
-            const checkbox = this.element.querySelector('#deadline');
-            const textFieldContainer = this.element.querySelector('#deadlineInput');
 
-            checkbox.addEventListener('change', function (event) {
+            const deadlineCheckboxDeck = this.element.querySelector('#deadline');
+            const deadlineInputDeck = this.element.querySelector('#deadlineInput');
+            deadlineCheckboxDeck.addEventListener('change', function (event) {
                 if (event.currentTarget.checked) {
-                    textFieldContainer.classList.remove('hidden');
+                    deadlineInputDeck.classList.remove('hidden');
                 } else {
-                    textFieldContainer.classList.add('hidden');
+                    deadlineInputDeck.classList.add('hidden');
                 }
             });
 
             const courseSelect = this.element.querySelector("#course");
-
             dataset.courses.forEach(course => {
                 const option = document.createElement("option");
                 option.value = course.id;
@@ -212,9 +206,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             if (deckToEdit) {
-                const courseSelect = this.element.querySelector("#course");
                 const selectedCourse = dataset.courses.find(course => course.cardDecks.some(deck => deck.id === deckToEdit.id));
-
                 if (selectedCourse) {
                     courseSelect.value = selectedCourse.id;
                 }
@@ -223,40 +215,21 @@ ccm.files["ccm.flash_cards.js"] = {
                 form.description.value = deckToEdit.description || '';
 
                 if (deckToEdit.deadline) {
-                    const deadlineCheckbox = this.element.querySelector('#deadline');
-                    const deadlineInput = this.element.querySelector('#deadlineInput');
-
-                    deadlineCheckbox.checked = true;
-                    deadlineInput.classList.remove('hidden');
+                    deadlineCheckboxDeck.checked = true;
+                    deadlineInputDeck.classList.remove('hidden');
 
                     const [day, month, year] = deckToEdit.deadline.split('.');
-                    deadlineInput.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    deadlineInputDeck.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                 }
 
                 if (deckToEdit.cards.length > 0) {
+                    this.element.querySelector("#card").setAttribute('data-card-id', deckToEdit.cards[0].id);
                     this.element.querySelector("#question").value = deckToEdit.cards[0].question;
                     this.element.querySelector("#answer").value = deckToEdit.cards[0].answer;
                 }
 
                 deckToEdit.cards.slice(1).forEach(card => {
-                    const htmlCardString = `
-                        <div id="card">
-                            <div class="input-group">
-                                <label for="question">Frage:</label>
-                                <textarea id="question" name="question" cols="34" rows="5">${card.question}</textarea>
-                            </div>
-                            <div class="input-group">
-                                <label for="answer">Antwort:</label>
-                                <textarea id="answer" name="answer" cols="34" rows="5">${card.answer}</textarea>
-                            </div>
-                            <button id="delete-card-button">Karte löschen</button>
-                            <input type="hidden" name="card-id" value="${card.id}">
-                        </div>`;
-                    const htmlCard = this.ccm.helper.html(htmlCardString);
-                    htmlCard.querySelector("#delete-card-button").addEventListener("click", () => {
-                        htmlCard.remove();
-                    });
-                    this.element.querySelector("#cards").append(htmlCard);
+                    addCard(card);
                 });
             }
 
@@ -272,18 +245,18 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             const deadlineCheckboxCourse = this.element.querySelector('#courseDeadline');
-            const deadlineTextFieldContainerCourse = this.element.querySelector('#courseDeadlineInput');
+            const deadlineInputCourse = this.element.querySelector('#courseDeadlineInput');
 
             deadlineCheckboxCourse.addEventListener('change', function (event) {
                 if (event.currentTarget.checked) {
-                    deadlineTextFieldContainerCourse.classList.remove('hidden');
+                    deadlineInputCourse.classList.remove('hidden');
                 } else {
-                    deadlineTextFieldContainerCourse.classList.add('hidden');
+                    deadlineInputCourse.classList.add('hidden');
                 }
             });
 
-            const submitCourseBtn = this.element.querySelector("#submit-course");
-            submitCourseBtn.addEventListener("click", async (event) => {
+            const submitCourseButton = this.element.querySelector("#submit-course");
+            submitCourseButton.addEventListener("click", async (event) => {
                 event.preventDefault();
                 if (!this.element.querySelector("#add-course-input").value) {
                     alert("Bitte füllen Sie alle erforderlichen Felder aus!");
@@ -330,9 +303,14 @@ ccm.files["ccm.flash_cards.js"] = {
                 courseSelect.append(newOption);
             });
 
-            const submitButton = this.element.querySelector("#submit-deck");
-            submitButton.innerHTML = deckToEdit ? "Ändern" : "Erstellen";
-            submitButton.addEventListener("click", async (event) => {
+            this.element.querySelector("#add-card").addEventListener("click", (event) => {
+                event.preventDefault();
+                addCard();
+            });
+
+            const submitDeckButton = this.element.querySelector("#submit-deck");
+            submitDeckButton.innerHTML = deckToEdit ? "Ändern" : "Erstellen";
+            submitDeckButton.addEventListener("click", async (event) => {
                 const form = this.element.querySelector("#add-card-deck-form");
                 if (!form.checkValidity()) {
                     event.preventDefault();
@@ -340,10 +318,11 @@ ccm.files["ccm.flash_cards.js"] = {
                     return;
                 }
                 event.preventDefault();
-                if (deckToEdit) await this.updateDeck(form, deckToEdit);
-                else await this.saveDeck(form);
+                if (deckToEdit) await this.addOrUpdateDeck(form, deckToEdit);
+                else await this.addOrUpdateDeck(form);
                 //this.onchange && this.onchange( { event: 'submit', instance: this } );
             });
+
             const cancelButton = this.element.querySelector(".cancel");
             cancelButton.addEventListener("click", (event) => {
                 event.preventDefault();
@@ -356,7 +335,7 @@ ccm.files["ccm.flash_cards.js"] = {
             const saveHint = this.element.querySelector(".save-hint");
             deckToEdit ? saveHint.classList.add("hidden") : saveHint.classList.remove("hidden");
 
-            this.saveDeck = async (form) => {
+            this.addOrUpdateDeck = async (form, deckToEdit = null) => {
                 const courseId = form.course.value;
 
                 let formattedDate = '';
@@ -366,7 +345,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
 
                 let newDeck = {
-                    id: this.ccm.helper.generateKey(),
+                    id: deckToEdit?.id || this.ccm.helper.generateKey(),
                     title: form.name.value,
                     description: form.description.value,
                     deadline: formattedDate,
@@ -378,9 +357,12 @@ ccm.files["ccm.flash_cards.js"] = {
                     alert("Lehrveranstaltung nicht gefunden");
                     return;
                 }
-                if (dataset.courses[courseIndex].cardDecks.some(deck => deck.title === newDeck.title)) {
-                    alert("Ein Stapel mit dem Namen existiert bereits! Wählen Sie einen anderen Namen.");
-                    return;
+
+                if (!deckToEdit || deckToEdit.title !== newDeck.title) {
+                    if (dataset.courses[courseIndex].cardDecks.some(existingDeck => existingDeck.title === deck.title)) {
+                        alert("Ein Stapel mit dem Namen existiert bereits! Wählen Sie einen anderen Namen.");
+                        return;
+                    }
                 }
 
                 const cards = this.element.querySelectorAll("#card");
@@ -388,14 +370,15 @@ ccm.files["ccm.flash_cards.js"] = {
                 cards.forEach(card => {
                     let question = card.querySelector("#question").value;
                     let answer = card.querySelector("#answer").value;
+                    let cardId = card.getAttribute("data-card-id") || this.ccm.helper.generateKey();
 
                     if (question !== "" && answer !== "") {
                         newDeck.cards.push({
-                            id: this.ccm.helper.generateKey(),
+                            id: cardId,
                             question: question,
                             answer: answer,
-                            currentStatus: "hard",
-                            status: []
+                            currentStatus: deckToEdit?.cards.find(c => c.id === cardId)?.currentStatus || "hard",
+                            status: deckToEdit?.cards.find(c => c.id === cardId)?.status || []
                         });
                     } else if (question !== "" || answer !== "") {
                         alert("Bitte füllen Sie beide Felder (Frage und Antwort) aus!");
@@ -404,96 +387,17 @@ ccm.files["ccm.flash_cards.js"] = {
                 });
 
                 if (valid) {
+                    if (deckToEdit) {
+                        const oldCourseIndex = dataset.courses.findIndex(course => course.cardDecks.some(deck => deck.id === deckToEdit.id));
+                        if (oldCourseIndex !== -1) {
+                            dataset.courses[oldCourseIndex].cardDecks = dataset.courses[oldCourseIndex].cardDecks.filter(deck => deck.id !== deckToEdit.id);
+                        }
+                    }
+
                     dataset.courses[courseIndex].cardDecks.push(newDeck);
                     await this.store.set({key: user.key, value: dataset});
                     this.initListView();
                 }
-            };
-
-            this.updateDeck = async (form, deckToEdit) => {
-                const courseId = form.course.value;
-
-                let formattedDate = '';
-                if (form.deadline.checked && form.deadlineInput.value) {
-                    const [year, month, day] = form.deadlineInput.value.split('-');
-                    formattedDate = `${day}.${month}.${year}`;
-                }
-
-                let updatedDeck = {
-                    id: deckToEdit.id,
-                    title: form.name.value,
-                    description: form.description.value,
-                    deadline: formattedDate,
-                    cards: []
-                };
-
-                const courseIndex = dataset.courses.findIndex(course => course.id === courseId);
-                if (courseIndex === -1) {
-                    alert("Lehrveranstaltung nicht gefunden");
-                    return;
-                }
-                if (deckToEdit.title !== updatedDeck.title && dataset.courses[courseIndex].cardDecks.some(deck => deck.title === updatedDeck.title)) {
-                    alert("Ein Stapel mit dem Namen existiert bereits! Wählen Sie einen anderen Namen.");
-                    return;
-                }
-
-                const cards = this.element.querySelectorAll("#card");
-                let valid = true;
-                cards.forEach(card => {
-                    let question = card.querySelector("#question").value;
-                    let answer = card.querySelector("#answer").value;
-                    let cardId = card.querySelector("input[name='card-id']")?.value || this.ccm.helper.generateKey();
-
-                    if (question !== "" && answer !== "") {
-                        updatedDeck.cards.push({
-                            id: cardId,
-                            question: question,
-                            answer: answer,
-                            currentStatus: deckToEdit.cards.find(c => c.id === cardId)?.currentStatus || "hard",
-                            status: deckToEdit.cards.find(c => c.id === cardId)?.status || []
-                        });
-                    } else if (question !== "" || answer !== "") {
-                        alert("Bitte füllen Sie beide Felder (Frage und Antwort) aus!");
-                        valid = false;
-                    }
-                });
-
-                if (valid) {
-                    const oldCourseIndex = dataset.courses.findIndex(coursel => coursel.cardDecks.some(deck => deck.id === deckToEdit.id));
-                    if (oldCourseIndex !== -1) {
-                        dataset.courses[oldCourseIndex].cardDecks = dataset.courses[oldCourseIndex].cardDecks.filter(deck => deck.id !== deckToEdit.id);
-                    }
-
-                    if (courseIndex !== -1) {
-                        dataset.courses[courseIndex].cardDecks.push(updatedDeck);
-                    } else {
-                        console.error("Neue Lehrveranstaltung nicht gefunden");
-                        return;
-                    }
-
-                    await this.store.set({key: user.key, value: dataset});
-                    this.initListView();
-                }
-            };
-
-            const addCard = () => {
-                const htmlCardString = `
-                    <div id="card">
-                        <div class="input-group">
-                            <label for="question">Frage:</label>
-                            <textarea id="question" name="question" cols="34" rows="5"></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label for="answer">Antwort:</label>
-                            <textarea id="answer" name="answer" cols="34" rows="5"></textarea>
-                        </div>
-                        <button id="delete-card-button">Karte löschen</button>
-                    </div>`;
-                const htmlCard = this.ccm.helper.html(htmlCardString);
-                htmlCard.querySelector("#delete-card-button").addEventListener("click", () => {
-                    htmlCard.remove();
-                });
-                this.element.querySelector("#cards").append(htmlCard);
             };
         };
 
@@ -946,6 +850,26 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 listContainer.append(courseHtml);
             }
+        };
+
+        const addCard = (card = {}) => {
+            const htmlCardString = `
+                    <div id="card" data-card-id="${card?.id || ''}">
+                        <div class="input-group">
+                            <label for="question">Frage:</label>
+                            <textarea id="question" name="question" cols="34" rows="5">${card?.question || ''}</textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="answer">Antwort:</label>
+                            <textarea id="answer" name="answer" cols="34" rows="5">${card?.answer || ''}</textarea>
+                        </div>
+                        <button id="delete-card-button">Karte löschen</button>
+                    </div>`;
+            const htmlCard = this.ccm.helper.html(htmlCardString);
+            htmlCard.querySelector("#delete-card-button").addEventListener("click", () => {
+                htmlCard.remove();
+            });
+            this.element.querySelector("#cards").append(htmlCard);
         };
 
         this.deleteDeck = async (courseId, deckId) => {
