@@ -234,7 +234,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
 
             const deadlineCheckboxCourse = this.element.querySelector('#courseDeadline');
-            const deadlineInputCourse = this.element.querySelector('#courseDeadlineInput');
+            const deadlineInputCourse = this.element.querySelector('#course-deadline-input');
 
             deadlineCheckboxCourse.addEventListener('change', function (event) {
                 if (event.currentTarget.checked) {
@@ -252,7 +252,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     return;
                 }
 
-                const deadlineInput = this.element.querySelector("#courseDeadlineInput").value;
+                const deadlineInput = this.element.querySelector("#course-deadline-input").value;
                 const courseDeadline = this.element.querySelector("#courseDeadline");
                 let formattedDate = '';
                 if (courseDeadline.checked && deadlineInput) {
@@ -263,7 +263,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 let newCourse = {
                     id: this.ccm.helper.generateKey(),
                     title: this.element.querySelector("#add-course-input").value,
-                    description: this.element.querySelector("#courseDescriptionInput").value,
+                    description: this.element.querySelector("#course-description-input").value,
                     deadline: formattedDate,
                     cardDecks: []
                 };
@@ -279,10 +279,10 @@ ccm.files["ccm.flash_cards.js"] = {
                 // close the add course container and reset the input fields
                 addCourseContainer.classList.add("hidden");
                 this.element.querySelector("#add-course-input").value = "";
-                this.element.querySelector("#courseDescriptionInput").value = "";
-                this.element.querySelector("#courseDeadlineInput").value = "";
+                this.element.querySelector("#course-description-input").value = "";
+                this.element.querySelector("#course-deadline-input").value = "";
                 this.element.querySelector("#courseDeadline").checked = false;
-                this.element.querySelector("#courseDeadlineInput").classList.add("hidden");
+                this.element.querySelector("#course-deadline-input").classList.add("hidden");
 
                 // update the course select options
                 const courseSelect = this.element.querySelector("#course");
@@ -347,7 +347,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
 
                 if (!deckToEdit || deckToEdit.title !== newDeck.title) {
-                    if (dataset.courses[courseIndex].cardDecks.some(existingDeck => existingDeck.title === deck.title)) {
+                    if (dataset.courses[courseIndex].cardDecks.some(existingDeck => existingDeck.title === newDeck.title)) {
                         alert("Ein Stapel mit dem Namen existiert bereits! Wählen Sie einen anderen Namen.");
                         return;
                     }
