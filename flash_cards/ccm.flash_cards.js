@@ -328,9 +328,8 @@ ccm.files["ccm.flash_cards.js"] = {
                     return;
                 }
                 event.preventDefault();
-                if (deckToEdit) await this.addOrUpdateDeck(form, deckToEdit);
-                else await this.addOrUpdateDeck(form);
-                //this.onchange && this.onchange( { event: 'submit', instance: this } );
+                await this.addOrUpdateDeck(form, deckToEdit);
+                //this.onchange && this.onchange( { event: 'submitDeck', instance: this } );
             });
 
             const cancelButton = this.element.querySelector(".cancel");
