@@ -57,27 +57,6 @@ ccm.files["ccm.flash_cards.js"] = {
             dataset = dataset.value;
             this.initListView();
 
-            /*
-            // user initialization
-            this.element.querySelector('#user').append(this.user.root);
-            user = await this.user.getValue();
-            if (!user) {
-                alert("Please login");
-                console.log("User is not logged in");
-                return;
-            }
-
-            dataset = await this.store.get(user.key);
-            if (!dataset) {
-                console.log("No dataset found");
-                await this.store.set({key: user.key, value: []});
-                dataset = await this.store.get(user.key);
-            }
-
-            dataset = dataset.value;
-            this.initListView();
-             */
-
             // close dropdowns when clicking outside
             this.element.addEventListener('click', (event) => {
                 const dropdowns = this.element.querySelectorAll('.dropdown-menu, .options');
