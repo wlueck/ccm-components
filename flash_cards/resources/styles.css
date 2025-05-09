@@ -273,6 +273,7 @@ button {
         border: none;
         text-decoration: underline;
         cursor: pointer;
+        color: #2c3e50;
     }
 
     #submit-course {
