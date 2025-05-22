@@ -2,4 +2,4 @@
 
 ## flash-cards
 
-## learning exchange
+## learning-exchange
