@@ -683,7 +683,7 @@ ccm.files["ccm.flash_cards.js"] = {
                                     <div style="display: flex">
                                         <button class="start-deck-btn" data-deck-id="${deck.id}">Starten</button>
                                         <div id="card-options">
-                                            <button id="option-btn" class="btn-low-style">...</button>
+                                            <button id="deck-option-btn" class="btn-low-style">...</button>
                                             <div id="deck-options" class="hidden options"> 
                                                 <a id="edit-deck">Bearbeiten</a>
                                                 <a id="export-deck">Exportieren</a>
@@ -706,7 +706,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         await this.startDeck(course.id, deck.id);
                     });
 
-                    cardDeckHtml.querySelector("#option-btn").addEventListener('click', () => {
+                    cardDeckHtml.querySelector("#deck-option-btn").addEventListener('click', () => {
                         const options = cardDeckHtml.querySelector("#deck-options");
                         options.classList.toggle('hidden');
                     });

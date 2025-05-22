@@ -126,6 +126,9 @@ button {
         right: 8px !important;
     }
 
+    #course-option-btn, #deck-option-btn {
+        font-weight: bold;
+    }
 
     #sort-deck-options {
         position: absolute;
@@ -199,7 +202,6 @@ button {
         background-color: #f0f0f0;
         cursor: pointer;
     }
-
 
     #card {
         border: 2px solid rgba(217, 217, 217);
