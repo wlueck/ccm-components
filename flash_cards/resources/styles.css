@@ -359,8 +359,8 @@ button {
 }
 /*endregion */
 
-/*region card template */
-#cc {
+/*region learning-view template */
+#learning-view {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -453,3 +453,23 @@ button {
     }
 }
 /*endregion */
+
+
+#card-order {
+    margin: 10px 0;
+    padding: 5px;
+    width: 200px;
+}
+
+#card-selection {
+    margin: 10px 0;
+    padding: 5px;
+    width: 200px;
+}
+
+#learning-mode-button {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 15px;
+}

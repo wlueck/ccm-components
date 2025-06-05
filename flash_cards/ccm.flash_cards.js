@@ -63,7 +63,7 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         // todo
-        // contains all event handler
+        // event handler
         this.events = {
             // closes dropdowns when clicking outside
             onClickOutside: (event) => {
@@ -89,7 +89,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 }
             },
-
+// todo
             onImportCourse: async () => {
                 const input = document.createElement('input');
                 input.type = 'file';
@@ -104,11 +104,11 @@ ccm.files["ccm.flash_cards.js"] = {
                                 alert('Ungültiges Dateiformat: Titel oder Karten fehlen');
                                 return;
                             }
-                            newCourse.id = newCourse.id || this.ccm.helper.generateKey();
+                            newCourse.id = newCourse.id || $.generateKey();
                             newCourse.cardDecks.forEach(deck => {
-                                deck.id = deck.id || this.ccm.helper.generateKey();
+                                deck.id = deck.id || $.generateKey();
                                 deck.cards.forEach(card => {
-                                    card.id = card.id || this.ccm.helper.generateKey();
+                                    card.id = card.id || $.generateKey();
                                     card.currentStatus = card.currentStatus || "hard";
                                     card.status = card.status || [];
                                 });
@@ -140,15 +140,15 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 const blob = new Blob([JSON.stringify(itemToExport, null, 2)], {type: 'application/json'});
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${exportData.title.replace(/\s+/g, '_')}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                const anchorElement = document.createElement('a');
+                anchorElement.href = url;
+                anchorElement.download = `${exportData.title.replace(/\s+/g, '_')}.json`;
+                document.body.appendChild(anchorElement);
+                anchorElement.click();
+                document.body.removeChild(anchorElement);
                 URL.revokeObjectURL(url);
             },
-
+// todo
             onImportDeck: (courseSelectDialog, overlay) => {
                 const selectedCourseId = this.element.querySelector('#course-select').value;
                 courseSelectDialog.remove();
@@ -167,9 +167,9 @@ ccm.files["ccm.flash_cards.js"] = {
                                 alert('Ungültiges Dateiformat: Titel oder Karten fehlen');
                                 return;
                             }
-                            newDeck.id = newDeck.id || this.ccm.helper.generateKey();
+                            newDeck.id = newDeck.id || $.generateKey();
                             newDeck.cards.forEach(card => {
-                                card.id = card.id || this.ccm.helper.generateKey();
+                                card.id = card.id || $.generateKey();
                                 card.currentStatus = card.currentStatus || "hard";
                                 card.status = card.status || [];
                             });
@@ -195,11 +195,11 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onDeleteDeck: async (courseId, deckToDelete) => {
-                const confirmDelete = confirm(`Möchten Sie das Deck "${deckToDelete.title}" wirklich löschen?`);
+                const confirmDelete = confirm(this.text.delete_deck.replace('%title%', deckToDelete.title));
                 if (confirmDelete) {
                     const course = dataset.courses.find(course => course.id === courseId);
                     if (!course) {
-                        console.error("Lehrveranstaltung nicht gefunden");
+                        console.error("Course not found");
                         return;
                     }
                     course.cardDecks = course.cardDecks.filter(deck => deck.id !== deckToDelete.id);
@@ -209,7 +209,7 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onDeleteCourse: async (courseToDelete) => {
-                const confirmDelete = confirm(`Möchten Sie die Lehrveranstaltung "${courseToDelete.title}" wirklich löschen?`);
+                const confirmDelete = confirm(this.text.delete_deck.replace('%title%', courseToDelete.title));
                 if (confirmDelete) {
                     dataset.courses = dataset.courses.filter(course => course.id !== courseToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
@@ -228,29 +228,26 @@ ccm.files["ccm.flash_cards.js"] = {
                 return await this.addOrUpdateCourse(form, courseToEdit);
             },
 
-            onCancelSubmit: (event) => {
-                event.preventDefault();
-                const confirmCancel = confirm(this.text.cancel_warning);
-                if (confirmCancel) {
-                    this.initListView();
-                }
-            },
-
             onSubmitCourseInDeckEditor: async (event) => {
                 const isSubmitted = await this.events.onSubmitCourse(event);
                 if (!isSubmitted) return;
 
-                const form = this.element.querySelector("#add-course-form");
                 // Update the course select options
+                const form = this.element.querySelector("#add-course-form");
                 const newOption = document.createElement("option");
                 newOption.value = form.title.value;
                 newOption.textContent = form.title.value;
-                this.element.querySelector("#select-course").append(newOption);
+                $.append(this.element.querySelector("#select-course"), newOption);
 
+                this.events.onResetCourseFormInDeckEditor();
+            },
+
+            onResetCourseFormInDeckEditor: () => {
                 // Close the add course container and reset the input fields
+                const form = this.element.querySelector("#add-course-form");
                 this.element.querySelector("#add-course-container").classList.add("hidden");
+                this.element.querySelector("#course-deadline-input").classList.add("hidden");
                 form.reset();
-                this.element.querySelector("#deadlineInput").classList.add("hidden");
             },
 
             onSubmitDeck: async (event, deckToEdit) => {
@@ -262,23 +259,19 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
                 event.preventDefault();
                 await this.addOrUpdateDeck(form, deckToEdit);
-                //this.onchange && this.onchange( { event: 'submitDeck', instance: this } );
             },
 
-            onToggleDeadline: (event) => {
-                console.log("hi")
-                const deadlineInput = this.element.querySelector('#deadlineInput');
-                if (event.currentTarget.checked) {
-                    deadlineInput.classList.remove('hidden');
-                } else {
-                    deadlineInput.classList.add('hidden');
+            onCancelSubmit: (event) => {
+                event.preventDefault();
+                const confirmCancel = confirm(this.text.cancel_warning);
+                if (confirmCancel) {
+                    this.initListView();
                 }
             },
-
+// todo
             onStartLearning: async (course, deck, mode, learningModeDialog, overlay) => {
                 const orderMode = this.element.querySelector('#card-order').value;
                 const selectionMode = this.element.querySelector('#card-selection').value;
-
                 let filteredCards = deck.cards;
 
                 // Apply card selection
@@ -319,7 +312,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 overlay.remove();
 
                 if (filteredDeck) {
-                    $.setContent(this.element.querySelector('#content'), $.html(this.html.card, {
+                    $.setContent(this.element.querySelector('#content'), $.html(this.html.learning_view, {
                         description: mode === "deck" ? deck.description || '' : course.description || '',
                         maxNumberOfCards: filteredDeck.cards.length.toString(),
                         difficulty_hard: this.text.difficulty_hard,
@@ -334,7 +327,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             }
         };
-
+// todo
         this.initListView = () => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.list_view, {
                 onAddDeckOrCourse: () => this.element.querySelector("#add-deck-course-options").classList.toggle('hidden'),
@@ -382,7 +375,7 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.fillCourseList = () => {
-            // apply sort preference
+            // apply sort preference for courses
             if (dataset.sortPreference) sortCourses();
 
             for (const course of dataset.courses) {
@@ -397,12 +390,12 @@ ccm.files["ccm.flash_cards.js"] = {
                 $.append(this.element.querySelector('#list-of-courses'), courseHtml);
             }
         };
-
+// todo
         this.initCourseEditorView = (courseToEdit = null) => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_course_view, {
                 courseTitleInput: this.text.course_title_input,
                 courseDescriptionInput: this.text.course_description_input,
-                onToggleDeadline: (event) => this.events.onToggleDeadline(event),
+                onToggleDeadline: (event) => this.element.querySelector('#course-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 courseDeadlineInput: this.text.course_deadline_input,
                 onSubmitCourse: async (event) => {
                     await this.events.onSubmitCourse(event, courseToEdit);
@@ -421,7 +414,7 @@ ccm.files["ccm.flash_cards.js"] = {
             if (courseToEdit) {
                 const form = this.element.querySelector("#add-course-form");
                 const deadlineCheckbox = this.element.querySelector('#course-deadline');
-                const deadlineInput = this.element.querySelector('#deadlineInput');
+                const deadlineInput = this.element.querySelector('#course-deadline-input');
                 form.title.value = courseToEdit.title;
                 form.description.value = courseToEdit.description || '';
 
@@ -433,7 +426,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             }
         };
-
+// todo
         this.initDeckEditorView = (deckToEdit = null) => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_deck_view, {
                 courseInput: this.text.select_course_input,
@@ -447,7 +440,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 deckTitleInput: this.text.deck_title_input,
                 deckDescriptionInput: this.text.deck_description_input,
-                onToggleDeadline: (event) => this.events.onToggleDeadline(event),
+                onToggleDeadline: (event) => this.element.querySelector('#deck-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 deckDeadlineInput: this.text.deck_deadline_input,
                 onAddCard: (event) => {
                     event.preventDefault();
@@ -477,15 +470,13 @@ ccm.files["ccm.flash_cards.js"] = {
             $.setContent(this.element.querySelector("#add-course-container"), $.html(this.html.editor_course_view, {
                 courseTitleInput: this.text.course_title_input,
                 courseDescriptionInput: this.text.course_description_input,
-                onToggleDeadline: (event) => {
-                    this.events.onToggleDeadline(event)
-                },
+                onToggleDeadline: (event) => this.element.querySelector('#course-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 courseDeadlineInput: this.text.course_deadline_input,
                 onSubmitCourse: async (event) => {
                     await this.events.onSubmitCourseInDeckEditor(event);
                 },
                 submitCourse: this.text.create,
-                onCancelSubmitCourse: (event) => this.events.onCancelSubmit(event),
+                onCancelSubmitCourse: (event) => this.events.onResetCourseFormInDeckEditor(event),
                 cancelCourse: this.text.cancel,
                 submitCourseHint: this.text.submit_course_hint,
             }));
@@ -515,7 +506,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 });
             }
         };
-
+// todo
         this.initImportDeckDialog = () => {
             this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
 
@@ -533,11 +524,11 @@ ccm.files["ccm.flash_cards.js"] = {
                     courseSelectDialog.remove();
                     overlay.remove();
                 },
-                cancelImportDeck: this.text.cancel_import_deck
+                cancelImportDeck: this.text.cancel
             });
             $.append(this.element.querySelector("#main"), courseSelectDialog);
         };
-
+// todo
         const addCardInEditor = (card = {}) => {
             const htmlCard = $.html(this.html.add_card, {
                 cardId: card?.id || '',
@@ -554,7 +545,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
             $.append(this.element.querySelector("#cards"), htmlCard);
         };
-
+// todo
         this.addOrUpdateCourse = async (form, courseToEdit = null) => {
             let formattedDate = '';
             if (form.deadline.checked && form.deadlineInput.value) {
@@ -563,7 +554,7 @@ ccm.files["ccm.flash_cards.js"] = {
             }
 
             const course = {
-                id: courseToEdit?.id || this.ccm.helper.generateKey(),
+                id: courseToEdit?.id || $.generateKey(),
                 title: form.title.value,
                 description: form.description.value,
                 deadline: formattedDate,
@@ -589,12 +580,11 @@ ccm.files["ccm.flash_cards.js"] = {
                 dataset.courses.push(course);
             }
             await this.store.set({key: user.key, value: dataset});
+            this.onchange && this.onchange({ event: courseToEdit ? 'updatedCourse' : 'createdCourse', instance: this });
             return true;
         };
-
+// todo
         this.addOrUpdateDeck = async (form, deckToEdit = null) => {
-            const courseId = form.course.value;
-
             let formattedDate = '';
             if (form.deadline.checked && form.deadlineInput.value) {
                 const [year, month, day] = form.deadlineInput.value.split('-');
@@ -602,14 +592,14 @@ ccm.files["ccm.flash_cards.js"] = {
             }
 
             let newDeck = {
-                id: deckToEdit?.id || this.ccm.helper.generateKey(),
+                id: deckToEdit?.id || $.generateKey(),
                 title: form.title.value,
                 description: form.description.value,
                 deadline: formattedDate,
                 cards: []
             };
 
-            const courseIndex = dataset.courses.findIndex(course => course.id === courseId);
+            const courseIndex = dataset.courses.findIndex(course => course.id === form.course.value);
             if (courseIndex === -1) {
                 alert(this.text.course_not_found_warning);
                 return;
@@ -627,7 +617,7 @@ ccm.files["ccm.flash_cards.js"] = {
             cards.forEach(card => {
                 let question = card.querySelector("#question").value;
                 let answer = card.querySelector("#answer").value;
-                let cardId = card.getAttribute("data-card-id") || this.ccm.helper.generateKey();
+                let cardId = card.getAttribute("data-card-id") || $.generateKey();
 
                 if (question !== "" && answer !== "") {
                     newDeck.cards.push({
@@ -638,7 +628,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         status: deckToEdit?.cards.find(c => c.id === cardId)?.status || []
                     });
                 } else if (question !== "" || answer !== "") {
-                    alert("Bitte füllen Sie beide Felder (Frage und Antwort) aus!");
+                    alert(this.text.fill_answer_question_warning);
                     valid = false;
                 }
             });
@@ -653,11 +643,12 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 dataset.courses[courseIndex].cardDecks.push(newDeck);
                 await this.store.set({key: user.key, value: dataset});
+                this.onchange && this.onchange( { event: deckToEdit? 'updatedDeck' : 'createdDeck', instance: this } );
                 this.initListView();
             }
         };
 
-
+// todo
         this.startDeck = async (courseId, deckId) => {
             const currentCourse = dataset.courses.find(course => course.id === courseId);
             if (!currentCourse) {
@@ -669,40 +660,34 @@ ccm.files["ccm.flash_cards.js"] = {
                 console.error(this.text.deck_not_found_warning);
                 return;
             }
-
-            this.showLearningModeModal(currentCourse, currentCardDeck, "deck");
+            this.showLearningModeDialog(currentCourse, currentCardDeck, "deck");
         };
-
+// todo
         this.startCourse = async (courseId) => {
             const currentCourse = dataset.courses.find(course => course.id === courseId);
             if (!currentCourse) {
                 console.error(this.text.course_not_found_warning);
-                this.initListView();
                 return;
             }
-
             const allCards = {cards: currentCourse.cardDecks.flatMap(deck => deck.cards)};
-
             if (allCards.length === 0) {
                 alert(this.text.no_cards_warning);
-                this.initListView();
                 return;
             }
-
-            this.showLearningModeModal(currentCourse, allCards);
+            this.showLearningModeDialog(currentCourse, allCards);
         };
-
-        this.showLearningModeModal = (course, deck, mode) => {
+// todo
+        this.showLearningModeDialog = (course, deck, mode) => {
             const overlay = document.createElement('div');
             overlay.className = 'overlay';
             $.append(this.element.querySelector("#main"), overlay);
 
             const learningModeDialog = $.html(this.html.learning_mode_dialog, {
                 learningMode: this.text.learning_mode,
-                sortCards: this.text.sort_cards,
-                sortCardsOriginal: this.text.sort_cards_original,
-                sortCardsRandom: this.text.sort_cards_random,
-                sortCardsDifficulty: this.text.sort_cards_difficulty,
+                cardsOrder: this.text.cards_order,
+                cardsOrderOriginal: this.text.cards_order_original,
+                cardsOrderRandom: this.text.cards_order_random,
+                cardsOrderDifficulty: this.text.cards_order_difficulty,
                 selectCards: this.text.select_cards,
                 selectCardsAll: this.text.select_cards_all,
                 selectCardsHard: this.text.select_cards_hard,
@@ -717,7 +702,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
             $.append(this.element.querySelector("#main"), learningModeDialog);
         };
-
+// todo
         this.startLearningSession = (course, cardDeck) => {
             const cards = cardDeck.cards;
             const updateCardDisplay = (index) => {
@@ -857,12 +842,12 @@ ccm.files["ccm.flash_cards.js"] = {
             }
         }
 
-        const getDeadline = (deadline) => {
+        const getDeadlineHtml = (deadline) => {
             if (!deadline) return '';
             const isDeadlineExpired = (() => {
                 const [day, month, year] = deadline.split('.');
-                return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)) < new Date();
-            });
+                return new Date(year, month - 1, day) < new Date();
+            })();
             return `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: <br> ${deadline}</a>`;
         }
 
@@ -879,7 +864,6 @@ ccm.files["ccm.flash_cards.js"] = {
             let easyCount = cards.filter(card => card.currentStatus === 'easy').length;
             let mediumCount = cards.filter(card => card.currentStatus === 'medium').length;
             let hardCount = cards.filter(card => card.currentStatus === 'hard').length;
-
             const totalCards = easyCount + mediumCount + hardCount;
 
             const easyPercent = totalCards > 0 ? (easyCount / totalCards) * 100 : 0;
@@ -887,13 +871,9 @@ ccm.files["ccm.flash_cards.js"] = {
             const hardPercent = totalCards > 0 ? (hardCount / totalCards) * 100 : 0;
 
             return {
-                easyCount: easyCount,
-                mediumCount: mediumCount,
-                hardCount: hardCount,
+                easyCount: easyCount, mediumCount: mediumCount, hardCount: hardCount,
                 totalCards: totalCards,
-                easyPercent: easyPercent,
-                mediumPercent: mediumPercent,
-                hardPercent: hardPercent
+                easyPercent: easyPercent, mediumPercent: mediumPercent, hardPercent: hardPercent
             };
         };
 
@@ -905,7 +885,7 @@ ccm.files["ccm.flash_cards.js"] = {
         this.getDeckStatus = (deck) => {
             return calculateStatus(deck.cards);
         };
-
+// todo
         const createCourseListItemHtml = (course) => {
             const courseStatus = this.getCourseStatus(course);
             const courseHtml = $.html(this.html.course_list_item, {
@@ -938,29 +918,29 @@ ccm.files["ccm.flash_cards.js"] = {
                 deleteCourse: this.text.delete_course,
                 courseStatusChartStyle: getStatusChartStyle(courseStatus),
                 courseStatus: courseStatus.easyCount + ' / ' + courseStatus.mediumCount + ' / ' + courseStatus.hardCount,
-                courseDeadline: getDeadline(course.deadline),
+                courseDeadline: getDeadlineHtml(course.deadline),
             });
             return courseHtml;
         }
-
-        const createDeckListItemHtml = (course, deck) => {
+// todo
+        const createDeckListItemHtml = (courseId, deck) => {
             const deckStatus = this.getDeckStatus(deck);
             const cardDeckHtml = $.html(this.html.deck_list_item, {
                 deckTitle: deck.title,
                 deckDescription: deck.description || '',
                 deckId: deck.id,
-                onStartDeck: async () => await this.startDeck(course.id, deck.id),
+                onStartDeck: async () => await this.startDeck(courseId, deck.id),
                 startDeck: this.text.start_deck,
                 onDeckOptions: () => cardDeckHtml.querySelector("#deck-options").classList.toggle('hidden'),
                 onEditDeck: () => this.initDeckEditorView(deck),
                 editDeck: this.text.edit_deck,
                 onExportDeck: () => this.events.onExportCourseOrDeck(deck, 'deck'),
                 exportDeck: this.text.export_deck,
-                onDeleteDeck: async () => await this.events.onDeleteDeck(course.id, deck),
+                onDeleteDeck: async () => await this.events.onDeleteDeck(courseId, deck),
                 deleteDeck: this.text.delete_deck,
                 deckStatusChartStyle: getStatusChartStyle(deckStatus),
                 deckStatus: deckStatus.easyCount + ' / ' + deckStatus.mediumCount + ' / ' + deckStatus.hardCount,
-                deckDeadline: getDeadline(deck.deadline),
+                deckDeadline: getDeadlineHtml(deck.deadline),
             });
             return cardDeckHtml;
         }

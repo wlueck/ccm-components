@@ -7,7 +7,7 @@
             </div>
             <div id="user"></div>
         </div>
-        <button onclick="%onBackButton%" id="back-button">%backButton%</button>
+        <button id="back-button" onclick="%onBackButton%">%backButton%</button>
         <div id="content">%defaultContent%</div>
     </div>
 </ccm-template>
@@ -137,7 +137,7 @@
 
         <input type="checkbox" id="course-deadline" name="deadline" onchange="%onToggleDeadline%">
         <label for="course-deadline">%courseDeadlineInput%</label><br>
-        <input id="deadlineInput" name="deadlineInput" type="date" class="hidden"/><br><br>
+        <input id="course-deadline-input" name="deadlineInput" type="date" class="hidden"/><br><br>
 
         <button onclick="%onSubmitCourse%">%submitCourse%</button>
         <button class="cancel" onclick="%onCancelSubmitCourse%">%cancelCourse%</button>
@@ -195,30 +195,30 @@
     <div id="learning-mode-dialog" class="modal-dialog">
         <h3>%learningMode%</h3>
         <div>
-            <label>%sortCards%</label><br>
-            <select id="card-order" style="margin: 10px 0; padding: 5px; width: 200px;">
-                <option value="original">%sortCardsOriginal%</option>
-                <option value="random">%sortCardsRandom%</option>
-                <option value="status">%sortCardsDifficulty%</option>
+            <label>%cardsOrder%</label><br>
+            <select id="card-order">
+                <option value="original">%cardsOrderOriginal%</option>
+                <option value="random">%cardsOrderRandom%</option>
+                <option value="status">%cardsOrderDifficulty%</option>
             </select>
         </div>
-        <div style="margin: 15px 0;">
+        <div>
             <label for="card-selection">%selectCards%</label><br>
-            <select id="card-selection" style="margin: 10px 0; padding: 5px; width: 200px;">
+            <select id="card-selection">
                 <option value="all">%selectCardsAll%</option>
                 <option value="hard">%selectCardsHard%</option>
                 <option value="medium-hard">%selectCardsMediumHard%</option>
             </select>
         </div>
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+        <div id="learning-mode-button">
             <button id="start-learning" onclick="%onStartLearning%">%startLearning%</button>
             <button id="cancel-learning" onclick="%onCancelLearning%">%cancelLearning%</button>
         </div>
     </div>
 </ccm-template>
 
-<ccm-template key="card">
-    <a id="cc">
+<ccm-template key="learning_view">
+    <a id="learning-view">
         <p id="description">%description%</p>
         <div id="card">
             <p id="question-answer-text"></p>
