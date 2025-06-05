@@ -28,7 +28,7 @@ ccm.files["ccm.flash_cards.js"] = {
             $.use(this.ccm);
 
             if (this.user) this.user.onchange = this.start;
-        }
+        };
 
         this.start = async () => {
             $.setContent(this.element, $.html(this.html.main, {
@@ -811,7 +811,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     });
                     break;
             }
-        }
+        };
 
         const sortDecks = (course) => {
             switch (course.sortPreference) {
@@ -840,7 +840,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     });
                     break;
             }
-        }
+        };
 
         const getDeadlineHtml = (deadline) => {
             if (!deadline) return '';
@@ -849,7 +849,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 return new Date(year, month - 1, day) < new Date();
             })();
             return `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: <br> ${deadline}</a>`;
-        }
+        };
 
         const getStatusChartStyle = (status) => {
             return `width: 30px; height: 30px;
@@ -858,7 +858,7 @@ ccm.files["ccm.flash_cards.js"] = {
                                                      #e0cd00 ${status.hardPercent}% ${status.hardPercent + status.mediumPercent}%, 
                                                      #2b6c22 ${status.hardPercent + status.mediumPercent}% 100%);
                     border-radius: 50%;`;
-        }
+        };
 
         const calculateStatus = (cards) => {
             let easyCount = cards.filter(card => card.currentStatus === 'easy').length;
@@ -921,7 +921,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 courseDeadline: getDeadlineHtml(course.deadline),
             });
             return courseHtml;
-        }
+        };
 // todo
         const createDeckListItemHtml = (courseId, deck) => {
             const deckStatus = this.getDeckStatus(deck);
@@ -943,6 +943,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 deckDeadline: getDeadlineHtml(deck.deadline),
             });
             return cardDeckHtml;
-        }
+        };
     },
 };
