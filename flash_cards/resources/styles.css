@@ -1,7 +1,11 @@
 #element {
     /* colors */
     --button-primary: #2c3e50;
+    --button-primary-font: #fff;
+
     --button-secondary: #efefef;
+    --button-secondary-font: #000;
+
     --border: #a9a9a9ff;
 
     font-family: Montserrat, sans-serif;
@@ -23,7 +27,7 @@ button {
     border: 1px solid var(--border);
     border-radius: 5px;
     background-color: var(--button-primary);
-    color: white;
+    color: var(--button-primary-font);
 
     &.btn-low-style {
         background: none;
@@ -60,7 +64,7 @@ button {
 
 .cancel {
     background-color: var(--button-secondary);
-    color: black;
+    color: var(--button-secondary-font);
 }
 /*endregion */
 
