@@ -7,9 +7,11 @@
             </div>
             <div id="user"></div>
         </div>
+        <button onclick="%onBackButton%" id="back-button">%backButton%</button>
         <div id="content">%defaultContent%</div>
     </div>
 </ccm-template>
+
 
 <ccm-template key="list_view">
     <div id="list-view">
@@ -110,33 +112,22 @@
     </div>
 </ccm-template>
 
-<ccm-template key="card">
-    <a id="cc">
-        <button id="back-button" onclick="%onBackButton%">%backButton%</button>
-
-        <p id="description">%description%</p>
-        <div id="card">
-            <p id="question-answer-text"></p>
-            <div id="card-buttons">
-                <button class="btn-low-style" id="previous-card-button">&#8592;</button>
-                <button class="btn-low-style" id="turn-around-button">&#8634;</button>
-                <button class="btn-low-style" id="next-card-button">&#8594;</button>
-            </div>
-            <div id="number-of-cards">
-                <span id="current-card-number"></span> / <span>%maxNumberOfCards%</span>
-            </div>
+<ccm-template key="import_deck_dialog">
+    <div class="modal-dialog">
+        <h3>%importDeck%</h3>
+        <label for="course-select">%associatedCourse%</label><br>
+        <select id="course-select">
+            %courseSelectOptions%
+        </select>
+        <div id="import-deck-buttons">
+            <button onclick="%onChooseDeckFileToImport%">%chooseDeckFileToImport%</button>
+            <button onclick="%onCancelImportDeck%">%cancelImportDeck%</button>
         </div>
-        <div id="difficulty-buttons" class="questionStyle">
-            <button id="hard">%difficulty_hard%</button>
-            <button id="medium">%difficulty_medium%</button>
-            <button id="easy">%difficulty_easy%</button>
-        </div>
-    </a>
+    </div>
 </ccm-template>
 
-<ccm-template key="editor_course">
-    <button class="%editor_course_class%" onclick="%onBackButton%">%back%</button>
 
+<ccm-template key="editor_course_view">
     <form id="add-course-form" class="editor"><br>
         <label for="course-title">%courseTitleInput%</label><br>
         <input type="text" id="course-title" name="title" size="40" required/><br><br>
@@ -154,9 +145,7 @@
     </form>
 </ccm-template>
 
-<ccm-template key="editor_deck">
-    <button onclick="%onBackButton%">%backButton%</button>
-
+<ccm-template key="editor_deck_view">
     <form id="add-deck-form" class="editor" ><br>
         <label for="course-select">%courseInput%</label><br>
         <select id="select-course" name="course" required>
@@ -187,6 +176,21 @@
     </form>
 </ccm-template>
 
+<ccm-template key="add_card">
+    <div id="card" data-card-id="%cardId%">
+        <div class="input-group">
+            <label for="question">%question%</label>
+            <textarea id="question" name="question" cols="34" rows="5">%current_question%</textarea>
+        </div>
+        <div class="input-group">
+            <label for="answer">%answer%</label>
+            <textarea id="answer" name="answer" cols="34" rows="5">%current_answer%</textarea>
+        </div>
+        <button id="delete-card-button" class="%deleteButtonClass%" onclick="%onDeleteCard%">%deleteCard%</button>
+    </div>
+</ccm-template>
+
+
 <ccm-template key="learning_mode_dialog">
     <div id="learning-mode-dialog" class="modal-dialog">
         <h3>%learningMode%</h3>
@@ -213,30 +217,24 @@
     </div>
 </ccm-template>
 
-<ccm-template key="import_deck_dialog">
-    <div class="modal-dialog">
-        <h3>%importDeck%</h3>
-        <label for="course-select">%associatedCourse%</label><br>
-        <select id="course-select">
-            %courseSelectOptions%
-        </select>
-        <div id="import-deck-buttons">
-            <button onclick="%onChooseDeckFileToImport%">%chooseDeckFileToImport%</button>
-            <button onclick="%onCancelImportDeck%">%cancelImportDeck%</button>
+<ccm-template key="card">
+    <a id="cc">
+        <p id="description">%description%</p>
+        <div id="card">
+            <p id="question-answer-text"></p>
+            <div id="card-buttons">
+                <button class="btn-low-style" id="previous-card-button">&#8592;</button>
+                <button class="btn-low-style" id="turn-around-button">&#8634;</button>
+                <button class="btn-low-style" id="next-card-button">&#8594;</button>
+            </div>
+            <div id="number-of-cards">
+                <span id="current-card-number"></span> / <span>%maxNumberOfCards%</span>
+            </div>
         </div>
-    </div>
-</ccm-template>
-
-<ccm-template key="add_card">
-    <div id="card" data-card-id="%cardId%">
-        <div class="input-group">
-            <label for="question">%question%</label>
-            <textarea id="question" name="question" cols="34" rows="5">%current_question%</textarea>
+        <div id="difficulty-buttons" class="questionStyle">
+            <button id="hard">%difficulty_hard%</button>
+            <button id="medium">%difficulty_medium%</button>
+            <button id="easy">%difficulty_easy%</button>
         </div>
-        <div class="input-group">
-            <label for="answer">%answer%</label>
-            <textarea id="answer" name="answer" cols="34" rows="5">%current_answer%</textarea>
-        </div>
-        <button id="delete-card-button" class="%deleteButtonClass%" onclick="%onDeleteCard%">%deleteCard%</button>
-    </div>
+    </a>
 </ccm-template>

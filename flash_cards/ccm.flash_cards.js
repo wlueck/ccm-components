@@ -35,6 +35,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 onClickOutside: this.events.onClickOutside,
                 headline: this.text.headline_course_list,
                 subHeadline: '',
+                backButton: this.text.back,
+                onBackButton: () => this.initListView(),
                 defaultContent: this.text.default_content
             }));
 
@@ -318,8 +320,6 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 if (filteredDeck) {
                     $.setContent(this.element.querySelector('#content'), $.html(this.html.card, {
-                        backButton: this.text.back,
-                        onBackButton: () => this.initListView,
                         description: mode === "deck" ? deck.description || '' : course.description || '',
                         maxNumberOfCards: filteredDeck.cards.length.toString(),
                         difficulty_hard: this.text.difficulty_hard,
@@ -329,6 +329,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                     $.setContent(this.element.querySelector('#headline'), mode === "deck" ? deck.title : course.title);
                     $.setContent(this.element.querySelector('#sub-headline'), mode === "deck" ? `(${course.title})` : "Gesamte Lehrveranstaltung");
+                    this.element.querySelector("#back-button").classList.remove('hidden');
                     this.startLearningSession(course, filteredDeck);
                 }
             }
@@ -362,6 +363,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
             $.setContent(this.element.querySelector('#headline'), this.text.headline_course_list);
             $.setContent(this.element.querySelector('#sub-headline'), '');
+            this.element.querySelector("#back-button").classList.add('hidden');
 
             // initialize text if there are no courses
             if (!dataset.courses || dataset.courses.length === 0) {
@@ -397,9 +399,7 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.initCourseEditorView = (courseToEdit = null) => {
-            $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_course, {
-                back: this.text.back,
-                onBackButton: () => this.initListView(),
+            $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_course_view, {
                 courseTitleInput: this.text.course_title_input,
                 courseDescriptionInput: this.text.course_description_input,
                 onToggleDeadline: (event) => this.events.onToggleDeadline(event),
@@ -415,6 +415,7 @@ ccm.files["ccm.flash_cards.js"] = {
             }));
             $.setContent(this.element.querySelector('#headline'), courseToEdit ? this.text.headline_edit_course : this.text.headline_create_course);
             $.setContent(this.element.querySelector('#sub-headline'), '');
+            this.element.querySelector("#back-button").classList.remove('hidden');
 
             // initialize form in case of editing a course
             if (courseToEdit) {
@@ -434,10 +435,7 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.initDeckEditorView = (deckToEdit = null) => {
-            $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_deck, {
-                backButton: this.text.back,
-                onBackButton: () => this.initListView(),
-
+            $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_deck_view, {
                 courseInput: this.text.select_course_input,
                 selectCoursePlaceholder: this.text.deck_course_placeholder,
                 courseOptions: dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join(''),
@@ -473,10 +471,10 @@ ccm.files["ccm.flash_cards.js"] = {
             }));
             $.setContent(this.element.querySelector('#headline'), deckToEdit ? "Karteikartenstapel bearbeiten" : "Karteikartenstapel erstellen");
             $.setContent(this.element.querySelector('#sub-headline'), '');
+            this.element.querySelector("#back-button").classList.remove('hidden');
 
             //
-            $.setContent(this.element.querySelector("#add-course-container"), $.html(this.html.editor_course, {
-                editor_course_class: "hidden",
+            $.setContent(this.element.querySelector("#add-course-container"), $.html(this.html.editor_course_view, {
                 courseTitleInput: this.text.course_title_input,
                 courseDescriptionInput: this.text.course_description_input,
                 onToggleDeadline: (event) => {
