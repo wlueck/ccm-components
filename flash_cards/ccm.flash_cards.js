@@ -195,7 +195,7 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onDeleteDeck: async (courseId, deckToDelete) => {
-                const confirmDelete = confirm(this.text.delete_deck.replace('%title%', deckToDelete.title));
+                const confirmDelete = confirm(this.text.delete_deck_warning.replace('%title%', deckToDelete.title));
                 if (confirmDelete) {
                     const course = dataset.courses.find(course => course.id === courseId);
                     if (!course) {
@@ -209,7 +209,7 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onDeleteCourse: async (courseToDelete) => {
-                const confirmDelete = confirm(this.text.delete_deck.replace('%title%', courseToDelete.title));
+                const confirmDelete = confirm(this.text.delete_course_warning.replace('%title%', courseToDelete.title));
                 if (confirmDelete) {
                     dataset.courses = dataset.courses.filter(course => course.id !== courseToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
