@@ -84,6 +84,7 @@ export const de = {
     "headline_edit_deck": "Karteikartenstapel bearbeiten",
     "select_course_input": "Lehrveranstaltung*",
     "deck_course_placeholder": "-- Lehrveranstaltung wählen --",
+    "deck_cards_container": "Karten",
     "add_course": "Lehrveranstaltung hinzufügen",
     "deck_title_input": "Titel*",
     "deck_description_input": "Beschreibung",

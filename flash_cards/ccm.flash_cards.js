@@ -442,6 +442,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 deckDescriptionInput: this.text.deck_description_input,
                 onToggleDeadline: (event) => this.element.querySelector('#deck-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 deckDeadlineInput: this.text.deck_deadline_input,
+                cards: this.text.deck_cards_container,
                 onAddCard: (event) => {
                     event.preventDefault();
                     addCardInEditor();
@@ -500,7 +501,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     const [day, month, year] = deckToEdit.deadline.split('.');
                     deadlineInputDeck.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                 }
-
+                // add existing cards to editor -> first one is already added
                 deckToEdit.cards.slice(1).forEach(card => {
                     addCardInEditor(card);
                 });
