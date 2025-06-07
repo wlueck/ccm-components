@@ -345,6 +345,7 @@ button {
         display: flex;
         flex-direction: column;
         gap: 5px;
+        width: 30%;
     }
 
     #course-deadline-input {
@@ -352,7 +353,6 @@ button {
     }
 
     .input-group textarea {
-        width: 200px;
         resize: vertical;
     }
 

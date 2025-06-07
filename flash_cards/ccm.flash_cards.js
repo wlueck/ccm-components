@@ -533,7 +533,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
             $.append(this.element.querySelector("#main"), courseSelectDialog);
         };
-// todo
+
         const addCardInEditor = async (card = {}) => {
             const htmlCard = $.html(this.html.add_card, {
                 cardId: card?.id || '',
