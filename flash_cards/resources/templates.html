@@ -166,9 +166,8 @@
         <input type="date" id="deck-deadline-input" name="deadlineInput" class="hidden"/><br><br>
 
         <div id="cards-container">
-            <h4>Karten</h4>
-            <div id="cards">%cards%</div>
-            <h3>%cards%</h3>
+            <h3>%cardsHeadline%</h3>
+            <div id="cards"></div>
             <button id="add-card" onclick="%onAddCard%">%addCard%</button><br>
         </div><br>
         <button id="submit-deck" onclick="%onSubmitDeck%">%submitDeck%</button>
@@ -187,7 +186,7 @@
             <label for="answer">%answer%</label>
             <textarea id="answer" name="answer" cols="34" rows="5">%current_answer%</textarea>
         </div>
-        <button id="delete-card-button" class="%deleteButtonClass%" onclick="%onDeleteCard%">%deleteCard%</button>
+        <button id="delete-card-button" onclick="%onDeleteCard%">%deleteCard%</button>
     </div>
 </ccm-template>
 

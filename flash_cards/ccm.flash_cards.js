@@ -250,6 +250,16 @@ ccm.files["ccm.flash_cards.js"] = {
                 form.reset();
             },
 
+            onDeleteCard: (event, htmlCard) => {
+                event.preventDefault();
+                // check if at least one card exists before removing
+                if (this.element.querySelectorAll("#cards > #card").length > 1) {
+                    htmlCard.remove();
+                } else {
+                    alert(this.text.minimum_card_warning);
+                }
+            },
+
             onSubmitDeck: async (event, deckToEdit) => {
                 const form = this.element.querySelector("#add-deck-form");
                 if (!form.checkValidity()) {
@@ -442,21 +452,12 @@ ccm.files["ccm.flash_cards.js"] = {
                 deckDescriptionInput: this.text.deck_description_input,
                 onToggleDeadline: (event) => this.element.querySelector('#deck-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 deckDeadlineInput: this.text.deck_deadline_input,
-                cards: this.text.deck_cards_container,
+                cardsHeadline: this.text.deck_cards_container,
                 onAddCard: (event) => {
                     event.preventDefault();
                     addCardInEditor();
                 },
                 addCard: this.text.add_card,
-                cards: $.html(this.html.add_card, {
-                    cardId: deckToEdit?.cards[0].id || '',
-                    question: this.text.question_input_required,
-                    current_question: deckToEdit?.cards[0].question || '',
-                    answer: this.text.answer_input_required,
-                    current_answer: deckToEdit?.cards[0].answer || '',
-                    deleteButtonClass: 'hidden' //first card is not deletable
-                }).outerHTML,
-
                 onSubmitDeck: (event) => this.events.onSubmitDeck(event, deckToEdit),
                 submitDeck: deckToEdit ? this.text.change : this.text.create,
                 onCancelSubmitDeck: (event) => this.events.onCancelSubmit(event),
@@ -467,7 +468,10 @@ ccm.files["ccm.flash_cards.js"] = {
             $.setContent(this.element.querySelector('#sub-headline'), '');
             this.element.querySelector("#back-button").classList.remove('hidden');
 
-            //
+            // add initial card in editor
+            await addCardInEditor(deckToEdit?.cards[0] || {});
+
+            // add small course editor to deck form
             $.setContent(this.element.querySelector("#add-course-container"), $.html(this.html.editor_course_view, {
                 courseTitleInput: this.text.course_title_input,
                 courseDescriptionInput: this.text.course_description_input,
@@ -537,12 +541,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 current_question: card?.question || '',
                 answer: this.text.answer_input,
                 current_answer: card?.answer || '',
-                onDeleteCard: (event) => {
-                    event.preventDefault();
-                    htmlCard.remove();
-                },
+                onDeleteCard: (event) => this.events.onDeleteCard(event, htmlCard),
                 deleteCard: this.text.delete_card,
-                deleteButtonClass: ''
             });
             $.append(this.element.querySelector("#cards"), htmlCard);
         };
@@ -620,7 +620,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 let answer = card.querySelector("#answer").value;
                 let cardId = card.getAttribute("data-card-id") || $.generateKey();
 
-                if (question !== "" && answer !== "") {
+                if (question.trim() !== "" && answer.trim() !== "") {
                     newDeck.cards.push({
                         id: cardId,
                         question: question,
@@ -628,7 +628,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         currentStatus: deckToEdit?.cards.find(c => c.id === cardId)?.currentStatus || "hard",
                         status: deckToEdit?.cards.find(c => c.id === cardId)?.status || []
                     });
-                } else if (question !== "" || answer !== "") {
+                } else {
                     alert(this.text.fill_answer_question_warning);
                     valid = false;
                 }

@@ -21,6 +21,7 @@ export const de = {
     "delete_deck_warning": "Möchten Sie das Deck \"%title%\" wirklich löschen?",
     "delete_course_warning": "Möchten Sie die Lehrveranstaltung \"%title%\" wirklich löschen?",
     "fill_answer_question_warning": "Bitte füllen Sie beide Felder (Frage und Antwort) aus!",
+    "minimum_card_warning": "Ein Stapel muss mindestens eine Karte enthalten!",
 
     // main template
     "default_content": "Bitte loggen Sie sich ein, um auf Ihre Karteikarten zuzugreifen.",
