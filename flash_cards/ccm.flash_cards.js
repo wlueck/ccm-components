@@ -409,7 +409,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     }));
 
                     $.setContent(this.element.querySelector('#headline'), mode === "deck" ? deck.title : course.title);
-                    $.setContent(this.element.querySelector('#sub-headline'), mode === "deck" ? `(${course.title})` : "Gesamte Lehrveranstaltung");
+                    $.setContent(this.element.querySelector('#sub-headline'), mode === "deck" ? `(${course.title})` : this.text.sub_headline_course_learning);
                     this.element.querySelector("#back-button").classList.remove('hidden');
                     this.startLearningSession(course, filteredDeck);
                 }

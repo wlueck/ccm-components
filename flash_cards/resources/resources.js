@@ -15,10 +15,10 @@ export const de = {
     // warning messages
     "login_warning": "Bitte loggen Sie sich ein, um fortzufahren!",
     "duplicated_course_title_warning": "Eine Lehrveranstaltung mit diesem Namen existiert bereits!",
-    "fill_all_fields_warning": "Bitte fülle alle erforderlichen Felder aus!",
+    "fill_all_fields_warning": "Bitte füllen Sie alle erforderlichen Felder aus!",
     "cancel_warning": "Möchten Sie die Änderungen wirklich verwerfen?",
     "course_not_found_warning": "Lehrveranstaltung nicht gefunden!",
-    "duplicated_deck_title_warning": "Ein Stapel mit dem Namen existiert bereits!",
+    "duplicated_deck_title_warning": "Ein Stapel mit diesem Namen existiert bereits!",
     "deck_not_found_warning": "Deck nicht gefunden!",
     "no_cards_warning": "Diese Lehrveranstaltung enthält keine Karten!",
     "delete_deck_warning": "Möchten Sie das Deck \"%title%\" wirklich löschen?",
@@ -127,7 +127,8 @@ export const de = {
     "start_learning": "Lernen beginnen",
     "cancel_learning": "Abbrechen",
 
-    // card template
+    // learning-view template
+    "sub_headline_course_learning": "Gesamte Lehrveranstaltung",
     "difficulty_hard": "Nicht gewusst",
     "difficulty_medium": "Unsicher",
     "difficulty_easy": "Gut gewusst",
@@ -258,7 +259,8 @@ export const en = {
     "start_learning": "Start learning",
     "cancel_learning": "Cancel",
 
-    // card template
+    // learning-view template
+    "sub_headline_course_learning": "Entire course",
     "difficulty_hard": "Didn't know",
     "difficulty_medium": "Unsure",
     "difficulty_easy": "Knew well"
