@@ -96,7 +96,7 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onOpenSettings: () => {
-                const overlay = this.html.overlay;
+                const overlay = $.html(this.html.overlay);
                 $.append(this.element.querySelector("#main"), overlay);
 
                 const settingsDialog = $.html(this.html.settings_dialog, {
@@ -231,6 +231,10 @@ ccm.files["ccm.flash_cards.js"] = {
                 const selectedCourseId = this.element.querySelector('#import-deck-course-select').value;
                 courseSelectDialog.remove();
                 overlay.remove();
+                if (!selectedCourseId || selectedCourseId === this.text.no_courses_available) {
+                    alert(this.text.select_course_warning);
+                    return;
+                }
 
                 const input = document.createElement('input');
                 input.type = 'file';
@@ -594,13 +598,13 @@ ccm.files["ccm.flash_cards.js"] = {
         this.initImportDeckDialog = () => {
             this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
 
-            const overlay = this.html.overlay;
+            const overlay = $.html(this.html.overlay);
             $.append(this.element.querySelector("#main"), overlay);
 
             const courseSelectDialog = $.html(this.html.import_deck_dialog, {
                 importDeck: this.text.import_deck_headline,
                 associatedCourse: this.text.associated_course,
-                courseSelectOptions: dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join(''),
+                courseSelectOptions: dataset.courses?.length ? dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join('') : `<option selected disabled>${this.text.no_courses_available}</option>`,
                 onChooseDeckFileToImport: () => this.events.onImportDeck(courseSelectDialog, overlay),
                 chooseDeckFileToImport: this.text.choose_deck_file_to_import,
                 onCancelImportDeck: () => {
@@ -764,7 +768,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 return;
             }
 
-            const overlay = this.html.overlay;
+            const overlay = $.html(this.html.overlay);
             $.append(this.element.querySelector("#main"), overlay);
 
             const learningModeDialog = $.html(this.html.learning_mode_dialog, {

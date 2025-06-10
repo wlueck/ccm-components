@@ -6,7 +6,7 @@
     --secondary-color: #efefef;
     --secondary-font: #000;
 
-    --border: #a9a9a9ff;
+    --border: #ccc;
     --card-bg: #ffffff;
 
     --course-item-bg: #b9cce2;
@@ -135,7 +135,7 @@ input[type="checkbox"] {
     .dropdown-menu {
         position: absolute;
         background-color: white;
-        border: 1px solid #ccc;
+        border: 1px solid var(--border);
         border-radius: 4px;
         width: 150px;
         z-index: 1000;
@@ -191,7 +191,7 @@ input[type="checkbox"] {
     }
 
     .list-item {
-        border: 2px solid rgba(217, 217, 217);
+        border: 2px solid var(--border);
         border-radius: 5px;
         padding: 10px;
         margin: 10px 0;
@@ -246,7 +246,7 @@ input[type="checkbox"] {
     #empty_course_list {
         padding-left: 20px;
         margin-top: 10px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--border);
         border-radius: 5px;
         background-color: #f9f9f9;
     }
@@ -345,7 +345,7 @@ input[type="checkbox"] {
         height: 50vh;
         min-height: 300px;
         background-color: var(--card-bg);
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--border);
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

@@ -1,6 +1,13 @@
 await this.store.set({
     key: "wlueck2s", value: {
         sortPreference: "title",
+        settings: {
+            language: this.defaultLanguage,
+            statusDisplay: 'count',
+            defaultCardOrder: 'original',
+            defaultCardSelection: 'all',
+            skipLearningDialog: false
+        },
         courses: [
             {
                 id: "d6641658-2c82-4a5e-ae56-89af97b70bba",

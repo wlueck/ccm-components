@@ -25,6 +25,7 @@ export const de = {
     "delete_course_warning": "Möchten Sie die Lehrveranstaltung \"%title%\" wirklich löschen?",
     "fill_answer_question_warning": "Bitte füllen Sie beide Felder (Frage und Antwort) aus!",
     "minimum_card_warning": "Ein Stapel muss mindestens eine Karte enthalten!",
+    "select_course_warning": "Bitte wählen Sie einen Kurs aus",
 
     // main template
     "default_content": "Bitte loggen Sie sich ein, um auf Ihre Karteikarten zuzugreifen.",
@@ -71,6 +72,7 @@ export const de = {
     // import-deck-dialog template
     "import_deck_headline": "Stapel importieren",
     "associated_course": "Zugehörige Lehrveranstaltung:",
+    "no_courses_available": "Keine Kurse vorhanden",
     "choose_deck_file_to_import": "Datei auswählen",
 
     // settings-dialog template
@@ -161,6 +163,7 @@ export const en = {
     "delete_course_warning": "Do you really want to delete the course \"%title%\"?",
     "fill_answer_question_warning": "Please fill out both fields (question and answer)!",
     "minimum_card_warning": "A deck must contain at least one card!",
+    "select_course_warning": "Please choose a course",
 
     // main template
     "default_content": "Please log in to access your flashcards.",
@@ -206,6 +209,7 @@ export const en = {
     // import-deck-dialog template
     "import_deck_headline": "Import deck",
     "associated_course": "Associated course:",
+    "no_courses_available": "No courses available",
     "choose_deck_file_to_import": "Choose file",
 
     // settings-dialog template
