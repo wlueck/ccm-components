@@ -12,12 +12,15 @@ ccm.files["ccm.flash_cards.js"] = {
         "css": ["ccm.load", "./resources/styles.css"],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         "html": ["ccm.load", "./resources/templates.html"],
+        "languages": {
+            "de": "./resources/resources.js#de",
+            "en": "./resources/resources.js#en"
+        },
+        "defaultLanguage": "de",
         "onchange": event => console.log(event),
-        "store": ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_mycollection"}],
+        "store": ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_flash_cards"}],
         "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}],
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"]
-        //"user": ["ccm.start", "../libs/fb02user/ccm.fb02user.js"],
-        //"user": [ "ccm.instance", "https://ccmjs.github.io/akless-components/user/versions/ccm.user-9.7.1.js" ]
     },
 
     Instance: function () {
@@ -55,14 +58,30 @@ ccm.files["ccm.flash_cards.js"] = {
             dataset = await this.store.get(user.key);
             if (!dataset) {
                 console.log("No dataset found");
-                await this.store.set({key: user.key, value: []});
+                // initialize new dataset
+                await this.store.set({
+                    key: user.key,
+                    value: {
+                        courses: [],
+                        settings: {
+                            language: this.defaultLanguage,
+                            statusDisplay: 'count',
+                            defaultCardOrder: 'original',
+                            defaultCardSelection: 'all',
+                            skipLearningDialog: false
+                        },
+                        sortPreference: 'title',
+                    }});
                 dataset = await this.store.get(user.key);
             }
             dataset = dataset.value;
+
+            // load saved or default language
+            const savedLanguage = dataset?.settings?.language || this.defaultLanguage;
+            this.text = await this.ccm.load({url: this.languages[savedLanguage], type: "module"});
             this.initListView();
         };
 
-        // todo
         // event handler
         this.events = {
             // closes dropdowns when clicking outside
@@ -73,6 +92,65 @@ ccm.files["ccm.flash_cards.js"] = {
                         dropdown.classList.add('hidden');
                     }
                 });
+            },
+
+            onOpenSettings: () => {
+                const overlay = document.createElement('div');
+                overlay.className = 'overlay';
+                $.append(this.element.querySelector("#main"), overlay);
+
+                const settingsDialog = $.html(this.html.settings_dialog, {
+                    settingsHeadline: this.text.settings_headline,
+                    languageSelect: this.text.language_select,
+                    languageOptions: Object.keys(this.languages).map(lang => `<option value="${lang}">${this.text[lang]}</option>`).join(''),
+                    learningModeSettings: this.text.learning_mode_settings,
+                    learningModeStandards: this.text.learning_mode_standards,
+                    cardsOrder: this.text.cards_order,
+                    cardsOrderOriginal: this.text.cards_order_original,
+                    cardsOrderRandom: this.text.cards_order_random,
+                    cardsOrderDifficulty: this.text.cards_order_difficulty,
+                    selectCards: this.text.select_cards,
+                    selectCardsAll: this.text.select_cards_all,
+                    selectCardsHard: this.text.select_cards_hard,
+                    selectCardsMediumHard: this.text.select_cards_medium_hard,
+                    skipLearningDialog: this.text.skip_learning_dialog,
+                    statusSettings: this.text.status_settings,
+                    percent: this.text.percent,
+                    count: this.text.count,
+                    onSubmitSettings: () => this.events.onSubmitSettings(settingsDialog, overlay),
+                    submitSettings: this.text.save,
+                    onCancelSettings: () => this.events.onCloseSettings(settingsDialog, overlay),
+                    cancelSettings: this.text.cancel,
+                });
+                $.append(this.element.querySelector("#main"), settingsDialog);
+
+                // populate settings dialog with current settings
+                this.element.querySelector('#language-select').value = dataset.settings?.language || 'de';
+                const statusDisplay = dataset.settings?.statusDisplay || 'count';
+                this.element.querySelector(`input[name="status"][value="${statusDisplay}"]`).checked = true;
+                this.element.querySelector('#default-card-order').value = dataset.settings?.defaultCardOrder || 'original';
+                this.element.querySelector('#default-card-selection').value = dataset.settings?.defaultCardSelection || 'all';
+                this.element.querySelector('#skip-learning-dialog').checked = !!dataset.settings?.skipLearningDialog;
+            },
+
+            onSubmitSettings: async (settingsDialog, overlay) => {
+                dataset.settings = dataset.settings || {};
+                const newLanguage = this.element.querySelector('#language-select').value;
+                dataset.settings.language = newLanguage;
+                dataset.settings.defaultCardOrder = this.element.querySelector('#default-card-order').value;
+                dataset.settings.defaultCardSelection = this.element.querySelector('#default-card-selection').value;
+                dataset.settings.skipLearningDialog = this.element.querySelector('#skip-learning-dialog').checked;
+                dataset.settings.statusDisplay = this.element.querySelector('input[name="status"]:checked').value;
+
+                this.text = await this.ccm.load({url: this.languages[newLanguage], type: "module"});
+                await this.store.set({key: user.key, value: dataset});
+                this.events.onCloseSettings(settingsDialog, overlay);
+                await this.start();
+            },
+
+            onCloseSettings: (settingsDialog, overlay) => {
+                settingsDialog.remove();
+                overlay.remove();
             },
 
             onSortCourses: async (sortPreference) => {
@@ -89,7 +167,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 }
             },
-// todo
+
             onImportCourse: async () => {
                 const input = document.createElement('input');
                 input.type = 'file';
@@ -148,9 +226,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 document.body.removeChild(anchorElement);
                 URL.revokeObjectURL(url);
             },
-// todo
+
             onImportDeck: (courseSelectDialog, overlay) => {
-                const selectedCourseId = this.element.querySelector('#course-select').value;
+                const selectedCourseId = this.element.querySelector('#import-deck-course-select').value;
                 courseSelectDialog.remove();
                 overlay.remove();
 
@@ -235,7 +313,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 // Update the course select options
                 const form = this.element.querySelector("#add-course-form");
                 const newOption = document.createElement("option");
-                newOption.value = form.title.value;
+                newOption.value = dataset.courses.find(course => course.title === form.title.value).id;
                 newOption.textContent = form.title.value;
                 $.append(this.element.querySelector("#select-course"), newOption);
 
@@ -278,10 +356,10 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 }
             },
-// todo
-            onStartLearning: async (course, deck, mode, learningModeDialog, overlay) => {
-                const orderMode = this.element.querySelector('#card-order').value;
-                const selectionMode = this.element.querySelector('#card-selection').value;
+
+            onStartLearning: async (course, deck, mode, learningModeDialog, overlay, order, selection) => {
+                const orderMode = order || this.element.querySelector('#card-order').value;
+                const selectionMode = selection || this.element.querySelector('#card-selection').value;
                 let filteredCards = deck.cards;
 
                 // Apply card selection
@@ -296,8 +374,8 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 if (filteredCards.length === 0) {
                     alert("Keine Karten zum Lernen gefunden!");
-                    learningModeDialog.remove();
-                    overlay.remove();
+                    learningModeDialog?.remove();
+                    overlay?.remove();
                     return;
                 }
 
@@ -318,8 +396,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
 
                 const filteredDeck = {...deck, cards: filteredCards};
-                learningModeDialog.remove();
-                overlay.remove();
+                learningModeDialog?.remove();
+                overlay?.remove();
 
                 if (filteredDeck) {
                     $.setContent(this.element.querySelector('#content'), $.html(this.html.learning_view, {
@@ -337,7 +415,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             }
         };
-// todo
+
         this.initListView = () => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.list_view, {
                 onAddDeckOrCourse: () => this.element.querySelector("#add-deck-course-options").classList.toggle('hidden'),
@@ -351,7 +429,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 createCourse: this.text.create_course,
                 onImportCourse: this.events.onImportCourse,
                 importCourse: this.text.import_course,
-
+                onOpenSettings: () => this.events.onOpenSettings(),
+                settings: this.text.settings,
                 onSortCourses: () => this.element.querySelector("#sort-courses-options").classList.toggle("hidden"),
                 sortCourses: this.text.sort_courses,
                 onSortCoursesTitle: () => this.events.onSortCourses('title'),
@@ -400,7 +479,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 $.append(this.element.querySelector('#list-of-courses'), courseHtml);
             }
         };
-// todo
+
         this.initCourseEditorView = (courseToEdit = null) => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_course_view, {
                 courseTitleInput: this.text.course_title_input,
@@ -436,12 +515,12 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             }
         };
-// todo
+
         this.initDeckEditorView = async (deckToEdit = null) => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.editor_deck_view, {
                 courseInput: this.text.select_course_input,
                 selectCoursePlaceholder: this.text.deck_course_placeholder,
-                courseOptions: dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join(''),
+                courseOptions: dataset.courses?.length ? dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join('') : '',
                 onAddCourse: (event) => {
                     event.preventDefault();
                     this.element.querySelector("#add-course-container").classList.toggle("hidden");
@@ -464,7 +543,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 cancelDeck: this.text.cancel,
                 submitDeckHint: deckToEdit ? '' : this.text.submit_deck_hint,
             }));
-            $.setContent(this.element.querySelector('#headline'), deckToEdit ? "Karteikartenstapel bearbeiten" : "Karteikartenstapel erstellen");
+            $.setContent(this.element.querySelector('#headline'), deckToEdit ? this.text.headline_edit_deck: this.text.headline_create_deck);
             $.setContent(this.element.querySelector('#sub-headline'), '');
             this.element.querySelector("#back-button").classList.remove('hidden');
 
@@ -511,7 +590,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 });
             }
         };
-// todo
+
         this.initImportDeckDialog = () => {
             this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
 
@@ -546,7 +625,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
             $.append(this.element.querySelector("#cards"), htmlCard);
         };
-// todo
+
         this.addOrUpdateCourse = async (form, courseToEdit = null) => {
             let formattedDate = '';
             if (form.deadline.checked && form.deadlineInput.value) {
@@ -584,7 +663,7 @@ ccm.files["ccm.flash_cards.js"] = {
             this.onchange && this.onchange({ event: courseToEdit ? 'updatedCourse' : 'createdCourse', instance: this });
             return true;
         };
-// todo
+
         this.addOrUpdateDeck = async (form, deckToEdit = null) => {
             let formattedDate = '';
             if (form.deadline.checked && form.deadlineInput.value) {
@@ -649,7 +728,6 @@ ccm.files["ccm.flash_cards.js"] = {
             }
         };
 
-// todo
         this.startDeck = async (courseId, deckId) => {
             const currentCourse = dataset.courses.find(course => course.id === courseId);
             if (!currentCourse) {
@@ -661,9 +739,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 console.error(this.text.deck_not_found_warning);
                 return;
             }
-            this.showLearningModeDialog(currentCourse, currentCardDeck, "deck");
+            await this.showLearningModeDialog(currentCourse, currentCardDeck, "deck");
         };
-// todo
+
         this.startCourse = async (courseId) => {
             const currentCourse = dataset.courses.find(course => course.id === courseId);
             if (!currentCourse) {
@@ -675,10 +753,18 @@ ccm.files["ccm.flash_cards.js"] = {
                 alert(this.text.no_cards_warning);
                 return;
             }
-            this.showLearningModeDialog(currentCourse, allCards);
+            await this.showLearningModeDialog(currentCourse, allCards);
         };
-// todo
-        this.showLearningModeDialog = (course, deck, mode) => {
+
+        this.showLearningModeDialog = async (course, deck, mode) => {
+            // skip if settings are enabled
+            if (dataset.settings?.skipLearningDialog) {
+                const order = dataset.settings.defaultCardOrder || 'original';
+                const selection = dataset.settings.defaultCardSelection || 'all';
+                await this.events.onStartLearning(course, deck, mode, null, null, order, selection);
+                return;
+            }
+
             const overlay = document.createElement('div');
             overlay.className = 'overlay';
             $.append(this.element.querySelector("#main"), overlay);
@@ -703,7 +789,7 @@ ccm.files["ccm.flash_cards.js"] = {
             });
             $.append(this.element.querySelector("#main"), learningModeDialog);
         };
-// todo
+
         this.startLearningSession = (course, cardDeck) => {
             const cards = cardDeck.cards;
             const updateCardDisplay = (index) => {
@@ -852,6 +938,14 @@ ccm.files["ccm.flash_cards.js"] = {
             return `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: <br> ${deadline}</a>`;
         };
 
+        const getStatusDisplay = (status) => {
+            if (dataset.settings?.statusDisplay === 'percent') {
+                return `${Math.round(status.easyPercent)}% / ${Math.round(status.mediumPercent)}% / ${Math.round(status.hardPercent)}%`;
+            } else {
+                return `${status.easyCount} / ${status.mediumCount} / ${status.hardCount}`;
+            }
+        };
+
         const getStatusChartStyle = (status) => {
             return `width: 30px; height: 30px;
                     background-image: radial-gradient(circle, white 57%, transparent 57%),
@@ -886,7 +980,7 @@ ccm.files["ccm.flash_cards.js"] = {
         this.getDeckStatus = (deck) => {
             return calculateStatus(deck.cards);
         };
-// todo
+
         const createCourseListItemHtml = (course) => {
             const courseStatus = this.getCourseStatus(course);
             const courseHtml = $.html(this.html.course_list_item, {
@@ -918,12 +1012,12 @@ ccm.files["ccm.flash_cards.js"] = {
                 onDeleteCourse: async () => await this.events.onDeleteCourse(course),
                 deleteCourse: this.text.delete_course,
                 courseStatusChartStyle: getStatusChartStyle(courseStatus),
-                courseStatus: courseStatus.easyCount + ' / ' + courseStatus.mediumCount + ' / ' + courseStatus.hardCount,
+                courseStatus: getStatusDisplay(courseStatus),
                 courseDeadline: getDeadlineHtml(course.deadline),
             });
             return courseHtml;
         };
-// todo
+
         const createDeckListItemHtml = (courseId, deck) => {
             const deckStatus = this.getDeckStatus(deck);
             const cardDeckHtml = $.html(this.html.deck_list_item, {
@@ -940,7 +1034,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 onDeleteDeck: async () => await this.events.onDeleteDeck(courseId, deck),
                 deleteDeck: this.text.delete_deck,
                 deckStatusChartStyle: getStatusChartStyle(deckStatus),
-                deckStatus: deckStatus.easyCount + ' / ' + deckStatus.mediumCount + ' / ' + deckStatus.hardCount,
+                deckStatus: getStatusDisplay(deckStatus),
                 deckDeadline: getDeadlineHtml(deck.deadline),
             });
             return cardDeckHtml;

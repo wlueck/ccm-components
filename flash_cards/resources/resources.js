@@ -7,7 +7,10 @@ export const de = {
     "back": "Zurück",
     "cancel": "Abbrechen",
     "create": "Erstellen",
+    "save": "Speichern",
     "change": "Ändern",
+    "de": "Deutsch",
+    "en": "Englisch",
 
     // warning messages
     "login_warning": "Bitte loggen Sie sich ein, um fortzufahren!",
@@ -70,6 +73,16 @@ export const de = {
     "associated_course": "Zugehörige Lehrveranstaltung:",
     "choose_deck_file_to_import": "Datei auswählen",
 
+    // settings-dialog template
+    "settings_headline": "Einstellungen",
+    "language_select": "Sprache auswählen",
+    "learning_mode_settings": "Lernmodus",
+    "learning_mode_standards": "Standartwerte",
+    "skip_learning_dialog": "Lernmodus-Dialog überspringen",
+    "status_settings": "Status anzeigen in",
+    "percent": "Prozent",
+    "count": "Anzahl",
+
 
     // edit/create-course template
     "headline_create_course": "Lehrveranstaltung erstellen",
@@ -125,5 +138,128 @@ export const de = {
  * @type {Object}
  */
 export const en = {
+    // general
+    "back": "Back",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "change": "Change",
+    "de": "German",
+    "en": "English",
 
+    // warning messages
+    "login_warning": "Please log in to continue!",
+    "duplicated_course_title_warning": "A course with this title already exists!",
+    "fill_all_fields_warning": "Please fill out all required fields!",
+    "cancel_warning": "Do you really want to discard the changes?",
+    "course_not_found_warning": "Course not found!",
+    "duplicated_deck_title_warning": "A deck with this name already exists!",
+    "deck_not_found_warning": "Deck not found!",
+    "no_cards_warning": "This course contains no cards!",
+    "delete_deck_warning": "Do you really want to delete the deck \"%title%\"?",
+    "delete_course_warning": "Do you really want to delete the course \"%title%\"?",
+    "fill_answer_question_warning": "Please fill out both fields (question and answer)!",
+    "minimum_card_warning": "A deck must contain at least one card!",
+
+    // main template
+    "default_content": "Please log in to access your flashcards.",
+
+    // list-view template
+    "headline_course_list": "Flashcards",
+    "add_deck_or_course": "Add",
+    "create_deck": "Create deck",
+    "import_deck": "Import deck",
+    "create_course": "Create course",
+    "import_course": "Import course",
+    "sort_courses": "Sort",
+    "sort_courses_title": "By title",
+    "sort_courses_deadline": "By deadline",
+    "sort_courses_cardCount": "By card count",
+    "sort_courses_status": "By status",
+
+    // empty-course-list template
+    "no_courses_message": "No courses and flashcard decks available yet.",
+    "no_courses_click_to_add": "Click on Add to:",
+    "no_courses_create_new_deck": "create a new flashcard deck",
+    "no_courses_import_existing_deck": "import an existing deck",
+    "no_courses_create_new_course": "create a new course",
+    "no_courses_import_existing_course": "import a course",
+
+    // course-list-item template
+    "start_course": "Learn entire course",
+    "sort_decks": "Sort",
+    "sort_decks_title": "By title",
+    "sort_decks_deadline": "By deadline",
+    "sort_decks_cardCount": "By card count",
+    "sort_decks_status": "By status",
+    "edit_course": "Edit",
+    "export_course": "Export",
+    "delete_course": "Delete",
+
+    // deck-list-item template
+    "start_deck": "Start",
+    "edit_deck": "Edit",
+    "export_deck": "Export",
+    "delete_deck": "Delete",
+
+    // import-deck-dialog template
+    "import_deck_headline": "Import deck",
+    "associated_course": "Associated course:",
+    "choose_deck_file_to_import": "Choose file",
+
+    // settings-dialog template
+    "settings_headline": "Settings",
+    "language_select": "Select language",
+    "learning_mode_settings": "Learning mode",
+    "learning_mode_standards": "Defaults",
+    "skip_learning_dialog": "Skip learning mode dialog",
+    "status_settings": "Show status in",
+    "percent": "Percent",
+    "count": "Count",
+
+    // edit/create-course template
+    "headline_create_course": "Create course",
+    "headline_edit_course": "Edit course",
+    "course_title_input": "Title*",
+    "course_description_input": "Description",
+    "course_deadline_input": "Deadline",
+    "submit_course_hint": "The course can be edited anytime after saving.",
+
+    // edit/create-deck template
+    "headline_create_deck": "Create flashcard deck",
+    "headline_edit_deck": "Edit flashcard deck",
+    "select_course_input": "Course*",
+    "deck_course_placeholder": "-- Select course --",
+    "deck_cards_container": "Cards",
+    "add_course": "Add course",
+    "deck_title_input": "Title*",
+    "deck_description_input": "Description",
+    "deck_deadline_input": "Deadline",
+    "add_card": "Add card",
+    "submit_deck_hint": "The flashcard deck can be edited anytime after saving.",
+
+    // add-card template
+    "question_input_required": "Question*",
+    "answer_input_required": "Answer*",
+    "question_input": "Question",
+    "answer_input": "Answer",
+    "delete_card": "Delete card",
+
+    // learning-mode template
+    "learning_mode": "Select learning mode",
+    "cards_order": "Order cards by",
+    "cards_order_original": "Original order",
+    "cards_order_random": "Random",
+    "cards_order_difficulty": "Difficulty",
+    "select_cards": "Select cards",
+    "select_cards_all": "All cards",
+    "select_cards_hard": "Only hard cards",
+    "select_cards_medium_hard": "Medium and hard cards",
+    "start_learning": "Start learning",
+    "cancel_learning": "Cancel",
+
+    // card template
+    "difficulty_hard": "Didn't know",
+    "difficulty_medium": "Unsure",
+    "difficulty_easy": "Knew well"
 };
