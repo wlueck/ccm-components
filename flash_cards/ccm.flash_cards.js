@@ -95,9 +95,7 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onOpenSettings: () => {
-                const overlay = document.createElement('div');
-                overlay.className = 'overlay';
-                $.append(this.element.querySelector("#main"), overlay);
+                $.append(this.element.querySelector("#main"), this.html.overlay);
 
                 const settingsDialog = $.html(this.html.settings_dialog, {
                     settingsHeadline: this.text.settings_headline,
@@ -594,9 +592,7 @@ ccm.files["ccm.flash_cards.js"] = {
         this.initImportDeckDialog = () => {
             this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
 
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            $.append(this.element.querySelector("#main"), overlay);
+            $.append(this.element.querySelector("#main"), this.html.overlay);
 
             const courseSelectDialog = $.html(this.html.import_deck_dialog, {
                 importDeck: this.text.import_deck_headline,
@@ -765,9 +761,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 return;
             }
 
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            $.append(this.element.querySelector("#main"), overlay);
+            $.append(this.element.querySelector("#main"), this.html.overlay);
 
             const learningModeDialog = $.html(this.html.learning_mode_dialog, {
                 learningMode: this.text.learning_mode,
