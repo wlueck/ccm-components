@@ -272,23 +272,27 @@
 <ccm-template key="learning_view">
     <a id="learning-view">
         <p id="description">%description%</p>
-        <div id="card">
-            <p id="question-answer-text"></p>
-            <div id="card-buttons">
-                <button class="btn-low-style" id="previous-card-button">&#8592;</button>
-                <button class="btn-low-style" id="turn-around-button">&#8634;</button>
-                <button class="btn-low-style" id="next-card-button">&#8594;</button>
-            </div>
-            <div id="number-of-cards">
-                <span id="current-card-number"></span> / <span>%maxNumberOfCards%</span>
-            </div>
-        </div>
-        <div id="difficulty-buttons" class="questionStyle">
+        <div id="card-content-container"></div>
+        <div id="difficulty-buttons" class="unseen">
             <button id="hard">%difficulty_hard%</button>
             <button id="medium">%difficulty_medium%</button>
             <button id="easy">%difficulty_easy%</button>
         </div>
     </a>
+</ccm-template>
+
+<ccm-template key="learning_view_card">
+    <div id="card-content">
+        <p id="question-answer-text">%content%</p>
+        <div id="card-buttons">
+            <button class="btn-low-style %hidePrevBtn%" id="previous-card-button" onclick="%onPreviousCard%">&#8592;</button>
+            <button class="btn-low-style" id="turn-around-button" onclick="%onTurnAround%">&#8634;</button>
+            <button class="btn-low-style %hideNextBtn%" id="next-card-button" onclick="%onNextCard%">&#8594;</button>
+        </div>
+        <div id="number-of-cards">
+            <span>%currentCardNumber%</span> / <span>%maxNumberOfCards%</span>
+        </div>
+    </div>
 </ccm-template>
 
 <ccm-template key="overlay">

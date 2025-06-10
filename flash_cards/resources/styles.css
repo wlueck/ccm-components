@@ -23,7 +23,7 @@
 }
 
 .unseen {
-    visibility: hidden;
+    visibility: hidden !important;
 }
 
 button {
@@ -333,12 +333,14 @@ input[type="checkbox"] {
 
 /*region learning-view template */
 #learning-view {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
+    #card-content-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+    }
 
-    #card {
+    #card-content {
         width: 80%;
         max-width: 100%;
         min-width: 300px;
@@ -369,10 +371,8 @@ input[type="checkbox"] {
     #question-answer-text {
         flex-grow: 1;
         display: flex;
-        justify-content: center;
         align-items: center;
         font-size: 18px;
-        margin: 0;
     }
 
     #card-buttons {
@@ -398,6 +398,11 @@ input[type="checkbox"] {
         display: flex;
         justify-content: center;
         width: 68%;
+    }
+
+    #difficulty-buttons {
+        display: flex;
+        justify-content: center;
     }
 
     #hard {

@@ -361,62 +361,42 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
             },
 
-            onStartLearning: async (course, deck, mode, learningModeDialog, overlay, order, selection) => {
-                const orderMode = order || this.element.querySelector('#card-order').value;
-                const selectionMode = selection || this.element.querySelector('#card-selection').value;
-                let filteredCards = deck.cards;
-
-                // Apply card selection
-                switch (selectionMode) {
-                    case 'hard':
-                        filteredCards = filteredCards.filter(card => card.currentStatus === 'hard');
-                        break;
-                    case 'medium-hard':
-                        filteredCards = filteredCards.filter(card => card.currentStatus === 'hard' || card.currentStatus === 'medium');
-                        break;
-                }
-
-                if (filteredCards.length === 0) {
-                    alert("Keine Karten zum Lernen gefunden!");
-                    learningModeDialog?.remove();
-                    overlay?.remove();
+            onStartCourseOrDeck: async (courseId, deckId = null) => {
+                const currentCourse = dataset.courses.find(course => course.id === courseId);
+                if (!currentCourse) {
+                    console.error(this.text.course_not_found_warning);
                     return;
                 }
+                let learningContent, mode;
 
-                // Apply ordering
-                switch (orderMode) {
-                    case 'random':
-                        filteredCards.sort(() => Math.random() - 0.5);
-                        break;
-                    case 'status':
-                        filteredCards.sort((a, b) => {
-                            const statusA = this.getDeckStatus(a);
-                            const statusB = this.getDeckStatus(b);
-                            return statusB.hardPercent - statusA.hardPercent ||
-                                statusB.mediumPercent - statusA.mediumPercent ||
-                                statusA.easyPercent - statusB.easyPercent;
-                        });
-                        break;
+                if (deckId) {
+                    const currentCardDeck = currentCourse.cardDecks.find(deck => deck.id === deckId);
+                    if (!currentCardDeck) {
+                        console.error(this.text.deck_not_found_warning);
+                        return;
+                    }
+                    learningContent = currentCardDeck;
+                    mode = "deck";
+                } else {
+                    learningContent = {cards: currentCourse.cardDecks.flatMap(deck => deck.cards)};
+                    if (learningContent.cards.length === 0) {
+                        alert(this.text.no_cards_warning);
+                        return;
+                    }
                 }
+                await this.showLearningModeDialog(currentCourse, learningContent, mode);
+            },
 
-                const filteredDeck = {...deck, cards: filteredCards};
+            onStartLearning: async (course, deck, mode, learningModeDialog, overlay, order, selection) => {
+                const filteredCards = filterAndSortCardsForLearning(deck, order, selection);
+
                 learningModeDialog?.remove();
                 overlay?.remove();
-
-                if (filteredDeck) {
-                    $.setContent(this.element.querySelector('#content'), $.html(this.html.learning_view, {
-                        description: mode === "deck" ? deck.description || '' : course.description || '',
-                        maxNumberOfCards: filteredDeck.cards.length.toString(),
-                        difficulty_hard: this.text.difficulty_hard,
-                        difficulty_medium: this.text.difficulty_medium,
-                        difficulty_easy: this.text.difficulty_easy,
-                    }));
-
-                    $.setContent(this.element.querySelector('#headline'), mode === "deck" ? deck.title : course.title);
-                    $.setContent(this.element.querySelector('#sub-headline'), mode === "deck" ? `(${course.title})` : this.text.sub_headline_course_learning);
-                    this.element.querySelector("#back-button").classList.remove('hidden');
-                    this.startLearningSession(course, filteredDeck);
+                if (filteredCards.cards.length === 0) {
+                    alert("Keine Karten zum Lernen gefunden!");
+                    return;
                 }
+                this.initLearningView(course, deck, mode, filteredCards.cards);
             }
         };
 
@@ -731,34 +711,6 @@ ccm.files["ccm.flash_cards.js"] = {
             }
         };
 
-        this.startDeck = async (courseId, deckId) => {
-            const currentCourse = dataset.courses.find(course => course.id === courseId);
-            if (!currentCourse) {
-                console.error(this.text.course_not_found_warning);
-                return;
-            }
-            const currentCardDeck = currentCourse.cardDecks.find(deck => deck.id === deckId);
-            if (!currentCardDeck) {
-                console.error(this.text.deck_not_found_warning);
-                return;
-            }
-            await this.showLearningModeDialog(currentCourse, currentCardDeck, "deck");
-        };
-
-        this.startCourse = async (courseId) => {
-            const currentCourse = dataset.courses.find(course => course.id === courseId);
-            if (!currentCourse) {
-                console.error(this.text.course_not_found_warning);
-                return;
-            }
-            const allCards = {cards: currentCourse.cardDecks.flatMap(deck => deck.cards)};
-            if (allCards.length === 0) {
-                alert(this.text.no_cards_warning);
-                return;
-            }
-            await this.showLearningModeDialog(currentCourse, allCards);
-        };
-
         this.showLearningModeDialog = async (course, deck, mode) => {
             // skip if settings are enabled
             if (dataset.settings?.skipLearningDialog) {
@@ -792,84 +744,85 @@ ccm.files["ccm.flash_cards.js"] = {
             $.append(this.element.querySelector("#main"), learningModeDialog);
         };
 
-        this.startLearningSession = (course, cardDeck) => {
-            const cards = cardDeck.cards;
-            const updateCardDisplay = (index) => {
-                if (index < 0 || index >= cards.length) return;
+        this.initLearningView = (course, deck, mode, cards) => {
+            $.setContent(this.element.querySelector('#content'), $.html(this.html.learning_view, {
+                description: mode === "deck" ? deck.description || '' : course.description || '',
+                difficulty_hard: this.text.difficulty_hard,
+                difficulty_medium: this.text.difficulty_medium,
+                difficulty_easy: this.text.difficulty_easy,
+            }));
 
+            $.setContent(this.element.querySelector('#headline'), mode === "deck" ? deck.title : course.title);
+            $.setContent(this.element.querySelector('#sub-headline'), mode === "deck" ? `(${course.title})` : this.text.sub_headline_course_learning);
+            this.element.querySelector("#back-button").classList.remove('hidden');
+
+            let isShowingQuestion = true;
+
+            const updateCardContent = (index) => {
+                if (index < 0 || index >= cards.length) return;
                 const currentCard = cards[index];
 
-                // Update navigation buttons
-                this.element.querySelector('#previous-card-button').classList.toggle("unseen", index === 0);
-                this.element.querySelector('#next-card-button').classList.toggle("unseen", index === cards.length - 1);
-                this.element.querySelector('#current-card-number').innerHTML = (index + 1).toString();
+                $.setContent(this.element.querySelector('#card-content-container'), $.html(this.html.learning_view_card, {
+                    content: isShowingQuestion ? currentCard.question : currentCard.answer,
+                    hidePrevBtn: index === 0 ? 'unseen' : '',
+                    onPreviousCard: () => {
+                        isShowingQuestion = true;
+                        updateCardContent(index - 1);
+                    },
+                    onTurnAround: () => {
+                        isShowingQuestion = !isShowingQuestion;
+                        updateCardContent(index);
+                    },
+                    hideNextBtn: index === cards.length - 1 ? 'unseen' : '',
+                    onNextCard: () => {
+                        isShowingQuestion = true;
+                        updateCardContent(index + 1);
+                    },
+                    currentCardNumber: (index + 1).toString(),
+                    maxNumberOfCards: cards.length.toString()
+                }));
 
-                // Show question initially
-                this.element.querySelector('#question-answer-text').innerHTML = currentCard.question;
-                this.element.querySelector('#difficulty-buttons').classList.remove('answerStyle');
-                this.element.querySelector('#difficulty-buttons').classList.add('questionStyle');
-
-                const difficultyButtons = {
-                    easy: this.element.querySelector('#easy'),
-                    medium: this.element.querySelector('#medium'),
-                    hard: this.element.querySelector('#hard')
-                };
-                for (const btn of Object.values(difficultyButtons)) {
-                    btn.classList.remove("selected-difficulty");
-                }
-
-                this.element.querySelector('#turn-around-button').onclick = () => {
-                    if (this.element.querySelector('#question-answer-text').innerHTML === currentCard.question) {
-                        this.element.querySelector('#question-answer-text').innerHTML = currentCard.answer;
-                        this.element.querySelector('#difficulty-buttons').classList.remove('questionStyle');
-                        this.element.querySelector('#difficulty-buttons').classList.add('answerStyle');
-                    } else {
-                        this.element.querySelector('#question-answer-text').innerHTML = currentCard.question;
-                        this.element.querySelector('#difficulty-buttons').classList.remove('answerStyle');
-                        this.element.querySelector('#difficulty-buttons').classList.add('questionStyle');
-                    }
-                };
-
-                // Set up navigation buttons
-                this.element.querySelector('#next-card-button').onclick = () => updateCardDisplay(index + 1);
-                this.element.querySelector('#previous-card-button').onclick = () => updateCardDisplay(index - 1);
-
-                for (const [difficulty, button] of Object.entries(difficultyButtons)) {
-                    button.onclick = async () => {
-                        // Reset selected-difficulty class for all difficulty buttons
-                        for (const btn of Object.values(difficultyButtons)) {
-                            btn.classList.remove("selected-difficulty");
-                        }
-                        button.classList.add("selected-difficulty");
-
-                        const courseIndex = dataset.courses.findIndex(c => c.id === course.id);
-                        const deckIndex = cardDeck.title === course.title ? -1 :
-                            dataset.courses[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
-
-                        if (deckIndex === -1) {
-                            // Modus: gesamte Lehrveranstaltung
-                            const cardIndex = cards.findIndex(c => c.id === currentCard.id);
-                            cards[cardIndex].currentStatus = difficulty;
-                            cards[cardIndex].status.push(difficulty);
-                        } else {
-                            const cardIndex = dataset.courses[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
-                            dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].currentStatus = difficulty;
-                            dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].status.push(difficulty);
-                        }
-
-                        await this.store.set({key: user.key, value: dataset});
-                    };
-                }
+                this.element.querySelector('#difficulty-buttons').classList.toggle('unseen', isShowingQuestion);
+                this.updateDifficultyButtons(course, deck, currentCard, cards);
             };
-
-            if (cards.length > 0) {
-                updateCardDisplay(0);
-            } else {
-                this.element.querySelector('#question-answer-text').innerHTML = "Keine Karten vorhanden";
-                this.element.querySelector('#difficulty-buttons').classList.add('hidden');
-                this.element.querySelector('#turn-around-button').classList.add('hidden');
-            }
+            updateCardContent(0);
         };
+
+        this.updateDifficultyButtons = (course, cardDeck, currentCard, cards) => {
+            const difficultyButtons = {
+                easy: this.element.querySelector('#easy'),
+                medium: this.element.querySelector('#medium'),
+                hard: this.element.querySelector('#hard')
+            };
+            for (const btn of Object.values(difficultyButtons)) {
+                btn.classList.remove("selected-difficulty");
+            }
+            for (const [difficulty, button] of Object.entries(difficultyButtons)) {
+                button.onclick = async () => {
+                    // Reset selected-difficulty class for all difficulty buttons
+                    for (const btn of Object.values(difficultyButtons)) {
+                        btn.classList.remove("selected-difficulty");
+                    }
+                    button.classList.add("selected-difficulty");
+
+                    const courseIndex = dataset.courses.findIndex(c => c.id === course.id);
+                    const deckIndex = cardDeck.title === course.title ? -1 :
+                        dataset.courses[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
+
+                    if (deckIndex === -1) {
+                        // Modus: gesamte Lehrveranstaltung
+                        const cardIndex = cards.findIndex(c => c.id === currentCard.id);
+                        cards[cardIndex].currentStatus = difficulty;
+                        cards[cardIndex].status.push(difficulty);
+                    } else {
+                        const cardIndex = dataset.courses[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
+                        dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].currentStatus = difficulty;
+                        dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].status.push(difficulty);
+                    }
+                    await this.store.set({key: user.key, value: dataset});
+                };
+            }
+        }
 
 
         // helper functions
@@ -994,7 +947,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     decks.classList.toggle('hidden');
                     toggleCardButton.innerHTML = decks.classList.contains('hidden') ? '&#9660;' : '&#9650;';
                 },
-                onStartCourse: async () => await this.startCourse(course.id),
+                onStartCourse: async () => await this.events.onStartCourseOrDeck(course.id),
                 startCourse: this.text.start_course,
                 onCourseOptions: () => courseHtml.querySelector("#course-options").classList.toggle('hidden'),
                 onSortDecks: () => courseHtml.querySelector(("#sort-deck-options")).classList.toggle("hidden"),
@@ -1026,7 +979,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 deckTitle: deck.title,
                 deckDescription: deck.description || '',
                 deckId: deck.id,
-                onStartDeck: async () => await this.startDeck(courseId, deck.id),
+                onStartDeck: async () => await this.events.onStartCourseOrDeck(courseId, deck.id),
                 startDeck: this.text.start_deck,
                 onDeckOptions: () => cardDeckHtml.querySelector("#deck-options").classList.toggle('hidden'),
                 onEditDeck: () => this.initDeckEditorView(deck),
@@ -1041,5 +994,38 @@ ccm.files["ccm.flash_cards.js"] = {
             });
             return cardDeckHtml;
         };
+
+        const filterAndSortCardsForLearning = (deck, order, selection) => {
+            const orderMode = order || this.element.querySelector('#card-order').value;
+            const selectionMode = selection || this.element.querySelector('#card-selection').value;
+            let filteredCards = deck.cards;
+
+            // Apply card selection
+            switch (selectionMode) {
+                case 'hard':
+                    filteredCards = filteredCards.filter(card => card.currentStatus === 'hard');
+                    break;
+                case 'medium-hard':
+                    filteredCards = filteredCards.filter(card => card.currentStatus === 'hard' || card.currentStatus === 'medium');
+                    break;
+            }
+            // Apply ordering
+            switch (orderMode) {
+                case 'random':
+                    filteredCards.sort(() => Math.random() - 0.5);
+                    break;
+                case 'status':
+                    filteredCards.sort((a, b) => {
+                        const statusA = this.getDeckStatus(a);
+                        const statusB = this.getDeckStatus(b);
+                        return statusB.hardPercent - statusA.hardPercent ||
+                            statusB.mediumPercent - statusA.mediumPercent ||
+                            statusA.easyPercent - statusB.easyPercent;
+                    });
+                    break;
+            }
+
+            return {...deck, cards: filteredCards};
+        }
     },
 };
