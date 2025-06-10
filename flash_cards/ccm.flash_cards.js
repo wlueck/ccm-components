@@ -71,7 +71,8 @@ ccm.files["ccm.flash_cards.js"] = {
                             skipLearningDialog: false
                         },
                         sortPreference: 'title',
-                    }});
+                    }
+                });
                 dataset = await this.store.get(user.key);
             }
             dataset = dataset.value;
@@ -95,7 +96,8 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onOpenSettings: () => {
-                $.append(this.element.querySelector("#main"), this.html.overlay);
+                const overlay = this.html.overlay;
+                $.append(this.element.querySelector("#main"), overlay);
 
                 const settingsDialog = $.html(this.html.settings_dialog, {
                     settingsHeadline: this.text.settings_headline,
@@ -541,7 +543,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 cancelDeck: this.text.cancel,
                 submitDeckHint: deckToEdit ? '' : this.text.submit_deck_hint,
             }));
-            $.setContent(this.element.querySelector('#headline'), deckToEdit ? this.text.headline_edit_deck: this.text.headline_create_deck);
+            $.setContent(this.element.querySelector('#headline'), deckToEdit ? this.text.headline_edit_deck : this.text.headline_create_deck);
             $.setContent(this.element.querySelector('#sub-headline'), '');
             this.element.querySelector("#back-button").classList.remove('hidden');
 
@@ -592,7 +594,8 @@ ccm.files["ccm.flash_cards.js"] = {
         this.initImportDeckDialog = () => {
             this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
 
-            $.append(this.element.querySelector("#main"), this.html.overlay);
+            const overlay = this.html.overlay;
+            $.append(this.element.querySelector("#main"), overlay);
 
             const courseSelectDialog = $.html(this.html.import_deck_dialog, {
                 importDeck: this.text.import_deck_headline,
@@ -656,7 +659,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 dataset.courses.push(course);
             }
             await this.store.set({key: user.key, value: dataset});
-            this.onchange && this.onchange({ event: courseToEdit ? 'updatedCourse' : 'createdCourse', instance: this });
+            this.onchange && this.onchange({event: courseToEdit ? 'updatedCourse' : 'createdCourse', instance: this});
             return true;
         };
 
@@ -719,7 +722,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 dataset.courses[courseIndex].cardDecks.push(newDeck);
                 await this.store.set({key: user.key, value: dataset});
-                this.onchange && this.onchange( { event: deckToEdit? 'updatedDeck' : 'createdDeck', instance: this } );
+                this.onchange && this.onchange({event: deckToEdit ? 'updatedDeck' : 'createdDeck', instance: this});
                 this.initListView();
             }
         };
@@ -761,7 +764,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 return;
             }
 
-            $.append(this.element.querySelector("#main"), this.html.overlay);
+            const overlay = this.html.overlay;
+            $.append(this.element.querySelector("#main"), overlay);
 
             const learningModeDialog = $.html(this.html.learning_mode_dialog, {
                 learningMode: this.text.learning_mode,
