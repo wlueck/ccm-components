@@ -19,7 +19,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     course_id: "course_40bd08c5-4fbf-4ebe-a19d-97a065317603"
                 },
                 {
-                    course_id: "course_55422f81-0470-4843-ae9b-23b466c0142c"
+                    course_id: "course_1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
                 }
             ]
         },
@@ -30,6 +30,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 course_id: "course_40bd08c5-4fbf-4ebe-a19d-97a065317603",
                 title: "Klausurvorbereitung 2023",
                 description: "Zusammenfassung der wichtigsten Themen für die Klausur.",
+                file_url: "https://github.com/wlueck/ccm-components/blob/main/learning_exchange/resources/files/Lernunterlagen_Prog1.pdf",
                 uploader: "wlueck2s",
                 upload_date: "2025-05-21T10:00:00Z",
                 tags: ["Klausur", "Zusammenfassung"],
@@ -40,9 +41,10 @@ ccm.files["ccm.learning_exchange.js"] = {
             },
             {
                 id: "material_9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f",
-                course_id: "course_a33d93c2-3d74-4c60-b5c8-eb14a52c4a11",
+                course_id: "course_1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
                 title: "Klausurvorbereitung",
                 description: "Alles wichtige",
+                file_url: "https://github.com/wlueck/ccm-components/blob/main/learning_exchange/resources/files/Klausurvorbereitung%20Systemnahe%20Programmierung.pdf",
                 uploader: "userrr2s",
                 upload_date: "2025-05-21T10:00:00Z",
                 tags: ["Vorlesung", "Zusammenfassung"],
@@ -193,7 +195,6 @@ ccm.files["ccm.learning_exchange.js"] = {
 
         tags: ['Klausur', 'Zusammenfassung', 'Vorlesung', 'übung'],
 
-
         //chat: ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
         "css": ["ccm.load", "./resources/styles.css"],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
@@ -264,10 +265,8 @@ ccm.files["ccm.learning_exchange.js"] = {
                 const selectedSemester = parseInt(event.target.value);
                 this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
             },
-            onFavorite: (event, courseId) => {
+            onFavorite: (event, course) => {
                 event.stopPropagation();
-                const course = curriculum.flatMap(courseOfStudy => courseOfStudy.courses).find(c => c.id === courseId);
-                if (!course) return;
 
                 const isSaved = this.user_store.saved_courses.some(savedCourse => savedCourse.course_id === course.id);
                 if (isSaved) {
@@ -276,7 +275,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     this.user_store.saved_courses.push({course_id: course.id});
                 }
                 // update UI
-                const selectedCourseOfStudy = curriculum.find(c => c.courses.some(course => course.id === courseId));
+                const selectedCourseOfStudy = curriculum.find(c => c.courses.some(course => course.id === course.id));
                 const selectedSemester = this.element.querySelector("#semester").value ? parseInt(this.element.querySelector("#semester").value) : 1;
                 this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
                 this.updateAccordion("saved");
@@ -289,9 +288,55 @@ ccm.files["ccm.learning_exchange.js"] = {
                     content.classList.toggle("hidden");
                 }
             },
-            onAddDocument: (course) => {
-                // todo
-            }
+            onAddDocument: (event, course) => {
+                const overlay = $.html(this.html.overlay);
+                $.append(this.element.querySelector("#main"), overlay);
+
+                const modal = $.html(this.html.upload_document_modal, {
+                    headlineAddDocument: this.text.headline_add_document,
+                    title: this.text.document_title,
+                    description: this.text.document_description,
+                    documentFile: this.text.document_file,
+                    cancel: this.text.cancel,
+                    submit: this.text.submit,
+                    onCancelUpload: () => {
+                        modal.remove();
+                        overlay.remove();
+                    },
+                    onSubmitUpload: (event) => this.events.onSubmitUpload(event, course, modal, overlay),
+                });
+                $.append(this.element.querySelector('#main'), modal);
+            },
+            onSubmitUpload: (event, course, modal, overlay) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const form = modal.querySelector('#upload-form');
+                const title = form.title.value;
+                const file = form.file.value;
+                const description = form.description.value;
+
+                if (!title || !file) {
+                    alert("Bitte Titel und Datei angeben!");
+                    return;
+                }
+
+                this.materials.push({
+                    id: "material_" + $.generateKey(),
+                    course_id: course.id,
+                    title: title,
+                    description: description,
+                    file_url: file,
+                    uploader: user.key,
+                    upload_date: new Date().toISOString(),
+                    tags: [],
+                    ratings: []
+                });
+
+                modal.remove();
+                overlay.remove();
+                this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === course.id)), parseInt(this.element.querySelector("#semester").value));
+            },
+
         }
 
         this.initMainView = () => {
@@ -345,9 +390,9 @@ ccm.files["ccm.learning_exchange.js"] = {
                     chat: this.text.chat,
                     group: this.text.group,
                     addGroup: this.text.add_group,
-                    onFavorite: (event) => this.events.onFavorite(event, course.id),
+                    onFavorite: (event) => this.events.onFavorite(event, course),
                     onToggleAccItem: (event) => this.events.onToggleAccordionItem(event),
-                    onAddDocument: () => this.events.onAddDocument(course.id),
+                    onAddDocument: (event) => this.events.onAddDocument(event, course),
                 });
 
                 if (tabMode === "saved") {

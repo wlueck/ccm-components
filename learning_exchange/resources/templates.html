@@ -60,3 +60,31 @@
     </div>
 </ccm-template>
 
+<ccm-template key="upload_document_modal">
+    <div class="modal-dialog">
+        <h3>%headlineAddDocument%</h3>
+        <form id="upload-form">
+            <div class="form-group">
+                <label for="document-title">%title%*</label>
+                <input type="text" id="document-title" name="title">
+            </div>
+            <div class="form-group">
+                <label for="document-description">%description%</label>
+                <textarea id="document-description" name="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="document-file">%documentFile%*</label>
+                <input type="text" id="document-file" name="file">
+            </div>
+            <div class="modal-button-container">
+                <button onclick="%onSubmitUpload%">%submit%</button>
+                <button onclick="%onCancelUpload%">%cancel%</button>
+            </div>
+        </form>
+    </div>
+</ccm-template>
+
+<ccm-template key="overlay">
+    <div class="overlay"></div>
+</ccm-template>
+

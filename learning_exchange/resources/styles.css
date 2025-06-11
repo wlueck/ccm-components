@@ -1,3 +1,22 @@
+#element {
+    /* colors */
+    --primary-color: #2c3e50;
+    --primary-font: #fff;
+
+    --secondary-color: #efefef;
+    --secondary-font: #000;
+
+    --border: #ccc;
+    --card-bg: #ffffff;
+
+    --course-item-bg: #b9cce2;
+    --deck-item-bg: #f1f1e6;
+
+    /* fonts */
+    font-family: Montserrat, sans-serif;
+    font-weight: 100;
+}
+
 /*region general */
 .hidden {
     display: none;
@@ -16,15 +35,53 @@ button {
     &.btn-low-style {
         background: none;
         border: none;
+        color: var(--primary-color);
     }
 }
 
-input, select {
+.cancel {
+    background-color: var(--secondary-color);
+    color: var(--secondary-font);
+}
+
+input, select, textarea {
     padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    resize: vertical;
 }
 
 input[type="checkbox"] {
     cursor: pointer;
+}
+
+.modal-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 1001;
+
+    & h3 {
+        margin-top: 0;
+    }
+
+    .modal-button-container {
+        display: flex;
+        gap: 5px;
+        justify-content: flex-start;
+        margin-top: 15px;
+    }
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 /*endregion */
 
@@ -84,7 +141,7 @@ input[type="checkbox"] {
     background-color: #ccc;
 }
 
-#accordion-item-toggle-course, .accordion-item-toggle, .accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group  {
+#accordion-item-toggle-course, .accordion-item-toggle, .accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group, .accordion-item-content-item {
     width: 90%;
     border-radius: 0;
     text-align: left;
@@ -104,7 +161,9 @@ input[type="checkbox"] {
 }
 
 .accordion-item-content-item {
-
+    background-color: #fff;
+    margin-left: 20px;
+    width: calc(90% - 20px);
 }
 
 /*endregion */

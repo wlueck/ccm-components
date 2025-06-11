@@ -4,6 +4,8 @@
  */
 export const de = {
     // general
+    "cancel": "Abbrechen",
+    "submit": "Speichern",
 
     // warning messages
     "login_warning": "Please log in to continue!",
@@ -21,6 +23,12 @@ export const de = {
     "chat": "💬 Chat",
     "group": "👥Lerngruppen",
     "add_group": "Lerngruppe erstellen",
+
+    // document-upload-modal template
+    "headline_add_document": "Lernunterlagen hinzufügen",
+    "document_title": "Titel",
+    "document_description": "Beschreibung",
+    "document_file": "PDF-Datei auswählen",
 };
 
 /**
