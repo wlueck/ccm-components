@@ -154,7 +154,7 @@ input[type="checkbox"] {
     width: calc(90% - 10px);
 }
 
-.accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group {
+.accordion-item-content-documents, .accordion-item-content-chat, #accordion-item-content-group {
     background-color: #f1f1f1;
     margin-left: 20px;
     width: calc(90% - 50px);

@@ -10,7 +10,7 @@ ccm.files["ccm.learning_exchange.js"] = {
     config: {
         //user_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_user"}],
         //materials: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_materials"}],
-        //groups: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_groups"}],
+        groups_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_groups"}],
         //curriculum: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_curriculum"}],
 
         user_store: {
@@ -51,19 +51,6 @@ ccm.files["ccm.learning_exchange.js"] = {
                 ratings: [
                     {user: "tniede2s", value: 5},
                     {user: "wlueck2s", value: 4}
-                ]
-            }
-        ],
-
-        groups: [
-            {
-                id: "group_b2a3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d",
-                course_id: "course_40bd08c5-4fbf-4ebe-a19d-97a065317603",
-                title: "Lerngruppe für Programmierung 1",
-                members: ["wlueck2s", "tniede2s", "userrr2s"],
-                messages: [
-                    {user: "wlueck2s", message: "Hallo zusammen!", timestamp: "2025-05-21T10:00:00Z"},
-                    {user: "tniede2s", message: "Hallo! Wie läuft's bei euch?", timestamp: "2025-05-21T10:01:00Z"}
                 ]
             }
         ],
@@ -195,7 +182,10 @@ ccm.files["ccm.learning_exchange.js"] = {
 
         tags: ['Klausur', 'Zusammenfassung', 'Vorlesung', 'übung'],
 
+        // components
         //chat: ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
+        team: ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js"],
+
         "css": ["ccm.load", "./resources/styles.css"],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         "html": ["ccm.load", "./resources/templates.html"],
@@ -398,7 +388,6 @@ ccm.files["ccm.learning_exchange.js"] = {
                 } else {
                     $.append(this.element.querySelector("#tab-all .accordion"), courseItem);
                 }
-            });
 
                 // Add existing documents to the content
                 const courseMaterials = this.materials.filter(material => material.course_id === course.id);
@@ -410,6 +399,25 @@ ccm.files["ccm.learning_exchange.js"] = {
                     });
                     $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
                 });
+
+                // Initialize team component
+                const teamComponent = await this.team.start({
+                    data: {
+                        store: this.groups_store,
+                        key: "group_" + course.id,
+                    },
+                    onchange: async (event) => {
+                        console.log(event)
+                    },
+                    user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                    "text": {
+                        "team": "Gruppe",
+                        "leave": "leave",
+                        "join": "join",
+                        "free": "free"
+                    },
+                });
+                $.setContent(courseItem.querySelector("#accordion-item-content-group"), teamComponent.root);
             }
         };
     },
