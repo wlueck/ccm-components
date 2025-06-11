@@ -241,7 +241,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             savedCourses = this.user_store.saved_courses;
             curriculum = this.curriculum;
 
-            this.initMainView();
+            await this.initMainView();
         };
 
         // event handler
@@ -255,17 +255,17 @@ ccm.files["ccm.learning_exchange.js"] = {
                 this.element.querySelector(`#tab-${tabId}`).classList.remove('hidden');
                 this.element.querySelector(`#tab-${otherTabId}`).classList.add('hidden');
             },
-            onChangeCourseOfStudy: (event) => {
+            onChangeCourseOfStudy: async (event) => {
                 const selectedCourseOfStudy = curriculum.find(courseOfStudy => courseOfStudy.course_of_study_abbreviation === event.target.value);
                 this.updateSemesterOptions(selectedCourseOfStudy);
-                this.updateAccordion("all", selectedCourseOfStudy, 1);
+                await this.updateAccordion("all", selectedCourseOfStudy, 1);
             },
-            onChangeSemester: (event) => {
+            onChangeSemester: async (event) => {
                 const selectedCourseOfStudy = curriculum.find(courseOfStudy => courseOfStudy.course_of_study_abbreviation === this.element.querySelector("#course-of-study").value);
                 const selectedSemester = parseInt(event.target.value);
-                this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
+                await this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
             },
-            onFavorite: (event, course) => {
+            onFavorite: async (event, course) => {
                 event.stopPropagation();
 
                 const isSaved = this.user_store.saved_courses.some(savedCourse => savedCourse.course_id === course.id);
@@ -277,8 +277,8 @@ ccm.files["ccm.learning_exchange.js"] = {
                 // update UI
                 const selectedCourseOfStudy = curriculum.find(c => c.courses.some(course => course.id === course.id));
                 const selectedSemester = this.element.querySelector("#semester").value ? parseInt(this.element.querySelector("#semester").value) : 1;
-                this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
-                this.updateAccordion("saved");
+                await this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
+                await this.updateAccordion("saved");
             },
             onToggleAccordionItem: (event) => {
                 event.stopPropagation();
@@ -307,7 +307,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 });
                 $.append(this.element.querySelector('#main'), modal);
             },
-            onSubmitUpload: (event, course, modal, overlay) => {
+            onSubmitUpload: async (event, course, modal, overlay) => {
                 event.preventDefault();
                 event.stopPropagation();
                 const form = modal.querySelector('#upload-form');
@@ -334,12 +334,11 @@ ccm.files["ccm.learning_exchange.js"] = {
 
                 modal.remove();
                 overlay.remove();
-                this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === course.id)), parseInt(this.element.querySelector("#semester").value));
+                await this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === course.id)), parseInt(this.element.querySelector("#semester").value));
             },
-
         }
 
-        this.initMainView = () => {
+        this.initMainView = async () => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.course_semester_select, {
                 allCourses: this.text.all_courses,
                 savedCourses: this.text.saved_courses,
@@ -353,8 +352,8 @@ ccm.files["ccm.learning_exchange.js"] = {
             }));
 
             this.updateSemesterOptions(curriculum[0]);
-            this.updateAccordion("all", curriculum[0], 1);
-            this.updateAccordion("saved");
+            await this.updateAccordion("all", curriculum[0], 1);
+            await this.updateAccordion("saved");
         };
 
         this.updateSemesterOptions = (selectedCourseOfStudy) => {
@@ -368,7 +367,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
         };
 
-        this.updateAccordion = (tabMode, selectedCourseOfStudy, selectedSemester) => {
+        this.updateAccordion = async (tabMode, selectedCourseOfStudy, selectedSemester) => {
             let courses = [];
             if (tabMode === "saved") {
                 this.element.querySelector("#tab-saved .accordion").innerHTML = "";
@@ -381,7 +380,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 courses = selectedCourseOfStudy.courses.filter(c => c.semester === selectedSemester);
             }
 
-            courses.forEach(course => {
+            for (const course of courses) {
                 let courseItem = this.ccm.helper.html(this.html.course_item, {
                     courseTitle: course.title,
                     star: this.user_store.saved_courses.some(savedCourse => savedCourse.course_id === course.id) ? "★" : "☆",
@@ -389,7 +388,6 @@ ccm.files["ccm.learning_exchange.js"] = {
                     addDocuments: this.text.add_documents,
                     chat: this.text.chat,
                     group: this.text.group,
-                    addGroup: this.text.add_group,
                     onFavorite: (event) => this.events.onFavorite(event, course),
                     onToggleAccItem: (event) => this.events.onToggleAccordionItem(event),
                     onAddDocument: (event) => this.events.onAddDocument(event, course),
@@ -401,6 +399,18 @@ ccm.files["ccm.learning_exchange.js"] = {
                     $.append(this.element.querySelector("#tab-all .accordion"), courseItem);
                 }
             });
+
+                // Add existing documents to the content
+                const courseMaterials = this.materials.filter(material => material.course_id === course.id);
+                courseMaterials.forEach(material => {
+                    const documentItem = $.html(this.html.document_item, {
+                        title: material.title,
+                        description: material.description || '',
+                        fileUrl: material.file_url
+                    });
+                    $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
+                });
+            }
         };
     },
 }
