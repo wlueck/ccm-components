@@ -286,6 +286,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     }
                     course.cardDecks = course.cardDecks.filter(deck => deck.id !== deckToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
+                    this.onchange && this.onchange({event: 'deletedDeck', instance: this});
                     this.initListView();
                 }
             },
@@ -295,6 +296,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 if (confirmDelete) {
                     dataset.courses = dataset.courses.filter(course => course.id !== courseToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
+                    this.onchange && this.onchange({event: 'deletedCourse', instance: this});
                     this.initListView();
                 }
             },
