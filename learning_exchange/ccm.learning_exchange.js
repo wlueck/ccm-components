@@ -8,10 +8,11 @@ ccm.files["ccm.learning_exchange.js"] = {
     name: "learning-exchange",
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     config: {
-        //user_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_user"}],
-        //materials: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_materials"}],
-        groups_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_groups"}],
+        chats_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_chats"}],
         //curriculum: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_curriculum"}],
+        groups_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_groups"}],
+        //materials: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_materials"}],
+        //user_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_user"}],
 
         user_store: {
             saved_courses: [
@@ -183,8 +184,8 @@ ccm.files["ccm.learning_exchange.js"] = {
         tags: ['Klausur', 'Zusammenfassung', 'Vorlesung', 'übung'],
 
         // components
-        //chat: ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
-        team: ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js"],
+        chat: ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
+        team: ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/ccm.teambuild.js"],
 
         "css": ["ccm.load", "./resources/styles.css"],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
@@ -418,6 +419,19 @@ ccm.files["ccm.learning_exchange.js"] = {
                     },
                 });
                 $.setContent(courseItem.querySelector("#accordion-item-content-group"), teamComponent.root);
+
+                // Initialize chat component
+                const chatComponent = await this.chat.start({
+                    data: {
+                        store: this.chats_store,
+                        key: "chat_" + course.id,
+                    },
+                    onchange: async (event) => {
+                        console.log(event)
+                    },
+                    user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                });
+                $.setContent(courseItem.querySelector("#accordion-item-content-chat"), chatComponent.root);
             }
         };
     },

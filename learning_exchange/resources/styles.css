@@ -6,7 +6,7 @@
     --secondary-color: #efefef;
     --secondary-font: #000;
 
-    --border: #ccc;
+    --border: darkgray;
     --card-bg: #ffffff;
 
     --course-item-bg: #b9cce2;
@@ -154,10 +154,11 @@ input[type="checkbox"] {
     width: calc(90% - 10px);
 }
 
-.accordion-item-content-documents, .accordion-item-content-chat, #accordion-item-content-group {
-    background-color: #f1f1f1;
+#accordion-item-content-chat, #accordion-item-content-group {
+    background-color: white;
     margin-left: 20px;
-    width: calc(90% - 50px);
+    width: calc(90% - 22px);
+    border: 1px solid var(--border);
 }
 
 .accordion-item-content-item {

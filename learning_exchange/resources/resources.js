@@ -21,7 +21,7 @@ export const de = {
     "documents": "📖 Lernunterlagen",
     "add_documents": "+ Unterlagen hinzufügen",
     "chat": "💬 Chat",
-    "group": "👥Lerngruppen",
+    "group": "👥 Lerngruppen",
     "add_group": "Lerngruppe erstellen",
 
     // document-upload-modal template
