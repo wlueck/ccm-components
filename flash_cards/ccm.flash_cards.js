@@ -756,33 +756,33 @@ ccm.files["ccm.flash_cards.js"] = {
             $.setContent(this.element.querySelector('#sub-headline'), mode === "deck" ? `(${course.title})` : this.text.sub_headline_course_learning);
             this.element.querySelector("#back-button").classList.remove('hidden');
 
-            let isShowingQuestion = true;
-
             const updateCardContent = (index) => {
                 if (index < 0 || index >= cards.length) return;
                 const currentCard = cards[index];
 
                 $.setContent(this.element.querySelector('#card-content-container'), $.html(this.html.learning_view_card, {
-                    content: isShowingQuestion ? currentCard.question : currentCard.answer,
+                    question: currentCard.question,
+                    answer: currentCard.answer,
                     hidePrevBtn: index === 0 ? 'unseen' : '',
                     onPreviousCard: () => {
-                        isShowingQuestion = true;
+                        this.element.querySelector('#difficulty-buttons').classList.add('unseen');
                         updateCardContent(index - 1);
                     },
                     onTurnAround: () => {
-                        isShowingQuestion = !isShowingQuestion;
-                        updateCardContent(index);
+                        const cardContent = this.element.querySelector('#card-content');
+                        cardContent.style.transform = cardContent.style.transform === 'rotateY(180deg)'
+                            ? 'rotateY(0deg)'
+                            : 'rotateY(180deg)';
+                        this.element.querySelector('#difficulty-buttons').classList.toggle('unseen');
                     },
                     hideNextBtn: index === cards.length - 1 ? 'unseen' : '',
                     onNextCard: () => {
-                        isShowingQuestion = true;
+                        this.element.querySelector('#difficulty-buttons').classList.add('unseen');
                         updateCardContent(index + 1);
                     },
                     currentCardNumber: (index + 1).toString(),
                     maxNumberOfCards: cards.length.toString()
                 }));
-
-                this.element.querySelector('#difficulty-buttons').classList.toggle('unseen', isShowingQuestion);
                 this.updateDifficultyButtons(course, deck, currentCard, cards);
             };
             updateCardContent(0);
@@ -810,7 +810,7 @@ ccm.files["ccm.flash_cards.js"] = {
                         dataset.courses[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
 
                     if (deckIndex === -1) {
-                        // Modus: gesamte Lehrveranstaltung
+                        // Mode: entire course
                         const cardIndex = cards.findIndex(c => c.id === currentCard.id);
                         cards[cardIndex].currentStatus = difficulty;
                         cards[cardIndex].status.push(difficulty);

@@ -282,16 +282,24 @@
 </ccm-template>
 
 <ccm-template key="learning_view_card">
-    <div id="card-content">
-        <p id="question-answer-text">%content%</p>
+    <div id="card-container">
+        <div id="card-content">
+            <div class="card-face front">
+                <p id="question-text">%question%</p>
+            </div>
+            <div class="card-face back">
+                <p id="answer-text">%answer%</p>
+            </div>
+        </div>
+        <div id="number-of-cards">
+            <span>%currentCardNumber%</span> / <span>%maxNumberOfCards%</span>
+        </div>
         <div id="card-buttons">
             <button class="btn-low-style %hidePrevBtn%" id="previous-card-button" onclick="%onPreviousCard%">&#8592;</button>
             <button class="btn-low-style" id="turn-around-button" onclick="%onTurnAround%">&#8634;</button>
             <button class="btn-low-style %hideNextBtn%" id="next-card-button" onclick="%onNextCard%">&#8594;</button>
         </div>
-        <div id="number-of-cards">
-            <span>%currentCardNumber%</span> / <span>%maxNumberOfCards%</span>
-        </div>
+
     </div>
 </ccm-template>
 
