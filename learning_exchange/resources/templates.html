@@ -1,0 +1,62 @@
+<ccm-template key="main">
+    <div id="main">
+        <div id="header">
+            <div id="headline-wrapper">
+                <h1 id="headline">%headlineMain%</h1>
+                <b id="sub-headline"></b>
+            </div>
+            <div id="user"></div>
+        </div>
+
+        <div id="content"></div>
+    </div>
+</ccm-template>
+
+<ccm-template key="course_semester_select">
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-all-button" onclick="%onTabAll%">%allCourses%</button>
+        <button class="tab-btn" id="tab-saved-button" onclick="%onTabSaved%">%savedCourses%</button>
+    </div>
+
+    <div class="tab-content" id="tab-all">
+        <div class="form-container" id="course-semester-select">
+            <div class="form-group">
+                <label for="course-of-study">%courseOfStudy%</label>
+                <select id="course-of-study" name="course-of-study" onchange="%onChangeCourseOfStudy%">%courseOfStudyOptions%</select>
+            </div>
+            <div class="form-group">
+                <label for="semester">%semester%</label>
+                <select id="semester" name="semester" onchange="%onChangeSemester%"></select>
+            </div>
+        </div>
+        <div class="accordion"></div>
+    </div>
+
+    <div class="tab-content hidden" id="tab-saved">
+        <div class="accordion"></div>
+    </div>
+</ccm-template>
+
+<ccm-template key="course_item">
+    <button class="accordion-item-toggle" id="accordion-item-toggle-course" onclick="%onToggleAccItem%">%courseTitle%
+        <span style="float: right" id="favorite" onclick="%onFavorite%">
+            %star%
+        </span>
+    </button>
+    <div class="accordion-item-content hidden" id="accordion-item-content-course">
+        <button class="accordion-item-toggle" id="accordion-item-toggle-documents" onclick="%onToggleAccItem%">%documents%</button>
+        <div class="accordion-item-content hidden" id="accordion-item-content-documents">
+            <button class="accordion-item-content-item" onclick="%onAddDocument%">%addDocuments%</button>
+        </div>
+
+        <button class="accordion-item-toggle" id="accordion-item-toggle-chat">%chat%</button>
+        <div class="accordion-item-content hidden" id="accordion-item-content-chat">
+        </div>
+
+        <button class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItem%">%group%</button>
+        <div class="accordion-item-content hidden" id="accordion-item-content-group">
+            <button class="accordion-item-content-item">%addGroup%</button>
+        </div>
+    </div>
+</ccm-template>
+

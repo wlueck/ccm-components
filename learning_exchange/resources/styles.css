@@ -79,4 +79,66 @@ input[type="checkbox"] {
     max-width: 90%;
     margin-top: 20px;
 }
+
+#accordion-item-toggle-course {
+    background-color: #ccc;
+}
+
+#accordion-item-toggle-course, .accordion-item-toggle, .accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group  {
+    width: 90%;
+    border-radius: 0;
+    text-align: left;
+    padding: 15px;
+}
+
+.accordion-item-content-course > .accordion-item-toggle {
+    background-color: #f1f1f1;
+    margin-left: 10px;
+    width: calc(90% - 10px);
+}
+
+.accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group {
+    background-color: #f1f1f1;
+    margin-left: 20px;
+    width: calc(90% - 50px);
+}
+
+.accordion-item-content-item {
+
+}
+
+/*endregion */
+
+/*region tab */
+.tabs {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+.tab-btn {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+    border-radius: 0;
+}
+
+.tab-btn:hover {
+    background-color: #ddd;
+}
+
+.tab-btn.active {
+    background-color: #ccc;
+}
+
+.tab-content {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
 /*endregion */
