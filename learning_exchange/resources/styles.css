@@ -56,14 +56,8 @@ input[type="checkbox"] {
 }
 
 .modal-dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--card-bg);
-    padding: 20px;
+    border: 1px solid var(--border);
     border-radius: 5px;
-    z-index: 1001;
 
     & h3 {
         margin-top: 0;
@@ -72,17 +66,10 @@ input[type="checkbox"] {
     .modal-button-container {
         display: flex;
         gap: 5px;
-        justify-content: flex-start;
         margin-top: 15px;
     }
 }
 
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
 /*endregion */
 
 
@@ -212,4 +199,5 @@ input[type="checkbox"] {
     border: 1px solid #ccc;
     border-top: none;
 }
+
 /*endregion */

@@ -141,9 +141,6 @@ ccm.files["ccm.learning_exchange.js"] = {
                 }
             },
             onAddDocument: (event, course) => {
-                const overlay = $.html(this.html.overlay);
-                $.append(this.element.querySelector("#main"), overlay);
-
                 const modal = $.html(this.html.upload_document_modal, {
                     headlineAddDocument: this.text.headline_add_document,
                     title: this.text.document_title,
@@ -151,18 +148,16 @@ ccm.files["ccm.learning_exchange.js"] = {
                     documentFile: this.text.document_file,
                     cancel: this.text.cancel,
                     submit: this.text.submit,
-                    onCancelUpload: () => {
-                        modal.remove();
-                        overlay.remove();
-                    },
-                    onSubmitUpload: (event) => this.events.onSubmitUpload(event, course, modal, overlay),
+                    onCancelUpload: () => this.element.querySelector('#upload-document-modal').close(),
+                    onSubmitUpload: (event) => this.events.onSubmitUpload(event, course),
                 });
                 $.append(this.element.querySelector('#main'), modal);
+                this.element.querySelector('#upload-document-modal').showModal();
             },
-            onSubmitUpload: async (event, course, modal, overlay) => {
+            onSubmitUpload: async (event, course) => {
                 event.preventDefault();
                 event.stopPropagation();
-                const form = modal.querySelector('#upload-form');
+                const form = this.element.querySelector('#upload-form');
                 const title = form.title.value;
                 const file = form.file.value;
                 const description = form.description.value;
@@ -171,8 +166,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     alert("Bitte Titel und Datei angeben!");
                     return;
                 }
-
-                materials.push({
+                const newMaterial = {
                     id: "material_" + $.generateKey(),
                     course_id: course.id,
                     title: title,
@@ -180,13 +174,12 @@ ccm.files["ccm.learning_exchange.js"] = {
                     file_url: file,
                     uploader: user.key,
                     upload_date: new Date().toISOString(),
-                    tags: [],
                     ratings: []
-                });
+                };
+                materials.push(newMaterial);
                 await this.materials.set({key: "materials", value: materials});
-
-                modal.remove();
-                overlay.remove();
+                this.onchange && this.onchange({name: 'addedMaterial', instance: this, newMaterial: newMaterial});
+                this.element.querySelector('#upload-document-modal').close();
                 await this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === course.id)), parseInt(this.element.querySelector("#semester").value));
             },
         }
