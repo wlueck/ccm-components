@@ -10,6 +10,27 @@ ccm.files["ccm.flash_cards.js"] = {
     //ccm: "../libs/ccm-master/ccm.js",
     config: {
         "css": ["ccm.load", "./resources/styles.css"],
+        "editor": ["ccm.component", "https://ccmjs.github.io/tkless-components/editor/versions/ccm.editor-4.0.0.js", {
+            "editor": ["ccm.load",
+                "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js",
+                "https://ccmjs.github.io/tkless-components/libs/quill/quill.js",
+                "https://cdn.quilljs.com/1.2.0/quill.snow.css"
+            ],
+            "settings": {
+                "modules": {
+                    "syntax": true,
+                    "toolbar": [
+                        [{'header': [1, 2, 3, false]}],
+                        ['bold', 'italic', 'underline', {'color': []}],
+                        [{'list': 'ordered'}, {'list': 'bullet'}],
+                        ['link', 'image', 'code-block'],
+                        [{'script': 'sub'}, {'script': 'super'}]
+                    ]
+                },
+                "placeholder": "",
+                "theme": "snow"
+            }
+        }],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         "html": ["ccm.load", "./resources/templates.html"],
         "languages": {
@@ -25,6 +46,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
     Instance: function () {
         let user, dataset, $;
+        let cardEditorInstances = [];
 
         this.init = async () => {
             $ = Object.assign({}, this.ccm.helper, this.helper);
@@ -338,6 +360,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 event.preventDefault();
                 // check if at least one card exists before removing
                 if (this.element.querySelectorAll("#cards > #card").length > 1) {
+                    // remove editorInstance from cardEditorInstances
+                    cardEditorInstances = cardEditorInstances.filter(instance => instance.htmlCard !== htmlCard);
                     htmlCard.remove();
                 } else {
                     alert(this.text.minimum_card_warning);
@@ -612,6 +636,21 @@ ccm.files["ccm.flash_cards.js"] = {
                 onDeleteCard: (event) => this.events.onDeleteCard(event, htmlCard),
                 deleteCard: this.text.delete_card,
             });
+            // Start editor component if available
+            const questionEditor = this.editor ? await this.editor.start() : null;
+            const answerEditor = this.editor ? await this.editor.start() : null;
+
+            // Populate editor with existing text, if available
+            if (questionEditor && card?.question) questionEditor.get().root.innerHTML = card.question;
+            if (answerEditor && card?.answer) answerEditor.get().root.innerHTML = card.answer;
+
+            // Set editor or textarea
+            $.setContent(htmlCard.querySelector('#question-input'), this.editor ? questionEditor.root : `<textarea id="question" cols="34" rows="5">${card?.question || ''}</textarea>`);
+            $.setContent(htmlCard.querySelector('#answer-input'), this.editor ? answerEditor.root : `<textarea id="answer" cols="34" rows="5">${card?.answer || ''}</textarea>`);
+
+            if (questionEditor && answerEditor) {
+                cardEditorInstances.push({questionEditor, answerEditor, htmlCard});
+            }
             $.append(this.element.querySelector("#cards"), htmlCard);
         };
 
@@ -684,11 +723,17 @@ ccm.files["ccm.flash_cards.js"] = {
             const cards = this.element.querySelectorAll("#card");
             let valid = true;
             cards.forEach(card => {
-                let question = card.querySelector("#question").value;
-                let answer = card.querySelector("#answer").value;
+                // Get editor instances if available
+                const questionEditor = cardEditorInstances.find(instance => instance.htmlCard === card)?.questionEditor;
+                const answerEditor = cardEditorInstances.find(instance => instance.htmlCard === card)?.answerEditor;
+
+                // Get text out of editor or value from textarea
+                let question = questionEditor ? questionEditor.getValue().inner : card.querySelector("#question").value.trim();
+                let answer = answerEditor ? answerEditor.getValue().inner : card.querySelector("#answer").value.trim();
                 let cardId = card.getAttribute("data-card-id") || $.generateKey();
 
-                if (question.trim() !== "" && answer.trim() !== "") {
+                if ((this.editor && questionEditor.get().getLength() > 1 && answerEditor.get().getLength() > 1) ||
+                    (!this.editor && question !== "" && answer !== "")) {
                     newDeck.cards.push({
                         id: cardId,
                         question: question,
@@ -712,6 +757,8 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 dataset.courses[courseIndex].cardDecks.push(newDeck);
                 await this.store.set({key: user.key, value: dataset});
+                // reset cardEditorInstances
+                cardEditorInstances = [];
                 this.onchange && this.onchange({name: deckToEdit ? 'updatedDeck' : 'createdDeck', instance: this});
                 this.initListView();
             }

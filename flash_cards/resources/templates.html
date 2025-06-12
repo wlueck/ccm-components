@@ -231,12 +231,12 @@
 <ccm-template key="add_card">
     <div id="card" data-card-id="%cardId%">
         <div class="input-group">
-            <label for="question">%question%</label>
-            <textarea id="question" name="question" rows="5">%current_question%</textarea>
+            <label for="question-input">%question%</label>
+            <div id="question-input"></div>
         </div>
         <div class="input-group">
-            <label for="answer">%answer%</label>
-            <textarea id="answer" name="answer" rows="5">%current_answer%</textarea>
+            <label for="answer-input">%answer%</label>
+            <div id="answer-input"></div>
         </div>
         <button id="delete-card-button" onclick="%onDeleteCard%">%deleteCard%</button>
     </div>
