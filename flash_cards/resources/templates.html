@@ -117,7 +117,7 @@
 </ccm-template>
 
 <ccm-template key="import_deck_dialog">
-    <div class="modal-dialog">
+    <dialog class="modal-dialog" id="import-deck-dialog">
         <h3>%importDeck%</h3>
         <label for="import-deck-course-select">%associatedCourse%</label><br>
         <select id="import-deck-course-select">
@@ -127,12 +127,12 @@
             <button onclick="%onChooseDeckFileToImport%">%chooseDeckFileToImport%</button>
             <button onclick="%onCancelImportDeck%" class="cancel">%cancelImportDeck%</button>
         </div>
-    </div>
+    </dialog>
 </ccm-template>
 
 <ccm-template key="settings_dialog">
-    <div id="settings-dialog" class="modal-dialog">
-        <h2>%settingsHeadline%</h2>
+    <dialog id="settings-dialog" class="modal-dialog">
+        <h3>%settingsHeadline%</h3>
         <div>
             <p for="language-select">%languageSelect%</p>
             <select id="language-select">%languageOptions%</select>
@@ -171,7 +171,7 @@
             <button onclick="%onSubmitSettings%">%submitSettings%</button>
             <button onclick="%onCancelSettings%" class="cancel">%cancelSettings%</button>
         </div>
-    </div>
+    </dialog>
 </ccm-template>
 
 
@@ -244,7 +244,7 @@
 
 
 <ccm-template key="learning_mode_dialog">
-    <div id="learning-mode-dialog" class="modal-dialog">
+    <dialog id="learning-mode-dialog" class="modal-dialog">
         <h3>%learningMode%</h3>
         <div>
             <label for="card-order">%cardsOrder%</label><br>
@@ -266,7 +266,7 @@
             <button onclick="%onStartLearning%">%startLearning%</button>
             <button onclick="%onCancelLearning%" class="cancel">%cancelLearning%</button>
         </div>
-    </div>
+    </dialog>
 </ccm-template>
 
 <ccm-template key="learning_view">
@@ -301,8 +301,4 @@
         </div>
 
     </div>
-</ccm-template>
-
-<ccm-template key="overlay">
-    <div class="overlay"></div>
 </ccm-template>
