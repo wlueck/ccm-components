@@ -229,7 +229,7 @@ input[type="checkbox"] {
         gap: 10px;
     }
 
-    #empty_course_list {
+    #empty-course-list {
         padding-left: 20px;
         margin-top: 10px;
         border: 1px solid var(--border);
