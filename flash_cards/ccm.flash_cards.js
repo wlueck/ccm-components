@@ -402,6 +402,10 @@ ccm.files["ccm.flash_cards.js"] = {
             }
         };
 
+        this.getValue = () => {
+            return dataset;
+        }
+
         this.initListView = () => {
             $.setContent(this.element.querySelector("#content"), $.html(this.html.list_view, {
                 onAddDeckOrCourse: () => this.element.querySelector("#add-deck-course-options").classList.toggle('hidden'),
