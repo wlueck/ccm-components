@@ -92,6 +92,10 @@ ccm.files["ccm.learning_exchange.js"] = {
             await this.initMainView();
         };
 
+        this.getValue = () => {
+            return savedCourses;
+        }
+
         // event handler
         this.events = {
             onSwitchTab: (tabId) => {
