@@ -286,7 +286,7 @@ ccm.files["ccm.flash_cards.js"] = {
                     }
                     course.cardDecks = course.cardDecks.filter(deck => deck.id !== deckToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
-                    this.onchange && this.onchange({event: 'deletedDeck', instance: this});
+                    this.onchange && this.onchange({name: 'deletedDeck', instance: this});
                     this.initListView();
                 }
             },
@@ -296,7 +296,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 if (confirmDelete) {
                     dataset.courses = dataset.courses.filter(course => course.id !== courseToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
-                    this.onchange && this.onchange({event: 'deletedCourse', instance: this});
+                    this.onchange && this.onchange({name: 'deletedCourse', instance: this});
                     this.initListView();
                 }
             },
@@ -649,7 +649,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 dataset.courses.push(course);
             }
             await this.store.set({key: user.key, value: dataset});
-            this.onchange && this.onchange({event: courseToEdit ? 'updatedCourse' : 'createdCourse', instance: this});
+            this.onchange && this.onchange({name: courseToEdit ? 'updatedCourse' : 'createdCourse', instance: this});
             return true;
         };
 
@@ -712,7 +712,7 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 dataset.courses[courseIndex].cardDecks.push(newDeck);
                 await this.store.set({key: user.key, value: dataset});
-                this.onchange && this.onchange({event: deckToEdit ? 'updatedDeck' : 'createdDeck', instance: this});
+                this.onchange && this.onchange({name: deckToEdit ? 'updatedDeck' : 'createdDeck', instance: this});
                 this.initListView();
             }
         };
