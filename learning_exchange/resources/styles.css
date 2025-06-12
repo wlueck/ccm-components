@@ -157,11 +157,27 @@ input[type="checkbox"] {
 .document-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .document-title {
     font-weight: bold;
     color: black;
+}
+
+#star-rating {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid var(--border);
+}
+
+#star-rating-result:hover #star-rating {
+    display: block;
+}
+
+#star-rating-result {
+    margin-right: -90px;
 }
 
 /*endregion */

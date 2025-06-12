@@ -27,6 +27,8 @@ ccm.files["ccm.learning_exchange.js"] = {
 
         // components
         chat: ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
+        star_rating: ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating/versions/ccm.star_rating-5.0.0.js"],
+        star_rating_result: ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating_result/versions/ccm.star_rating_result-4.0.0.js"],
         team: ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/ccm.teambuild.js"],
 
         "css": ["ccm.load", "./resources/styles.css"],
@@ -247,24 +249,32 @@ ccm.files["ccm.learning_exchange.js"] = {
 
                 // Add existing documents to the content
                 const courseMaterials = materials.filter(material => material.course_id === course.id);
-                courseMaterials.forEach(material => {
+                for (const material of courseMaterials) {
                     const documentItem = $.html(this.html.document_item, {
                         title: material.title,
                         description: material.description || '',
                         fileUrl: material.file_url
                     });
                     $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
-                });
+
+                    // add star rating
+                    const result = await this.star_rating_result.start({
+                        data: {store: this.materials, key: material.id},
+                        detailed: false,
+                        user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                    });
+                    const star = await this.star_rating.start({
+                        data: {store: this.materials, key: material.id},
+                        onchange: result.start,
+                        user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                    });
+                    $.setContent(documentItem.querySelector('#star-rating'), star.root);
+                    $.prepend(documentItem.querySelector('#star-rating-result'), result.root);
+                }
 
                 // Initialize team component
                 const teamComponent = await this.team.start({
-                    data: {
-                        store: this.groups_store,
-                        key: "group_" + course.id,
-                    },
-                    onchange: async (event) => {
-                        console.log(event)
-                    },
+                    data: {store: this.groups_store, key: "group_" + course.id},
                     user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                     "text": {
                         "team": "Gruppe",
@@ -277,13 +287,7 @@ ccm.files["ccm.learning_exchange.js"] = {
 
                 // Initialize chat component
                 const chatComponent = await this.chat.start({
-                    data: {
-                        store: this.chats_store,
-                        key: "chat_" + course.id,
-                    },
-                    onchange: async (event) => {
-                        console.log(event)
-                    },
+                    data: {store: this.chats_store, key: "chat_" + course.id},
                     user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                 });
                 $.setContent(courseItem.querySelector("#accordion-item-content-chat"), chatComponent.root);
