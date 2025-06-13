@@ -143,18 +143,22 @@ ccm.files["ccm.learning_exchange.js"] = {
                 }
             },
             onAddDocument: (event, course) => {
-                const modal = $.html(this.html.upload_document_modal, {
+                const modal = this.element.querySelector('#upload-document-modal') || $.html(this.html.upload_document_modal, {
                     headlineAddDocument: this.text.headline_add_document,
                     title: this.text.document_title,
                     description: this.text.document_description,
                     documentFile: this.text.document_file,
                     cancel: this.text.cancel,
                     submit: this.text.submit,
-                    onCancelUpload: () => this.element.querySelector('#upload-document-modal').close(),
+                    onCancelUpload: () => modal.close(),
                     onSubmitUpload: (event) => this.events.onSubmitUpload(event, course),
                 });
-                $.append(this.element.querySelector('#main'), modal);
-                this.element.querySelector('#upload-document-modal').showModal();
+                if (!this.element.querySelector('#upload-document-modal')) {
+                    $.append(this.element.querySelector('#main'), modal);
+                } else {
+                    this.element.querySelector('#upload-form').reset();
+                }
+                modal.showModal();
             },
             onSubmitUpload: async (event, course) => {
                 event.preventDefault();
