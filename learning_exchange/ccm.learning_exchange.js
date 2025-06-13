@@ -46,7 +46,6 @@ ccm.files["ccm.learning_exchange.js"] = {
         this.init = async () => {
             $ = Object.assign({}, this.ccm.helper, this.helper);
             $.use(this.ccm);
-
             if (this.user) this.user.onchange = this.start;
         };
 
@@ -57,11 +56,6 @@ ccm.files["ccm.learning_exchange.js"] = {
 
             if (this.user) {
                 this.element.querySelector('#user').append(this.user.root);
-                this.user.start();
-            }
-
-            if (this.user) {
-                $.append(this.element.querySelector('#user'), this.user.root);
                 this.user.start();
             }
 
@@ -121,7 +115,6 @@ ccm.files["ccm.learning_exchange.js"] = {
             },
             onFavorite: async (event, course) => {
                 event.stopPropagation();
-
                 const isSaved = this.user_store.saved_courses.some(savedCourse => savedCourse.course_id === course.id);
                 if (isSaved) {
                     this.user_store.saved_courses = this.user_store.saved_courses.filter(savedCourse => savedCourse.course_id !== course.id);
@@ -133,6 +126,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 const selectedSemester = this.element.querySelector("#semester").value ? parseInt(this.element.querySelector("#semester").value) : 1;
                 await this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
                 await this.updateAccordion("saved");
+                this.onchange && this.onchange({name: 'addedCourseToFavorite', instance: this, newCourse: course});
             },
             onToggleAccordionItem: (event) => {
                 event.stopPropagation();
