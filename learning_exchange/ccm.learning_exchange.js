@@ -29,7 +29,7 @@ ccm.files["ccm.learning_exchange.js"] = {
         chat: ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
         star_rating: ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating/versions/ccm.star_rating-5.0.0.js"],
         star_rating_result: ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating_result/versions/ccm.star_rating_result-4.0.0.js"],
-        team: ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/ccm.teambuild.js"],
+        team_project: ["ccm.component", "https://ccmjs.github.io/akless-components/team_project/ccm.team_project.js"],
 
         "css": ["ccm.load", "./resources/styles.css"],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
@@ -174,7 +174,6 @@ ccm.files["ccm.learning_exchange.js"] = {
                     file_url: file,
                     uploader: user.key,
                     upload_date: new Date().toISOString(),
-                    ratings: []
                 };
                 materials.push(newMaterial);
                 await this.materials.set({key: "materials", value: materials});
@@ -251,6 +250,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     const documentItem = $.html(this.html.document_item, {
                         title: material.title,
                         description: material.description || '',
+                        uploadDate: new Date(material.upload_date).toLocaleDateString('de-DE'),
                         fileUrl: material.file_url
                     });
                     $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
@@ -266,22 +266,27 @@ ccm.files["ccm.learning_exchange.js"] = {
                         onchange: result.start,
                         user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                     });
-                    $.setContent(documentItem.querySelector('#star-rating'), star.root);
-                    $.prepend(documentItem.querySelector('#star-rating-result'), result.root);
+                    $.setContent(documentItem.querySelector('.star-rating'), star.root);
+                    $.prepend(documentItem.querySelector('.star-rating-result'), result.root);
                 }
 
-                // Initialize team component
-                const teamComponent = await this.team.start({
-                    data: {store: this.groups_store, key: "group_" + course.id},
-                    user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
-                    "text": {
-                        "team": "Gruppe",
-                        "leave": "leave",
-                        "join": "join",
-                        "free": "free"
+                // Initialize team-project component
+                const teamProjectComponent = await this.team_project.start({
+                    "data": {store: this.groups_store, key: "group_project_" + course.id},
+                    "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                    "teambuild": {
+                        "title": "Gruppen",
+                        "app": ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js", {"text.team": "Gruppe"}]
                     },
+                    "tools.1.app.2": {
+                        "ignore": {
+                            "card": {
+                                "component": "https://ccmjs.github.io/akless-components/kanban_card/versions/ccm.kanban_card-4.1.0.js",
+                            }
+                        }
+                    }
                 });
-                $.setContent(courseItem.querySelector("#accordion-item-content-group"), teamComponent.root);
+                $.setContent(courseItem.querySelector("#accordion-item-content-group"), teamProjectComponent.root);
 
                 // Initialize chat component
                 const chatComponent = await this.chat.start({

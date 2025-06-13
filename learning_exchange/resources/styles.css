@@ -165,18 +165,18 @@ input[type="checkbox"] {
     color: black;
 }
 
-#star-rating {
+.star-rating {
     display: none;
     position: absolute;
     background-color: white;
     border: 1px solid var(--border);
 }
 
-#star-rating-result:hover #star-rating {
+.star-rating-result:hover .star-rating {
     display: block;
 }
 
-#star-rating-result {
+.star-rating-result {
     margin-right: -90px;
 }
 
