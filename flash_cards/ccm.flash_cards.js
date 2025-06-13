@@ -118,7 +118,7 @@ ccm.files["ccm.flash_cards.js"] = {
             },
 
             onOpenSettings: () => {
-                const settingsDialog = $.html(this.html.settings_dialog, {
+                const modal = this.element.querySelector('#settings-dialog') || $.html(this.html.settings_dialog, {
                     settingsHeadline: this.text.settings_headline,
                     languageSelect: this.text.language_select,
                     languageOptions: Object.keys(this.languages).map(lang => `<option value="${lang}">${this.text[lang]}</option>`).join(''),
@@ -138,19 +138,21 @@ ccm.files["ccm.flash_cards.js"] = {
                     count: this.text.count,
                     onSubmitSettings: () => this.events.onSubmitSettings(),
                     submitSettings: this.text.save,
-                    onCancelSettings: () => this.element.querySelector('#settings-dialog').close(),
+                    onCancelSettings: () => modal.close(),
                     cancelSettings: this.text.cancel,
                 });
-                $.append(this.element.querySelector("#main"), settingsDialog);
-                this.element.querySelector('#settings-dialog').showModal();
+                if (!this.element.querySelector('#settings-dialog')) {
+                    $.append(this.element.querySelector('#main'), modal);
+                }
+                modal.showModal();
 
                 // populate settings dialog with current settings
-                this.element.querySelector('#language-select').value = dataset.settings?.language || 'de';
+                modal.querySelector('#language-select').value = dataset.settings?.language || 'de';
                 const statusDisplay = dataset.settings?.statusDisplay || 'count';
-                this.element.querySelector(`input[name="status"][value="${statusDisplay}"]`).checked = true;
-                this.element.querySelector('#default-card-order').value = dataset.settings?.defaultCardOrder || 'original';
-                this.element.querySelector('#default-card-selection').value = dataset.settings?.defaultCardSelection || 'all';
-                this.element.querySelector('#skip-learning-dialog').checked = !!dataset.settings?.skipLearningDialog;
+                modal.querySelector(`input[name="status"][value="${statusDisplay}"]`).checked = true;
+                modal.querySelector('#default-card-order').value = dataset.settings?.defaultCardOrder || 'original';
+                modal.querySelector('#default-card-selection').value = dataset.settings?.defaultCardSelection || 'all';
+                modal.querySelector('#skip-learning-dialog').checked = !!dataset.settings?.skipLearningDialog;
             },
 
             onSubmitSettings: async () => {
@@ -597,20 +599,19 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         this.initImportDeckDialog = () => {
-            this.element.querySelector("#add-deck-course-options").classList.toggle('hidden');
-            const courseSelectDialog = $.html(this.html.import_deck_dialog, {
+            const modal = this.element.querySelector('#import-deck-dialog') || $.html(this.html.import_deck_dialog, {
                 importDeck: this.text.import_deck_headline,
                 associatedCourse: this.text.associated_course,
                 courseSelectOptions: dataset.courses?.length ? dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join('') : `<option selected disabled>${this.text.no_courses_available}</option>`,
                 onChooseDeckFileToImport: () => this.events.onImportDeck(),
                 chooseDeckFileToImport: this.text.choose_deck_file_to_import,
-                onCancelImportDeck: () => {
-                    this.element.querySelector('#import-deck-dialog').close()
-                },
+                onCancelImportDeck: () => modal.close(),
                 cancelImportDeck: this.text.cancel
             });
-            $.append(this.element.querySelector("#main"), courseSelectDialog);
-            this.element.querySelector('#import-deck-dialog').showModal();
+            if (!this.element.querySelector('#import-deck-dialog')) {
+                $.append(this.element.querySelector('#main'), modal);
+            }
+            modal.showModal();
         };
 
         const addCardInEditor = async (card = {}) => {
@@ -759,8 +760,7 @@ ccm.files["ccm.flash_cards.js"] = {
                 await this.events.onStartLearning(course, deck, mode, order, selection);
                 return;
             }
-
-            const learningModeDialog = $.html(this.html.learning_mode_dialog, {
+            const modal = this.element.querySelector('#learning-mode-dialog') || $.html(this.html.learning_mode_dialog, {
                 learningMode: this.text.learning_mode,
                 cardsOrder: this.text.cards_order,
                 cardsOrderOriginal: this.text.cards_order_original,
@@ -772,11 +772,13 @@ ccm.files["ccm.flash_cards.js"] = {
                 selectCardsMediumHard: this.text.select_cards_medium_hard,
                 onStartLearning: () => this.events.onStartLearning(course, deck, mode),
                 startLearning: this.text.start_learning,
-                onCancelLearning: () => this.element.querySelector('#learning-mode-dialog').close(),
+                onCancelLearning: () => modal.close(),
                 cancelLearning: this.text.cancel_learning
             });
-            $.append(this.element.querySelector("#main"), learningModeDialog);
-            this.element.querySelector('#learning-mode-dialog').showModal();
+            if (!this.element.querySelector('#learning-mode-dialog')) {
+                $.append(this.element.querySelector('#main'), modal);
+            }
+            modal.showModal();
         };
 
         this.initLearningView = (course, deck, mode, cards) => {
