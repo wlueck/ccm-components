@@ -282,6 +282,10 @@ input[type="checkbox"] {
         & textarea {
             width: 90% !important;
         }
+
+        & label {
+            font-weight: bold;
+        }
     }
 
     #delete-card-button {

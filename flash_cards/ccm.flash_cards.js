@@ -7,7 +7,6 @@
 ccm.files["ccm.flash_cards.js"] = {
     name: "flash-cards",
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
-    //ccm: "../libs/ccm-master/ccm.js",
     config: {
         "css": ["ccm.load", "./resources/styles.css"],
         "editor": ["ccm.component", "https://ccmjs.github.io/tkless-components/editor/versions/ccm.editor-4.0.0.js", {
@@ -62,7 +61,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 subHeadline: '',
                 backButton: this.text.back,
                 onBackButton: () => this.initListView(),
-                defaultContent: this.text.default_content
             }));
 
             if (this.user) {
@@ -74,6 +72,7 @@ ccm.files["ccm.flash_cards.js"] = {
             if (!user) {
                 alert(this.text.login_warning);
                 console.log("User is not logged in");
+                $.setContent(this.element.querySelector('#content'), this.text.default_content);
                 return;
             }
 
@@ -102,6 +101,8 @@ ccm.files["ccm.flash_cards.js"] = {
             // load saved or default language
             const savedLanguage = dataset?.settings?.language || this.defaultLanguage;
             this.text = await this.ccm.load({url: this.languages[savedLanguage], type: "module"});
+            $.setContent(this.element.querySelector('#back-button'), this.text.back);
+
             this.initListView();
         };
 
@@ -165,8 +166,8 @@ ccm.files["ccm.flash_cards.js"] = {
                 dataset.settings.statusDisplay = this.element.querySelector('input[name="status"]:checked').value;
 
                 this.text = await this.ccm.load({url: this.languages[newLanguage], type: "module"});
-                await this.store.set({key: user.key, value: dataset});
                 this.element.querySelector('#settings-dialog').close();
+                await this.store.set({key: user.key, value: dataset});
                 await this.start();
             },
 
@@ -1061,7 +1062,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     });
                     break;
             }
-
             return {...deck, cards: filteredCards};
         }
     },
