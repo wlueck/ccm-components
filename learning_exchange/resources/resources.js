@@ -16,6 +16,7 @@ export const de = {
     "saved_courses": "Meine Kurse",
     "course_of_study": "Studiengang:",
     "semester": "Semester:",
+    "no_courses_available": "Keine Kurse vorhanden",
 
     // course-item template
     "documents": "📖 Lernunterlagen",

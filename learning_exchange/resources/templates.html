@@ -39,7 +39,7 @@
 
 <ccm-template key="course_item">
     <button class="accordion-item-toggle" id="accordion-item-toggle-course" onclick="%onToggleAccItem%">%courseTitle%
-        <span style="float: right" id="favorite" onclick="%onFavorite%">
+        <span id="favorite-%courseId%" class="favorite" onclick="%onFavorite%">
             %star%
         </span>
     </button>

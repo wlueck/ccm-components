@@ -11,19 +11,8 @@ ccm.files["ccm.learning_exchange.js"] = {
         chats_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_chats"}],
         curriculum: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_curriculum"}],
         groups_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_groups"}],
-        materials: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_materials"}],
-        //user_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_user"}],
-
-        user_store: {
-            saved_courses: [
-                {
-                    course_id: "course_40bd08c5-4fbf-4ebe-a19d-97a065317603"
-                },
-                {
-                    course_id: "course_1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
-                }
-            ]
-        },
+        materials_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_materials"}],
+        saved_courses_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_saved_courses"}],
 
         // components
         chat: ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
@@ -40,8 +29,7 @@ ccm.files["ccm.learning_exchange.js"] = {
     },
 
     Instance: function () {
-        let user, curriculum, materials, $;
-        let savedCourses = [];
+        let user, curriculum, materials, savedCourses, $;
 
         this.init = async () => {
             $ = Object.assign({}, this.ccm.helper, this.helper);
@@ -67,21 +55,25 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
 
             // init savedCourses, curriculum and materials
-            savedCourses = this.user_store.saved_courses;
+            savedCourses = await this.saved_courses_store.get(user.key);
+            if (!savedCourses) {
+                console.error("Saved courses not found in store");
+                await this.saved_courses_store.set({key: user.key, value: []});
+                savedCourses = await this.saved_courses_store.get(user.key);
+            }
+            savedCourses = savedCourses.value;
+
             curriculum = await this.curriculum.get("curriculum");
             if (!curriculum) {
                 console.error("Curriculum not found in store");
             }
             curriculum = curriculum.value
 
-            materials = await this.materials.get("materials");
+            materials = await this.materials_store.get("materials");
             if (!materials) {
                 console.error("Materials not found in store");
-                await this.materials.set({
-                    key: "materials",
-                    value: []
-                });
-                materials = await this.materials.get("materials");
+                await this.materials_store.set({key: "materials", value: []});
+                materials = await this.materials_store.get("materials");
             }
             materials = materials.value;
 
@@ -115,18 +107,16 @@ ccm.files["ccm.learning_exchange.js"] = {
             },
             onFavorite: async (event, course) => {
                 event.stopPropagation();
-                const isSaved = this.user_store.saved_courses.some(savedCourse => savedCourse.course_id === course.id);
+                const isSaved = savedCourses?.some(savedCourse => savedCourse.course_id === course.id);
                 if (isSaved) {
-                    this.user_store.saved_courses = this.user_store.saved_courses.filter(savedCourse => savedCourse.course_id !== course.id);
+                    savedCourses = savedCourses?.filter(savedCourse => savedCourse.course_id !== course.id);
                 } else {
-                    this.user_store.saved_courses.push({course_id: course.id});
+                    savedCourses.push({course_id: course.id});
                 }
-                // update UI
-                const selectedCourseOfStudy = curriculum.find(c => c.courses.some(course => course.id === course.id));
-                const selectedSemester = this.element.querySelector("#semester").value ? parseInt(this.element.querySelector("#semester").value) : 1;
-                await this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
-                await this.updateAccordion("saved");
+                await this.saved_courses_store.set({key: user.key, value: savedCourses});
                 this.onchange && this.onchange({name: 'addedCourseToFavorite', instance: this, newCourse: course});
+                $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), isSaved ? '☆' : '★');
+                await this.updateAccordion("saved");
             },
             onToggleAccordionItem: (event) => {
                 event.stopPropagation();
@@ -176,7 +166,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     upload_date: new Date().toISOString(),
                 };
                 materials.push(newMaterial);
-                await this.materials.set({key: "materials", value: materials});
+                await this.materials_store.set({key: "materials", value: materials});
                 this.onchange && this.onchange({name: 'addedMaterial', instance: this, newMaterial: newMaterial});
                 this.element.querySelector('#upload-document-modal').close();
                 await this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === course.id)), parseInt(this.element.querySelector("#semester").value));
@@ -216,7 +206,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             let courses = [];
             if (tabMode === "saved") {
                 this.element.querySelector("#tab-saved .accordion").innerHTML = "";
-                courses = this.user_store.saved_courses.map(savedCourse => {
+                courses = savedCourses?.map(savedCourse => {
                     return curriculum.flatMap(courseOfStudy => courseOfStudy.courses)
                         .find(course => course.id === savedCourse.course_id);
                 }).filter(course => course);
@@ -225,10 +215,19 @@ ccm.files["ccm.learning_exchange.js"] = {
                 courses = selectedCourseOfStudy.courses.filter(c => c.semester === selectedSemester);
             }
 
+            if (!courses || courses.length < 1) {
+                if (tabMode === "saved") {
+                    $.setContent(this.element.querySelector("#tab-saved .accordion"), this.text.no_courses_available);
+                } else {
+                    $.setContent(this.element.querySelector("#tab-all .accordion"), this.text.no_courses_available);
+                }
+                return;
+            }
             for (const course of courses) {
                 let courseItem = this.ccm.helper.html(this.html.course_item, {
                     courseTitle: course.title,
-                    star: this.user_store.saved_courses.some(savedCourse => savedCourse.course_id === course.id) ? "★" : "☆",
+                    courseId: course.id,
+                    star: savedCourses?.some(savedCourse => savedCourse.course_id === course.id) ? "★" : "☆",
                     documents: this.text.documents,
                     addDocuments: this.text.add_documents,
                     chat: this.text.chat,
@@ -255,14 +254,14 @@ ccm.files["ccm.learning_exchange.js"] = {
                     });
                     $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
 
-                    // add star rating
+                    // Initialize star-rating component
                     const result = await this.star_rating_result.start({
-                        data: {store: this.materials, key: material.id},
+                        data: {store: this.materials_store, key: material.id},
                         detailed: false,
                         user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                     });
                     const star = await this.star_rating.start({
-                        data: {store: this.materials, key: material.id},
+                        data: {store: this.materials_store, key: material.id},
                         onchange: result.start,
                         user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                     });

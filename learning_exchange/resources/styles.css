@@ -154,6 +154,10 @@ input[type="checkbox"] {
     width: calc(90% - 20px);
 }
 
+.favorite{
+    float: right;
+}
+
 .document-item {
     display: flex;
     justify-content: space-between;
