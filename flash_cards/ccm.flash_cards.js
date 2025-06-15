@@ -117,7 +117,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     }
                 });
             },
-
             onOpenSettings: () => {
                 const modal = this.element.querySelector('#settings-dialog') || $.html(this.html.settings_dialog, {
                     settingsHeadline: this.text.settings_headline,
@@ -155,7 +154,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 modal.querySelector('#default-card-selection').value = dataset.settings?.defaultCardSelection || 'all';
                 modal.querySelector('#skip-learning-dialog').checked = !!dataset.settings?.skipLearningDialog;
             },
-
             onSubmitSettings: async () => {
                 dataset.settings = dataset.settings || {};
                 const newLanguage = this.element.querySelector('#language-select').value;
@@ -170,13 +168,11 @@ ccm.files["ccm.flash_cards.js"] = {
                 await this.store.set({key: user.key, value: dataset});
                 await this.start();
             },
-
             onSortCourses: async (sortPreference) => {
                 dataset.sortPreference = sortPreference;
                 await this.store.set({key: user.key, value: dataset});
                 this.initListView();
             },
-
             onSortDecks: (courseId, sortPreference) => {
                 const course = dataset.courses.find(c => c.id === courseId);
                 if (course) {
@@ -185,7 +181,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 }
             },
-
             onImportCourse: async () => {
                 const input = document.createElement('input');
                 input.type = 'file';
@@ -224,7 +219,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 };
                 input.click();
             },
-
             onExportCourseOrDeck: async (exportData, type) => {
                 const itemToExport = {
                     id: exportData.id,
@@ -244,7 +238,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 document.body.removeChild(anchorElement);
                 URL.revokeObjectURL(url);
             },
-
             onImportDeck: () => {
                 const selectedCourseId = this.element.querySelector('#import-deck-course-select').value;
                 if (!selectedCourseId || selectedCourseId === this.text.no_courses_available) {
@@ -292,7 +285,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 };
                 input.click();
             },
-
             onDeleteDeck: async (courseId, deckToDelete) => {
                 const confirmDelete = confirm(this.text.delete_deck_warning.replace('%title%', deckToDelete.title));
                 if (confirmDelete) {
@@ -307,7 +299,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 }
             },
-
             onDeleteCourse: async (courseToDelete) => {
                 const confirmDelete = confirm(this.text.delete_course_warning.replace('%title%', courseToDelete.title));
                 if (confirmDelete) {
@@ -317,7 +308,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 }
             },
-
             onSubmitCourse: async (event, courseToEdit) => {
                 const form = this.element.querySelector("#add-course-form");
                 if (!form.checkValidity()) {
@@ -328,7 +318,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 event.preventDefault();
                 return await this.addOrUpdateCourse(form, courseToEdit);
             },
-
             onSubmitCourseInDeckEditor: async (event) => {
                 const isSubmitted = await this.events.onSubmitCourse(event);
                 if (!isSubmitted) return;
@@ -342,7 +331,6 @@ ccm.files["ccm.flash_cards.js"] = {
 
                 this.events.onResetCourseFormInDeckEditor();
             },
-
             onResetCourseFormInDeckEditor: () => {
                 // Close the add course container and reset the input fields
                 const form = this.element.querySelector("#add-course-form");
@@ -350,7 +338,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 this.element.querySelector("#course-deadline-input").classList.add("hidden");
                 form.reset();
             },
-
             onDeleteCard: (event, htmlCard) => {
                 event.preventDefault();
                 // check if at least one card exists before removing
@@ -362,7 +349,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     alert(this.text.minimum_card_warning);
                 }
             },
-
             onSubmitDeck: async (event, deckToEdit) => {
                 const form = this.element.querySelector("#add-deck-form");
                 if (!form.checkValidity()) {
@@ -373,7 +359,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 event.preventDefault();
                 await this.addOrUpdateDeck(form, deckToEdit);
             },
-
             onCancelSubmit: (event) => {
                 event.preventDefault();
                 const confirmCancel = confirm(this.text.cancel_warning);
@@ -381,7 +366,6 @@ ccm.files["ccm.flash_cards.js"] = {
                     this.initListView();
                 }
             },
-
             onStartCourseOrDeck: async (courseId, deckId = null) => {
                 const currentCourse = dataset.courses.find(course => course.id === courseId);
                 if (!currentCourse) {
@@ -407,7 +391,6 @@ ccm.files["ccm.flash_cards.js"] = {
                 }
                 await this.showLearningModeDialog(currentCourse, learningContent, mode);
             },
-
             onStartLearning: async (course, deck, mode, order, selection) => {
                 const filteredCards = filterAndSortCardsForLearning(deck, order, selection);
 
