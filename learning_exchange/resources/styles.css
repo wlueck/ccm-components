@@ -154,19 +154,33 @@ input[type="checkbox"] {
     width: calc(90% - 20px);
 }
 
-.favorite{
+.favorite {
     float: right;
 }
 
 .document-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
 }
 
+#left-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
 .document-title {
-    font-weight: bold;
+    font-weight: 600;
     color: black;
+}
+
+.document-item span {
+    color: #555;
+}
+
+.star-rating-result {
+
+    margin-left: auto;
 }
 
 .star-rating {
@@ -178,10 +192,6 @@ input[type="checkbox"] {
 
 .star-rating-result:hover .star-rating {
     display: block;
-}
-
-.star-rating-result {
-    margin-right: -90px;
 }
 
 /*endregion */

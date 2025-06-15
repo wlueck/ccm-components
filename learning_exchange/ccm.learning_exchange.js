@@ -8,6 +8,7 @@ ccm.files["ccm.learning_exchange.js"] = {
     name: "learning-exchange",
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     config: {
+        // stores
         chats_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_chats"}],
         curriculum: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_curriculum"}],
         groups_store: ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_learning_exchange_groups"}],
@@ -170,7 +171,17 @@ ccm.files["ccm.learning_exchange.js"] = {
                 this.onchange && this.onchange({name: 'addedMaterial', instance: this, newMaterial: newMaterial});
                 this.element.querySelector('#upload-document-modal').close();
                 await this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === course.id)), parseInt(this.element.querySelector("#semester").value));
+                await this.updateAccordion("saved");
             },
+            onDeleteDocument: async (material, documentItem) => {
+                materials = materials.filter(m => m.id !== material.id);
+                await this.materials_store.set({key: "materials", value: materials});
+                await this.materials_store.del(material.id);
+                this.onchange && this.onchange({name: 'deletedMaterial', instance: this, deletedMaterial: material});
+                documentItem.remove();
+                //await this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === material.course_id)), parseInt(this.element.querySelector("#semester").value));
+                //await this.updateAccordion("saved");
+            }
         }
 
         this.initMainView = async () => {
@@ -250,7 +261,9 @@ ccm.files["ccm.learning_exchange.js"] = {
                         title: material.title,
                         description: material.description || '',
                         uploadDate: new Date(material.upload_date).toLocaleDateString('de-DE'),
-                        fileUrl: material.file_url
+                        fileUrl: material.file_url,
+                        deleteDocumentClass: material.uploader === user.key ? 'delete-document' : 'unseen',
+                        onDeleteDocument: () => this.events.onDeleteDocument(material, documentItem)
                     });
                     $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
 
