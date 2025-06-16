@@ -133,7 +133,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     content.classList.toggle("hidden");
                 }
             },
-            onAddDocument: (event, course, courseItem) => {
+            onAddDocument: (event, course) => {
                 const modal = this.element.querySelector('#upload-document-modal') || $.html(this.html.upload_document_modal, {
                     headlineAddDocument: this.text.headline_add_document,
                     title: this.text.document_title,
@@ -179,7 +179,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 await this.addMaterial(newMaterial, this.element.querySelector(`#tab-all #course-item-${course.id}`));
                 await this.addMaterial(newMaterial, this.element.querySelector(`#tab-saved #course-item-${course.id}`));
             },
-            onDeleteDocument: async (material, documentItem) => {
+            onDeleteDocument: async (material) => {
                 materials = materials.filter(m => m.id !== material.id);
                 // remove material and stars
                 await this.materials_store.set({key: "materials", value: materials});
@@ -250,7 +250,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     group: this.text.group,
                     onFavorite: (event) => this.events.onFavorite(event, tabMode, course, courseItem),
                     onToggleAccItem: (event) => this.events.onToggleAccordionItem(event),
-                    onAddDocument: (event) => this.events.onAddDocument(event, course, courseItem),
+                    onAddDocument: (event) => this.events.onAddDocument(event, course),
                 });
 
                 if (tabMode === "saved") {
@@ -300,7 +300,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 uploadDate: new Date(material.upload_date).toLocaleDateString('de-DE'),
                 fileUrl: material.file_url,
                 deleteDocumentClass: material.uploader === user.key ? 'delete-document' : 'unseen',
-                onDeleteDocument: () => this.events.onDeleteDocument(material, documentItem)
+                onDeleteDocument: () => this.events.onDeleteDocument(material)
             });
             $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
 
