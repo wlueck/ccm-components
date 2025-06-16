@@ -78,11 +78,11 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
             materials = materials.value;
 
-            await this.initMainView();
+            await this.initMainContent();
         };
 
         this.getValue = () => {
-            return savedCourses;
+            return {savedCourses: savedCourses, materials: materials};
         }
 
         // event handler
@@ -106,7 +106,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 const selectedSemester = parseInt(event.target.value);
                 await this.updateAccordion("all", selectedCourseOfStudy, selectedSemester);
             },
-            onFavorite: async (event, course) => {
+            onFavorite: async (event, tabMode, course, courseItem) => {
                 event.stopPropagation();
                 const isSaved = savedCourses?.some(savedCourse => savedCourse.course_id === course.id);
                 if (isSaved) {
@@ -115,9 +115,15 @@ ccm.files["ccm.learning_exchange.js"] = {
                     savedCourses.push({course_id: course.id});
                 }
                 await this.saved_courses_store.set({key: user.key, value: savedCourses});
-                this.onchange && this.onchange({name: 'addedCourseToFavorite', instance: this, newCourse: course});
-                $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), isSaved ? '☆' : '★');
-                await this.updateAccordion("saved");
+                this.onchange && this.onchange({name: isSaved? 'removedCourseFromFavorite' : 'addedCourseToFavorite', instance: this, course: course});
+                if (tabMode === "saved") {
+                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), isSaved ? '☆' : '★');
+                    if (isSaved) courseItem.remove();
+                } else {
+                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), isSaved ? '☆' : '★');
+                    if (isSaved) this.element.querySelector(`#tab-saved #course-item-${course.id}`).remove();
+                    else await this.updateAccordion("saved")
+                }
             },
             onToggleAccordionItem: (event) => {
                 event.stopPropagation();
@@ -127,7 +133,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     content.classList.toggle("hidden");
                 }
             },
-            onAddDocument: (event, course) => {
+            onAddDocument: (event, course, courseItem) => {
                 const modal = this.element.querySelector('#upload-document-modal') || $.html(this.html.upload_document_modal, {
                     headlineAddDocument: this.text.headline_add_document,
                     title: this.text.document_title,
@@ -170,22 +176,21 @@ ccm.files["ccm.learning_exchange.js"] = {
                 await this.materials_store.set({key: "materials", value: materials});
                 this.onchange && this.onchange({name: 'addedMaterial', instance: this, newMaterial: newMaterial});
                 this.element.querySelector('#upload-document-modal').close();
-                await this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === course.id)), parseInt(this.element.querySelector("#semester").value));
-                await this.updateAccordion("saved");
+                await this.addMaterial(newMaterial, this.element.querySelector(`#tab-all #course-item-${course.id}`));
+                await this.addMaterial(newMaterial, this.element.querySelector(`#tab-saved #course-item-${course.id}`));
             },
             onDeleteDocument: async (material, documentItem) => {
                 materials = materials.filter(m => m.id !== material.id);
+                // remove material and stars
                 await this.materials_store.set({key: "materials", value: materials});
                 await this.materials_store.del(material.id);
                 this.onchange && this.onchange({name: 'deletedMaterial', instance: this, deletedMaterial: material});
-                documentItem.remove();
-                //await this.updateAccordion("all", curriculum.find(c => c.courses.some(course => course.id === material.course_id)), parseInt(this.element.querySelector("#semester").value));
-                //await this.updateAccordion("saved");
+                this.element.querySelectorAll(`#document-item-${material.id}`).forEach(e => e.remove());
             }
         }
 
-        this.initMainView = async () => {
-            $.setContent(this.element.querySelector("#content"), $.html(this.html.course_semester_select, {
+        this.initMainContent = async () => {
+            $.setContent(this.element.querySelector("#content"), $.html(this.html.main_content, {
                 allCourses: this.text.all_courses,
                 savedCourses: this.text.saved_courses,
                 onTabAll: () => this.events.onSwitchTab('all'),
@@ -243,9 +248,9 @@ ccm.files["ccm.learning_exchange.js"] = {
                     addDocuments: this.text.add_documents,
                     chat: this.text.chat,
                     group: this.text.group,
-                    onFavorite: (event) => this.events.onFavorite(event, course),
+                    onFavorite: (event) => this.events.onFavorite(event, tabMode, course, courseItem),
                     onToggleAccItem: (event) => this.events.onToggleAccordionItem(event),
-                    onAddDocument: (event) => this.events.onAddDocument(event, course),
+                    onAddDocument: (event) => this.events.onAddDocument(event, course, courseItem),
                 });
 
                 if (tabMode === "saved") {
@@ -257,29 +262,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 // Add existing documents to the content
                 const courseMaterials = materials.filter(material => material.course_id === course.id);
                 for (const material of courseMaterials) {
-                    const documentItem = $.html(this.html.document_item, {
-                        title: material.title,
-                        description: material.description || '',
-                        uploadDate: new Date(material.upload_date).toLocaleDateString('de-DE'),
-                        fileUrl: material.file_url,
-                        deleteDocumentClass: material.uploader === user.key ? 'delete-document' : 'unseen',
-                        onDeleteDocument: () => this.events.onDeleteDocument(material, documentItem)
-                    });
-                    $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
-
-                    // Initialize star-rating component
-                    const result = await this.star_rating_result.start({
-                        data: {store: this.materials_store, key: material.id},
-                        detailed: false,
-                        user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
-                    });
-                    const star = await this.star_rating.start({
-                        data: {store: this.materials_store, key: material.id},
-                        onchange: result.start,
-                        user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
-                    });
-                    $.setContent(documentItem.querySelector('.star-rating'), star.root);
-                    $.prepend(documentItem.querySelector('.star-rating-result'), result.root);
+                    await this.addMaterial(material, courseItem);
                 }
 
                 // Initialize team-project component
@@ -308,5 +291,32 @@ ccm.files["ccm.learning_exchange.js"] = {
                 $.setContent(courseItem.querySelector("#accordion-item-content-chat"), chatComponent.root);
             }
         };
+
+        this.addMaterial = async (material, courseItem) => {
+            const documentItem = $.html(this.html.document_item, {
+                documentId: material.id,
+                title: material.title,
+                description: material.description || '',
+                uploadDate: new Date(material.upload_date).toLocaleDateString('de-DE'),
+                fileUrl: material.file_url,
+                deleteDocumentClass: material.uploader === user.key ? 'delete-document' : 'unseen',
+                onDeleteDocument: () => this.events.onDeleteDocument(material, documentItem)
+            });
+            $.append(courseItem.querySelector('#accordion-item-content-documents'), documentItem);
+
+            // Initialize star-rating components
+            const result = await this.star_rating_result.start({
+                data: {store: this.materials_store, key: material.id},
+                detailed: false,
+                user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+            });
+            const star = await this.star_rating.start({
+                data: {store: this.materials_store, key: material.id},
+                onchange: result.start,
+                user: this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+            });
+            $.setContent(documentItem.querySelector('.star-rating'), star.root);
+            $.prepend(documentItem.querySelector('.star-rating-result'), result.root);
+        }
     },
 }

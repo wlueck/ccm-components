@@ -1,16 +1,12 @@
 #element {
     /* colors */
-    --primary-color: #2c3e50;
-    --primary-font: #fff;
+    --primary-color: #ccc;
+    --primary-font: #000;
 
     --secondary-color: #efefef;
     --secondary-font: #000;
 
-    --border: darkgray;
-    --card-bg: #ffffff;
-
-    --course-item-bg: #b9cce2;
-    --deck-item-bg: #f1f1e6;
+    --border: #A9A9A9FF;
 
     /* fonts */
     font-family: Montserrat, sans-serif;
@@ -31,17 +27,16 @@ button {
     cursor: pointer;
     border: 1px solid darkgray;
     border-radius: 5px;
-
-    &.btn-low-style {
-        background: none;
-        border: none;
-        color: var(--primary-color);
-    }
 }
 
 .cancel {
     background-color: var(--secondary-color);
     color: var(--secondary-font);
+}
+
+.submit {
+    background-color: var(--primary-color);
+    color: var(--primary-font);
 }
 
 input, select, textarea {
@@ -69,36 +64,63 @@ input[type="checkbox"] {
         margin-top: 15px;
     }
 }
-
 /*endregion */
-
 
 /*region main template */
 #main {
-    font-family: Montserrat, sans-serif;
-    font-weight: 100;
+    #header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: #f0f0f0;
+        margin-bottom: 15px;
+    }
+
+    #headline {
+        margin: 0;
+    }
+
+    #sub-headline {
+        margin: 5px 0 0 0;
+    }
+
+    #user {
+        display: flex;
+        gap: 10px;
+    }
+}
+/*endregion */
+
+/*region main-content template */
+.tabs {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
 }
 
-#header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background-color: #f0f0f0;
-    margin-bottom: 15px;
+.tab-btn {
+    background-color: inherit;
+    border: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+    border-radius: 0;
 }
 
-#headline {
-    margin: 0;
+.tab-btn:hover {
+    background-color: #ddd;
 }
 
-#sub-headline {
-    margin: 5px 0 0 0;
+.tab-btn.active {
+    background-color: #ccc;
 }
 
-#user {
-    display: flex;
-    gap: 10px;
+.tab-content {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-top: none;
 }
 
 .form-container {
@@ -123,7 +145,9 @@ input[type="checkbox"] {
     max-width: 90%;
     margin-top: 20px;
 }
+/*endregion */
 
+/*region course-item template */
 #accordion-item-toggle-course {
     background-color: #ccc;
 }
@@ -157,76 +181,42 @@ input[type="checkbox"] {
 .favorite {
     float: right;
 }
+/*endregion */
 
+/*region document-item template */
 .document-item {
     display: flex;
     align-items: center;
+
+    #left-content {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .document-title {
+        font-weight: 600;
+        color: black;
+    }
+
+    .document-item span {
+        color: #555;
+    }
+
+    .star-rating-result {
+
+        margin-left: auto;
+    }
+
+    .star-rating {
+        display: none;
+        position: absolute;
+        background-color: white;
+        border: 1px solid var(--border);
+    }
+
+    .star-rating-result:hover .star-rating {
+        display: block;
+    }
 }
-
-#left-content {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.document-title {
-    font-weight: 600;
-    color: black;
-}
-
-.document-item span {
-    color: #555;
-}
-
-.star-rating-result {
-
-    margin-left: auto;
-}
-
-.star-rating {
-    display: none;
-    position: absolute;
-    background-color: white;
-    border: 1px solid var(--border);
-}
-
-.star-rating-result:hover .star-rating {
-    display: block;
-}
-
-/*endregion */
-
-/*region tab */
-.tabs {
-    overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
-}
-
-.tab-btn {
-    background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    font-size: 17px;
-    border-radius: 0;
-}
-
-.tab-btn:hover {
-    background-color: #ddd;
-}
-
-.tab-btn.active {
-    background-color: #ccc;
-}
-
-.tab-content {
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-top: none;
-}
-
 /*endregion */
