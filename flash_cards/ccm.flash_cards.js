@@ -700,9 +700,9 @@ ccm.files["ccm.flash_cards.js"] = {
                 const answerEditor = cardEditorInstances.find(instance => instance.htmlCard === card)?.answerEditor;
 
                 // Get text out of editor or value from textarea
-                let question = questionEditor ? questionEditor.getValue().inner : card.querySelector("#question").value.trim();
-                let answer = answerEditor ? answerEditor.getValue().inner : card.querySelector("#answer").value.trim();
-                let cardId = card.getAttribute("data-card-id") || $.generateKey();
+                const question = questionEditor ? questionEditor.getValue().inner : card.querySelector("#question").value.trim();
+                const answer = answerEditor ? answerEditor.getValue().inner : card.querySelector("#answer").value.trim();
+                const cardId = card.getAttribute("data-card-id") || $.generateKey();
 
                 if ((this.editor && questionEditor.get().getLength() > 1 && answerEditor.get().getLength() > 1) ||
                     (!this.editor && question !== "" && answer !== "")) {
@@ -847,13 +847,13 @@ ccm.files["ccm.flash_cards.js"] = {
 
 
         // helper functions
-        const sortCourses = () => {
-            switch (dataset.sortPreference) {
+        const sortItems = (items, sortPreference, getStatus) => {
+            switch (sortPreference) {
                 case 'title':
-                    dataset.courses.sort((a, b) => a.title.localeCompare(b.title));
+                    items.sort((a, b) => a.title.localeCompare(b.title));
                     break;
                 case 'deadline':
-                    dataset.courses.sort((a, b) => {
+                    items.sort((a, b) => {
                         const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
                         const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
                         if (!dateA) return 1;
@@ -862,12 +862,12 @@ ccm.files["ccm.flash_cards.js"] = {
                     });
                     break;
                 case 'cardCount':
-                    dataset.courses.sort((a, b) => this.getCourseStatus(a).totalCards - this.getCourseStatus(b).totalCards);
+                    items.sort((a, b) => getStatus(a).totalCards - getStatus(b).totalCards);
                     break;
                 case 'status':
-                    dataset.courses.sort((a, b) => {
-                        const statusA = this.getCourseStatus(a);
-                        const statusB = this.getCourseStatus(b);
+                    items.sort((a, b) => {
+                        const statusA = getStatus(a);
+                        const statusB = getStatus(b);
                         return statusB.hardPercent - statusA.hardPercent ||
                             statusB.mediumPercent - statusA.mediumPercent ||
                             statusA.easyPercent - statusB.easyPercent;
@@ -876,34 +876,9 @@ ccm.files["ccm.flash_cards.js"] = {
             }
         };
 
-        const sortDecks = (course) => {
-            switch (course.sortPreference) {
-                case 'title':
-                    course.cardDecks.sort((a, b) => a.title.localeCompare(b.title));
-                    break;
-                case 'deadline':
-                    course.cardDecks.sort((a, b) => {
-                        const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
-                        const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
-                        if (!dateA) return 1;
-                        if (!dateB) return -1;
-                        return dateA - dateB;
-                    });
-                    break;
-                case 'cardCount':
-                    course.cardDecks.sort((a, b) => this.getDeckStatus(a).totalCards - this.getDeckStatus(b).totalCards);
-                    break;
-                case 'status':
-                    course.cardDecks.sort((a, b) => {
-                        const statusA = this.getDeckStatus(a);
-                        const statusB = this.getDeckStatus(b);
-                        return statusB.hardPercent - statusA.hardPercent ||
-                            statusB.mediumPercent - statusA.mediumPercent ||
-                            statusA.easyPercent - statusB.easyPercent;
-                    });
-                    break;
-            }
-        };
+        const sortCourses = () => sortItems(dataset.courses, dataset.sortPreference, this.getCourseStatus);
+
+        const sortDecks = (course) => sortItems(course.cardDecks, course.sortPreference, this.getDeckStatus);
 
         const getDeadlineHtml = (deadline) => {
             if (!deadline) return '';
@@ -915,11 +890,9 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         const getStatusDisplay = (status) => {
-            if (dataset.settings?.statusDisplay === 'percent') {
-                return `${Math.round(status.easyPercent)}% / ${Math.round(status.mediumPercent)}% / ${Math.round(status.hardPercent)}%`;
-            } else {
-                return `${status.easyCount} / ${status.mediumCount} / ${status.hardCount}`;
-            }
+            return dataset.settings?.statusDisplay === 'percent'
+                ? `${Math.round(status.easyPercent)}% / ${Math.round(status.mediumPercent)}% / ${Math.round(status.hardPercent)}%`
+                : `${status.easyCount} / ${status.mediumCount} / ${status.hardCount}`;
         };
 
         const getStatusChartStyle = (status) => {
@@ -932,30 +905,23 @@ ccm.files["ccm.flash_cards.js"] = {
         };
 
         const calculateStatus = (cards) => {
-            let easyCount = cards.filter(card => card.currentStatus === 'easy').length;
-            let mediumCount = cards.filter(card => card.currentStatus === 'medium').length;
-            let hardCount = cards.filter(card => card.currentStatus === 'hard').length;
+            const easyCount = cards.filter(card => card.currentStatus === 'easy').length;
+            const mediumCount = cards.filter(card => card.currentStatus === 'medium').length;
+            const hardCount = cards.filter(card => card.currentStatus === 'hard').length;
             const totalCards = easyCount + mediumCount + hardCount;
 
-            const easyPercent = totalCards > 0 ? (easyCount / totalCards) * 100 : 0;
-            const mediumPercent = totalCards > 0 ? (mediumCount / totalCards) * 100 : 0;
-            const hardPercent = totalCards > 0 ? (hardCount / totalCards) * 100 : 0;
-
             return {
-                easyCount: easyCount, mediumCount: mediumCount, hardCount: hardCount,
-                totalCards: totalCards,
-                easyPercent: easyPercent, mediumPercent: mediumPercent, hardPercent: hardPercent
+                easyCount, mediumCount, hardCount,
+                totalCards,
+                easyPercent: totalCards > 0 ? (easyCount / totalCards) * 100 : 0,
+                mediumPercent: totalCards > 0 ? (mediumCount / totalCards) * 100 : 0,
+                hardPercent: totalCards > 0 ? (hardCount / totalCards) * 100 : 0
             };
         };
 
-        this.getCourseStatus = (course) => {
-            const allCards = course.cardDecks.flatMap(deck => deck.cards);
-            return calculateStatus(allCards);
-        };
+        this.getCourseStatus = (course) => calculateStatus(course.cardDecks.flatMap(deck => deck.cards));
 
-        this.getDeckStatus = (deck) => {
-            return calculateStatus(deck.cards);
-        };
+        this.getDeckStatus = (deck) => calculateStatus(deck.cards);
 
         const createCourseListItemHtml = (course) => {
             const courseStatus = this.getCourseStatus(course);
