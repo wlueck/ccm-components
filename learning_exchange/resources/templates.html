@@ -48,53 +48,17 @@
             <button class="accordion-item-toggle" id="accordion-item-toggle-documents" onclick="%onToggleAccItem%">
                 %documents%
             </button>
-            <div class="accordion-item-content hidden" id="accordion-item-content-documents">
-                <button class="accordion-item-content-item" onclick="%onAddDocument%"><b>%addDocuments%</b></button>
-            </div>
+            <div class="accordion-item-content hidden" id="accordion-item-content-documents"></div>
 
-            <button class="accordion-item-toggle" id="accordion-item-toggle-chat" onclick="%onToggleAccItem%">%chat%
+            <button class="accordion-item-toggle" id="accordion-item-toggle-chat" onclick="%onToggleAccItem%">
+                %chat%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-chat"></div>
 
-            <button class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItem%">%group%
+            <button class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItem%">
+                %group%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-group"></div>
         </div>
     </div>
-</ccm-template>
-
-<ccm-template key="document_item">
-    <button class="document-item accordion-item-content-item" id="document-item-%documentId%">
-        <span id="left-content">
-            <a href="%fileUrl%" class="document-title" target="_blank">%title%</a>
-            <span class="document-description">%description%</span>
-            <span>%uploadDate%</span>
-        </span>
-        <span class="star-rating-result"><a class="star-rating"></a></span>
-        <span class="%deleteDocumentClass%" onclick="%onDeleteDocument%">X</span>
-    </button>
-</ccm-template>
-
-<ccm-template key="upload_document_modal">
-    <dialog id="upload-document-modal" class="modal-dialog">
-        <h3>%headlineAddDocument%</h3>
-        <form id="upload-form">
-            <div class="form-group">
-                <label for="document-title">%title%*</label>
-                <input type="text" id="document-title" name="title">
-            </div>
-            <div class="form-group">
-                <label for="document-description">%description%</label>
-                <textarea id="document-description" name="description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="document-file">%documentFile%*</label>
-                <input type="text" id="document-file" name="file">
-            </div>
-            <div class="modal-button-container">
-                <button class="submit" onclick="%onSubmitUpload%">%submit%</button>
-                <button class="cancel" onclick="%onCancelUpload%">%cancel%</button>
-            </div>
-        </form>
-    </dialog>
 </ccm-template>

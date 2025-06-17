@@ -152,7 +152,7 @@ input[type="checkbox"] {
     background-color: #ccc;
 }
 
-#accordion-item-toggle-course, .accordion-item-toggle, .accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group, .accordion-item-content-item {
+#accordion-item-toggle-course, .accordion-item-toggle, .accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group, .accordion-item-content-documents{
     width: 90%;
     border-radius: 0;
     text-align: left;
@@ -165,58 +165,14 @@ input[type="checkbox"] {
     width: calc(90% - 10px);
 }
 
-#accordion-item-content-chat, #accordion-item-content-group {
+#accordion-item-content-chat, #accordion-item-content-group, #accordion-item-content-documents {
     background-color: white;
     margin-left: 20px;
     width: calc(90% - 22px);
     border: 1px solid var(--border);
 }
 
-.accordion-item-content-item {
-    background-color: #fff;
-    margin-left: 20px;
-    width: calc(90% - 20px);
-}
-
 .favorite {
     float: right;
-}
-/*endregion */
-
-/*region document-item template */
-.document-item {
-    display: flex;
-    align-items: center;
-
-    #left-content {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .document-title {
-        font-weight: 600;
-        color: black;
-    }
-
-    .document-item span {
-        color: #555;
-    }
-
-    .star-rating-result {
-
-        margin-left: auto;
-    }
-
-    .star-rating {
-        display: none;
-        position: absolute;
-        background-color: white;
-        border: 1px solid var(--border);
-    }
-
-    .star-rating-result:hover .star-rating {
-        display: block;
-    }
 }
 /*endregion */
