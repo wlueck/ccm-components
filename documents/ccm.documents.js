@@ -8,17 +8,17 @@ ccm.files["ccm.documents.js"] = {
     name: "documents",
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     config: {
-        "css": ["ccm.load", "./resources/styles.css"],
+        "css": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/styles.css"],
         //"data": {"store": [ "ccm.store" ]},
         "data": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_documents"}], "key": "documents"},
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         //"hide_login": "true",
-        "html": ["ccm.load", "./resources/templates.html"],
+        "html": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/templates.html"],
         "onchange": event => console.log(event),
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"],
         "star_rating": ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating/versions/ccm.star_rating-5.0.0.js"],
         "star_rating_result": ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating_result/versions/ccm.star_rating_result-4.0.0.js"],
-        "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}],
+        "text": ["ccm.load", {"url": "https://wlueck.github.io/ccm-components/documents/resources/resources.js#de", "type": "module"}],
     },
 
     Instance: function () {
