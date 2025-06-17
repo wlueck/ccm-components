@@ -10,10 +10,7 @@ ccm.files["ccm.documents.js"] = {
     config: {
         "css": ["ccm.load", "./resources/styles.css"],
         //"data": {"store": [ "ccm.store" ]},
-        "data": {
-            "store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_documents"}],
-            "key": "documents"
-        },
+        "data": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_documents"}], "key": "documents"},
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         //"hide_login": "true",
         "html": ["ccm.load", "./resources/templates.html"],
@@ -54,7 +51,7 @@ ccm.files["ccm.documents.js"] = {
             documents = await this.data.store.get(this.data.key);
             if (!documents) {
                 console.error('Documents not found in store');
-                await this.data.set({key: this.data.key, value: []});
+                await this.data.store.set({key: this.data.key, value: []});
                 documents = await this.data.store.get(this.data.key);
             }
             documents = documents.value;
