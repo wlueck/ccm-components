@@ -9,6 +9,8 @@ export const de = {
 
     // warning messages
     "login_warning": "Please log in to continue!",
+    "missing_fields_warning": "Bitte Titel und Datei angeben!",
+    "confirm_delete_document": "Möchten Sie dieses Dokument wirklich löschen?",
 
     // main template
     "headline_main": "Lernaustausch",

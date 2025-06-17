@@ -160,7 +160,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 const description = form.description.value;
 
                 if (!title || !file) {
-                    alert('Bitte Titel und Datei angeben!');
+                    alert(this.text.missing_fields_warning);
                     return;
                 }
                 const newMaterial = {
@@ -180,12 +180,14 @@ ccm.files["ccm.learning_exchange.js"] = {
                 await this.addMaterial(newMaterial, this.element.querySelector(`#tab-saved #course-item-${course.id}`));
             },
             onDeleteDocument: async (material) => {
-                materials = materials.filter(m => m.id !== material.id);
-                // remove material and stars
-                await this.materials_store.set({key: 'materials', value: materials});
-                await this.materials_store.del(material.id);
-                this.onchange && this.onchange({name: 'deletedMaterial', instance: this, deletedMaterial: material});
-                this.element.querySelectorAll(`#document-item-${material.id}`).forEach(e => e.remove());
+                if (confirm(this.text.confirm_delete_document)) {
+                    materials = materials.filter(m => m.id !== material.id);
+                    // remove material and stars
+                    await this.materials_store.set({key: 'materials', value: materials});
+                    await this.materials_store.del(material.id);
+                    this.onchange && this.onchange({name: 'deletedMaterial', instance: this, deletedMaterial: material});
+                    this.element.querySelectorAll(`#document-item-${material.id}`).forEach(e => e.remove());
+                }
             }
         }
 
