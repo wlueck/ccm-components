@@ -26,7 +26,7 @@ ccm.files["ccm.learning_exchange.js"] = {
         "html": ["ccm.load", "./resources/templates.html"],
         "onchange": event => console.log(event),
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"],
-        "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}],
+        "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}]
     },
 
     Instance: function () {
@@ -68,7 +68,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             if (!curriculum) {
                 console.error('Curriculum not found in store');
             }
-            curriculum = curriculum.value
+            curriculum = curriculum.value;
 
             materials = await this.materials_store.get('materials');
             if (!materials) {
@@ -83,7 +83,7 @@ ccm.files["ccm.learning_exchange.js"] = {
 
         this.getValue = () => {
             return {savedCourses: savedCourses, materials: materials};
-        }
+        };
 
         // event handler
         this.events = {
@@ -134,6 +134,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 }
             },
             onAddDocument: (event, course) => {
+                event.stopPropagation();
                 const modal = this.element.querySelector('#upload-document-modal') || $.html(this.html.upload_document_modal, {
                     headlineAddDocument: this.text.headline_add_document,
                     title: this.text.document_title,
@@ -142,7 +143,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     cancel: this.text.cancel,
                     submit: this.text.submit,
                     onCancelUpload: () => modal.close(),
-                    onSubmitUpload: (event) => this.events.onSubmitUpload(event, course),
+                    onSubmitUpload: (event) => this.events.onSubmitUpload(event, course)
                 });
                 if (!this.element.querySelector('#upload-document-modal')) {
                     $.append(this.element.querySelector('#main'), modal);
@@ -170,14 +171,17 @@ ccm.files["ccm.learning_exchange.js"] = {
                     description: description,
                     file_url: file,
                     uploader: user.key,
-                    upload_date: new Date().toISOString(),
+                    upload_date: new Date().toISOString()
                 };
                 materials.push(newMaterial);
                 await this.materials_store.set({key: 'materials', value: materials});
                 this.onchange && this.onchange({name: 'addedMaterial', instance: this, newMaterial: newMaterial});
                 this.element.querySelector('#upload-document-modal').close();
-                await this.addMaterial(newMaterial, this.element.querySelector(`#tab-all #course-item-${course.id}`));
-                await this.addMaterial(newMaterial, this.element.querySelector(`#tab-saved #course-item-${course.id}`));
+
+                const allCourseItem = this.element.querySelector(`#tab-all #course-item-${course.id}`);
+                const savedCourseItem = this.element.querySelector(`#tab-saved #course-item-${course.id}`);
+                if (allCourseItem) await this.addMaterial(newMaterial, allCourseItem);
+                if (savedCourseItem) await this.addMaterial(newMaterial, savedCourseItem);
             },
             onDeleteDocument: async (material) => {
                 if (confirm(this.text.confirm_delete_document)) {
@@ -189,7 +193,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     this.element.querySelectorAll(`#document-item-${material.id}`).forEach(e => e.remove());
                 }
             }
-        }
+        };
 
         this.initMainContent = async () => {
             $.setContent(this.element.querySelector('#content'), $.html(this.html.main_content, {
@@ -201,7 +205,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 courseOfStudyOptions: curriculum.map(c => `<option value="${c.course_of_study_abbreviation}">${c.course_of_study_title}</option>`).join(''),
                 onChangeCourseOfStudy: (event) => this.events.onChangeCourseOfStudy(event),
                 semester: this.text.semester,
-                onChangeSemester: (event) => this.events.onChangeSemester(event),
+                onChangeSemester: (event) => this.events.onChangeSemester(event)
             }));
 
             this.updateSemesterOptions(curriculum[0]);
@@ -242,7 +246,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 return;
             }
             for (const course of courses) {
-                let courseItem = this.ccm.helper.html(this.html.course_item, {
+                const courseItem = $.html(this.html.course_item, {
                     courseTitle: course.title,
                     courseId: course.id,
                     star: savedCourses?.some(savedCourse => savedCourse.course_id === course.id) ? '★' : '☆',
@@ -252,7 +256,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     group: this.text.group,
                     onFavorite: (event) => this.events.onFavorite(event, tabMode, course, courseItem),
                     onToggleAccItem: (event) => this.events.onToggleAccordionItem(event),
-                    onAddDocument: (event) => this.events.onAddDocument(event, course),
+                    onAddDocument: (event) => this.events.onAddDocument(event, course)
                 });
 
                 if (tabMode === 'saved') {
@@ -310,12 +314,12 @@ ccm.files["ccm.learning_exchange.js"] = {
             const result = await this.star_rating_result.start({
                 "data": {"store": this.materials_store, "key": material.id},
                 "detailed": false,
-                "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : ''
             });
             const star = await this.star_rating.start({
                 "data": {"store": this.materials_store, "key": material.id},
                 "onchange": result.start,
-                "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : ''
             });
             $.setContent(documentItem.querySelector('.star-rating'), star.root);
             $.prepend(documentItem.querySelector('.star-rating-result'), result.root);
