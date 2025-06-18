@@ -3,14 +3,8 @@
  * @type {Object}
  */
 export const de = {
-    // general
-    "cancel": "Abbrechen",
-    "submit": "Speichern",
-
     // warning messages
-    "login_warning": "Please log in to continue!",
-    "missing_fields_warning": "Bitte Titel und Datei angeben!",
-    "confirm_delete_document": "Möchten Sie dieses Dokument wirklich löschen?",
+    "login_warning": "Bitte loggen Sie sich ein um fortzufahren!",
 
     // main template
     "headline_main": "Lernaustausch",
@@ -22,15 +16,8 @@ export const de = {
 
     // course-item template
     "documents": "📖 Lernunterlagen",
-    "add_documents": "+ Unterlagen hinzufügen",
     "chat": "💬 Chat",
     "group": "👥 Lerngruppen",
-
-    // document-upload-modal template
-    "headline_add_document": "Lernunterlagen hinzufügen",
-    "document_title": "Titel",
-    "document_description": "Beschreibung",
-    "document_file": "Datei URL",
 };
 
 /**

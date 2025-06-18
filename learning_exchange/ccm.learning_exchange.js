@@ -9,11 +9,9 @@ ccm.files["ccm.learning_exchange.js"] = {
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     config: {
         // stores
-        "chats_store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange_chats"}],
-        "curriculum": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_curriculum"}],
-        "groups_store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange_groups"}],
-        "documents_store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange_documents"}],
-        "saved_courses_store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange_saved_courses"}],
+        "curriculum": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_curriculum"}], "key": "curriculum"},
+        //"data": {"store": [ "ccm.store" ]},
+        "data": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange"}], "key": "learning_exchange"},
 
         // components
         "chat": ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
@@ -61,19 +59,21 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
 
             // init savedCourses and curriculum
-            savedCourses = await this.saved_courses_store.get(user.key);
+            savedCourses = await this.data.store.get(user.key);
             if (!savedCourses) {
                 console.error('Saved courses not found in store');
-                await this.saved_courses_store.set({key: user.key, value: []});
-                savedCourses = await this.saved_courses_store.get(user.key);
+                await this.data.store.set({key: user.key, value: []});
+                savedCourses = await this.data.store.get(user.key);
             }
             savedCourses = savedCourses.value;
 
-            curriculum = await this.curriculum.get('curriculum');
+            curriculum = await this.curriculum.store.get(this.curriculum.key);
             if (!curriculum) {
                 console.error('Curriculum not found in store');
             }
             curriculum = curriculum.value;
+
+            console.log(await this.data.store.get())
 
             await this.initMainContent();
         };
@@ -111,7 +111,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 } else {
                     savedCourses.push({course_id: course.id});
                 }
-                await this.saved_courses_store.set({key: user.key, value: savedCourses});
+                await this.data.store.set({key: user.key, value: savedCourses});
                 this.onchange && this.onchange({
                     name: isSaved ? 'removedCourseFromFavorite' : 'addedCourseToFavorite',
                     instance: this,
@@ -208,7 +208,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 let documentsComponent = this.componentInstances.documents.get(documentsKey);
                 if (!documentsComponent) {
                     documentsComponent = await this.documents.start({
-                        "data": {"store": this.documents_store, "key": "documents_" + course.id},
+                        "data": {"store": this.data.store, "key": this.data.key + "_documents_" + course.id},
                         "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                         "hide_login": true,
                         "onchange": async () => {
@@ -221,7 +221,7 @@ ccm.files["ccm.learning_exchange.js"] = {
 
                 // Initialize team-project component
                 let teamProjectComponent = await this.team_project.start({
-                    "data": {"store": this.groups_store, "key": "group_project_" + course.id},
+                    "data": {"store": this.data.store, "key": this.data.key + "_group_project_" + course.id},
                     "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                     "teambuild": {
                         "title": "Gruppen",
@@ -243,7 +243,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 let chatComponent = this.componentInstances.chat.get(chatKey);
                 if (!chatComponent) {
                     chatComponent = await this.chat.start({
-                        "data": {"store": this.chats_store, "key": 'chat_' + course.id},
+                        "data": {"store": this.data.store, "key": this.data.key + '_chat_' + course.id},
                         "onchange": async () => {
                             if (this.componentInstances.chat.get(otherChatKey)) await this.componentInstances.chat.get(otherChatKey).start()
                         },

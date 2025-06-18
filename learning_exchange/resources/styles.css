@@ -18,10 +18,6 @@
     display: none;
 }
 
-.unseen {
-    visibility: hidden;
-}
-
 button {
     padding: 8px;
     cursor: pointer;
@@ -29,25 +25,11 @@ button {
     border-radius: 5px;
 }
 
-.cancel {
-    background-color: var(--secondary-color);
-    color: var(--secondary-font);
-}
-
-.submit {
-    background-color: var(--primary-color);
-    color: var(--primary-font);
-}
-
-input, select, textarea {
+select {
     padding: 5px;
     border: 1px solid var(--border);
     border-radius: 4px;
     resize: vertical;
-}
-
-input[type="checkbox"] {
-    cursor: pointer;
 }
 
 .modal-dialog {
@@ -79,15 +61,6 @@ input[type="checkbox"] {
 
     #headline {
         margin: 0;
-    }
-
-    #sub-headline {
-        margin: 5px 0 0 0;
-    }
-
-    #user {
-        display: flex;
-        gap: 10px;
     }
 }
 /*endregion */
