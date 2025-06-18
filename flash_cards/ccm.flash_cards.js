@@ -5,7 +5,7 @@
  */
 
 ccm.files['ccm.flash_cards.js'] = {
-    name: 'flash-cards',
+    name: 'flash_cards',
     ccm: 'https://ccmjs.github.io/ccm/ccm.js',
     config: {
         "css": ["ccm.load", "./resources/styles.css"],
