@@ -142,12 +142,12 @@ ccm.files["ccm.documents.js"] = {
 
             // Initialize star-rating components
             const result = await this.star_rating_result.start({
-                "data": {"store": this.data.store, "key": document.id},
+                "data": {"store": this.data.store, "key": this.data.key + "_star_result_" + document.id},
                 "detailed": false,
                 "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
             });
             const star = await this.star_rating.start({
-                "data": {"store": this.data.store, "key": document.id},
+                "data": {"store": this.data.store, "key": this.data.key + "_star_" + document.id},
                 "onchange": result.start,
                 "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
             });
