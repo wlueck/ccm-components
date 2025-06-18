@@ -10,7 +10,7 @@ ccm.files["ccm.documents.js"] = {
     config: {
         "css": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/styles.css"],
         //"data": {"store": [ "ccm.store" ]},
-        "data": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_documents"}], "key": "documents"},
+        "data": {"store": ["ccm.store", {"url": "wss://ccm2.inf.h-brs.de", "name": "wlueck2s_documents"}], "key": "documents"},
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         //"hide_login": "true",
         "html": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/templates.html"],
@@ -28,10 +28,9 @@ ccm.files["ccm.documents.js"] = {
             $ = Object.assign({}, this.ccm.helper, this.helper);
             $.use(this.ccm);
             if (this.user) this.user.onchange = this.start;
-            /*this.data.store.onchange = async (document) => {
+            this.data.store.onchange = async (document) => {
                 console.log("in onchange data")
-                await this.renderDocument(document);
-            };*/
+            };
         };
 
         this.start = async () => {
@@ -121,7 +120,7 @@ ccm.files["ccm.documents.js"] = {
                     documents = documents.filter(m => m.id !== document.id);
                     // remove document and stars
                     await this.data.store.set({key: this.data.key, value: documents});
-                    await this.data.store.del(document.id);
+                    await this.data.store.del(this.data.key + document.id);
                     this.onchange && this.onchange({name: 'deletedDocument', instance: this, deletedDocument: document});
                     documentItem.remove();
                 }
@@ -142,13 +141,16 @@ ccm.files["ccm.documents.js"] = {
 
             // Initialize star-rating components
             const result = await this.star_rating_result.start({
-                "data": {"store": this.data.store, "key": document.id},
+                "data": {"store": this.data.store, "key": this.data.key + document.id},
                 "detailed": false,
                 "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
             });
             const star = await this.star_rating.start({
-                "data": {"store": this.data.store, "key": document.id},
-                "onchange": result.start,
+                "data": {"store": this.data.store, "key": this.data.key + document.id},
+                "onchange": (event) => {
+                    result.start();
+                    this.onchange && this.onchange({name: 'addNewRatingForDocument', instance: this, newRating: event, document: document});
+                },
                 "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
             });
             $.setContent(documentItem.querySelector('.star-rating'), star.root);
