@@ -5,7 +5,7 @@
  */
 
 ccm.files["ccm.learning_exchange.js"] = {
-    name: "learning-exchange",
+    name: "learning_exchange",
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     config: {
         // stores
