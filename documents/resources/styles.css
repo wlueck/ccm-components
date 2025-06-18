@@ -2,19 +2,14 @@
     /* colors */
     --primary-color: #ccc;
     --primary-font: #000;
-
     --secondary-color: #efefef;
     --secondary-font: #000;
 
-    --border: #A9A9A9FF;
+    --border: 1px solid #A9A9A9FF;
 
-    /* fonts */
+    /* font */
     font-family: Montserrat, sans-serif;
     font-weight: 100;
-}
-
-.hidden {
-    display: none;
 }
 
 .unseen {
@@ -24,9 +19,23 @@
 button {
     padding: 8px;
     cursor: pointer;
-    border: 1px solid darkgray;
+    border: var(--border);
     border-radius: 5px;
 }
+
+#main {
+    #top {
+        float: right;
+    }
+}
+
+input, textarea {
+    padding: 5px;
+    border: var(--border);
+    border-radius: 4px;
+    resize: vertical;
+}
+
 
 .cancel {
     background-color: var(--secondary-color);
@@ -38,15 +47,8 @@ button {
     color: var(--primary-font);
 }
 
-input, textarea {
-    padding: 5px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    resize: vertical;
-}
-
 .modal-dialog {
-    border: 1px solid var(--border);
+    border: var(--border);
     border-radius: 5px;
 
     & h3 {
@@ -60,24 +62,22 @@ input, textarea {
     }
 }
 
-#main {
-    #top {
-        float: right;
-    }
-}
-
 .form-group {
     display: flex;
     flex-direction: column;
+
+    & label{
+        margin-bottom: 5px;
+    }
 }
 
-.form-group label {
-    margin-bottom: 5px;
+.add-document-button {
+    width: 100%;
 }
 
 .list-item {
     background-color: #fff;
-    width: 100%;
+    border: var(--border);
     border-radius: 0;
     text-align: left;
     padding: 15px;
@@ -87,6 +87,10 @@ input, textarea {
 .document-item {
     display: flex;
     align-items: center;
+
+    & span {
+        color: #555;
+    }
 
     #left-content {
         display: flex;
@@ -99,10 +103,6 @@ input, textarea {
         color: black;
     }
 
-    .document-item span {
-        color: #555;
-    }
-
     .star-rating-result {
         margin-left: auto;
     }
@@ -110,12 +110,17 @@ input, textarea {
     .star-rating {
         display: none;
         position: absolute;
-        background-color: white;
-        border: 1px solid var(--border);
+        background-color: #fff;
+        border: var(--border);
     }
 
     .star-rating-result:hover .star-rating {
         display: block;
+    }
+
+    .delete-document {
+        cursor: pointer;
+        padding: 10px;
     }
 }
 /*endregion */

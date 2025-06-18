@@ -7,7 +7,7 @@
 </ccm-template>
 
 <ccm-template key="document_item">
-    <button class="document-item list-item" id="document-item-%documentId%">
+    <div class="document-item list-item" id="document-item-%documentId%">
         <span id="left-content">
             <a href="%fileUrl%" class="document-title" target="_blank">%title%</a>
             <span class="document-description">%description%</span>
@@ -15,11 +15,11 @@
         </span>
         <span class="star-rating-result"><a class="star-rating"></a></span>
         <span class="%deleteDocumentClass%" onclick="%onDeleteDocument%">X</span>
-    </button>
+    </div>
 </ccm-template>
 
 <ccm-template key="upload_button">
-    <button class="list-item" onclick="%onAddDocument%"><b>%addDocument%</b></button>
+    <button type="button" class="list-item add-document-button" onclick="%onAddDocument%"><b>%addDocument%</b></button>
 </ccm-template>
 
 <ccm-template key="upload_document_modal">
@@ -39,8 +39,8 @@
                 <input type="text" id="document-file" name="file">
             </div>
             <div class="modal-button-container">
-                <button class="submit" onclick="%onSubmitUpload%">%submit%</button>
-                <button class="cancel" onclick="%onCancelUpload%">%cancel%</button>
+                <button type="button" class="submit" onclick="%onSubmitUpload%">%submit%</button>
+                <button type="button" class="cancel" onclick="%onCancelUpload%">%cancel%</button>
             </div>
         </form>
     </dialog>

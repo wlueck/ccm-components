@@ -9,11 +9,13 @@ ccm.files["ccm.documents.js"] = {
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     config: {
         "css": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/styles.css"],
-        //"data": {"store": [ "ccm.store" ]},
+        //"css": ["ccm.load", "././resources/styles.css"],
         "data": {"store": ["ccm.store", {"url": "wss://ccm2.inf.h-brs.de", "name": "wlueck2s_documents"}], "key": "documents"},
+        //"data": {"store": [ "ccm.store" ]},
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         //"hide_login": "true",
         "html": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/templates.html"],
+        //"html": ["ccm.load", " ././resources/templates.html"],
         "onchange": event => console.log(event),
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"],
         "star_rating": ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating/versions/ccm.star_rating-5.0.0.js"],
@@ -29,7 +31,8 @@ ccm.files["ccm.documents.js"] = {
             $.use(this.ccm);
             if (this.user) this.user.onchange = this.start;
             this.data.store.onchange = async (document) => {
-                console.log("in onchange data")
+                // todo not working
+                console.log("in onchange data");
             };
         };
 
@@ -81,7 +84,7 @@ ccm.files["ccm.documents.js"] = {
                     cancel: this.text.cancel,
                     submit: this.text.submit,
                     onCancelUpload: () => modal.close(),
-                    onSubmitUpload: (event) => this.events.onSubmitUpload(event),
+                    onSubmitUpload: () => this.events.onSubmitUpload(),
                 });
                 if (!this.element.querySelector('#upload-document-modal')) {
                     $.append(this.element.querySelector('#main'), modal);
@@ -90,9 +93,7 @@ ccm.files["ccm.documents.js"] = {
                 }
                 modal.showModal();
             },
-            onSubmitUpload: async (event) => {
-                event.preventDefault();
-                event.stopPropagation();
+            onSubmitUpload: async () => {
                 const form = this.element.querySelector('#upload-form');
                 const title = form.title.value;
                 const file = form.file.value;
@@ -118,7 +119,7 @@ ccm.files["ccm.documents.js"] = {
             onDeleteDocument: async (document, documentItem) => {
                 if (confirm(this.text.confirm_delete_document)) {
                     documents = documents.filter(m => m.id !== document.id);
-                    // remove document and stars
+                    // remove document and stars from db
                     await this.data.store.set({key: this.data.key, value: documents});
                     await this.data.store.del(this.data.key + document.id);
                     this.onchange && this.onchange({name: 'deletedDocument', instance: this, deletedDocument: document});
