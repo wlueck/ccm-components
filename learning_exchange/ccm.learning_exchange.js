@@ -11,13 +11,12 @@ ccm.files["ccm.learning_exchange.js"] = {
         // stores
         "curriculum": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_curriculum"}], "key": "curriculum"},
         //"data": {"store": [ "ccm.store" ]},
-        "data": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange"}], "key": "learning_exchange"},
+        "data": {"store": ["ccm.store", {"url": "wss://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange"}], "key": "learning_exchange"},
 
         // components
         "chat": ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
         "documents": ["ccm.component", "https://wlueck.github.io/ccm-components/documents/ccm.documents.js"],
-        "star_rating": ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating/versions/ccm.star_rating-5.0.0.js"],
-        "star_rating_result": ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating_result/versions/ccm.star_rating_result-4.0.0.js"],
+        //"documents": ["ccm.component", "../documents/ccm.documents.js"],
         "team_project": ["ccm.component", "https://ccmjs.github.io/akless-components/team_project/ccm.team_project.js"],
 
         "css": ["ccm.load", "./resources/styles.css"],
@@ -30,10 +29,6 @@ ccm.files["ccm.learning_exchange.js"] = {
 
     Instance: function () {
         let user, curriculum, savedCourses, $;
-        this.componentInstances = {
-            chat: new Map(),
-            documents: new Map()
-        };
 
         this.init = async () => {
             $ = Object.assign({}, this.ccm.helper, this.helper);
@@ -102,24 +97,24 @@ ccm.files["ccm.learning_exchange.js"] = {
                 await this.updateAccordion('all', selectedCourseOfStudy, selectedSemester);
             },
             onFavorite: async (tabMode, course, courseItem) => {
-                const isSaved = savedCourses?.some(savedCourse => savedCourse.course_id === course.id);
-                if (isSaved) {
+                const removeFavorite = savedCourses?.some(savedCourse => savedCourse.course_id === course.id);
+                if (removeFavorite) {
                     savedCourses = savedCourses?.filter(savedCourse => savedCourse.course_id !== course.id);
                 } else {
                     savedCourses.push({course_id: course.id});
                 }
                 await this.data.store.set({key: user.key, value: savedCourses});
                 this.onchange && this.onchange({
-                    name: isSaved ? 'removedCourseFromFavorite' : 'addedCourseToFavorite',
+                    name: removeFavorite ? 'removedCourseFromFavorite' : 'addedCourseToFavorite',
                     instance: this,
                     course: course
                 });
                 if (tabMode === 'saved') {
-                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), isSaved ? '☆' : '★');
-                    if (isSaved) courseItem.remove();
+                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), removeFavorite ? '☆' : '★');
+                    if (removeFavorite) courseItem.remove();
                 } else {
-                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), isSaved ? '☆' : '★');
-                    if (isSaved) this.element.querySelector(`#tab-saved #course-item-${course.id}`).remove();
+                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), removeFavorite ? '☆' : '★');
+                    if (removeFavorite) this.element.querySelector(`#tab-saved #course-item-${course.id}`).remove();
                     else await this.updateAccordion('saved')
                 }
             },
@@ -199,26 +194,19 @@ ccm.files["ccm.learning_exchange.js"] = {
                 $.append(container, courseItem);
 
                 // Initialize documents component
-                const documentsKey = `${tabMode}_${course.id}`;
-                const otherDocumentsKey = tabMode === 'saved' ? `all_${course.id}` : `saved_${course.id}`;
-                let documentsComponent = this.componentInstances.documents.get(documentsKey);
-                if (!documentsComponent) {
-                    documentsComponent = await this.documents.start({
-                        "data": {"store": this.data.store, "key": this.data.key + "_documents_" + course.id},
-                        "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
-                        "hide_login": true,
-                        "onchange": async () => {
-                            if (this.componentInstances.documents.get(otherDocumentsKey)) await this.componentInstances.documents.get(otherDocumentsKey).start()
-                        }
-                    });
-                    this.componentInstances.documents.set(documentsKey, documentsComponent);
-                }
+                let documentsComponent = await this.documents.start({
+                    "data": {"store": this.data.store, "key": this.data.key + "_documents_" + course.id},
+                    "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                    "hide_login": true,
+                    "onchange": async (event) => {console.log(event);}
+                });
                 $.setContent(courseItem.querySelector('#accordion-item-content-documents'), documentsComponent.root);
 
                 // Initialize team-project component
                 let teamProjectComponent = await this.team_project.start({
                     "data": {"store": this.data.store, "key": this.data.key + "_group_project_" + course.id},
                     "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                    "onchange": (event) => {console.log(event);},
                     "teambuild": {
                         "title": "Gruppen",
                         "app": ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js", {"text.team": "Gruppe"}]
@@ -234,19 +222,12 @@ ccm.files["ccm.learning_exchange.js"] = {
                 $.setContent(courseItem.querySelector('#accordion-item-content-group'), teamProjectComponent.root);
 
                 // Initialize chat component
-                const chatKey = `${tabMode}_${course.id}`;
-                const otherChatKey = tabMode === 'saved' ? `all_${course.id}` : `saved_${course.id}`;
-                let chatComponent = this.componentInstances.chat.get(chatKey);
-                if (!chatComponent) {
-                    chatComponent = await this.chat.start({
-                        "data": {"store": this.data.store, "key": this.data.key + '_chat_' + course.id},
-                        "onchange": async () => {
-                            if (this.componentInstances.chat.get(otherChatKey)) await this.componentInstances.chat.get(otherChatKey).start()
-                        },
-                        "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : ''
-                    });
-                    this.componentInstances.chat.set(chatKey, chatComponent);
-                }
+                let chatComponent = await this.chat.start({
+                    "data": {"store": this.data.store, "key": this.data.key + '_chat_' + course.id},
+                    "onchange": (event) => {console.log(event);},
+                    "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
+                    //"reload": true,
+                });
                 $.setContent(courseItem.querySelector('#accordion-item-content-chat'), chatComponent.root);
             }
         };
