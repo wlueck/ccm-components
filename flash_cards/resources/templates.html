@@ -7,7 +7,7 @@
             </div>
             <div id="user"></div>
         </div>
-        <button id="back-button" class="hidden" onclick="%onBackButton%">%backButton%</button>
+        <button type="button" id="back-button" class="hidden" onclick="%onBackButton%">%backButton%</button>
         <div id="content"></div>
     </div>
 </ccm-template>
@@ -16,7 +16,7 @@
 <ccm-template key="list_view">
     <div id="list-view">
         <div id="list-button-container">
-            <button id="add-deck-course-button" onclick="%onAddDeckOrCourse%">%addDeckOrCourse%</button>
+            <button type="button" id="add-deck-course-button" onclick="%onAddDeckOrCourse%">%addDeckOrCourse%</button>
             <div id="add-deck-course-options" class="dropdown-menu hidden">
                 <a id="create-deck" onclick="%onCreateDeck%">%createDeck%</a>
                 <a id="import-deck" onclick="%onImportDeck%">%importDeck%</a>
@@ -24,7 +24,7 @@
                 <a id="import-course" onclick="%onImportCourse%">%importCourse%</a>
             </div>
             <div id="right-button">
-                <button id="sort-courses-button" class="btn-low-style" onclick="%onSortCourses%">↓ %sortCourses%
+                <button type="button" id="sort-courses-button" class="btn-low-style" onclick="%onSortCourses%">↓ %sortCourses%
                 </button>
                 <div id="sort-courses-options" class="dropdown-menu hidden">
                     <a id="sort-courses-title" onclick="%onSortCoursesTitle%">%sortCoursesTitle%</a>
@@ -32,7 +32,7 @@
                     <a id="sort-courses-cardCount" onclick="%onSortCoursesCardCount%">%sortCoursesCardCount%</a>
                     <a id="sort-courses-status" onclick="%onSortCoursesStatus%">%sortCoursesStatus%</a>
                 </div>
-                <button id="settings-button" class="btn-low-style" onclick="%onOpenSettings%">⚙</button>
+                <button type="button" id="settings-button" class="btn-low-style" onclick="%onOpenSettings%">⚙</button>
             </div>
         </div>
 
@@ -60,10 +60,10 @@
                 <div class="list-item-title">%courseTitle%</div>
                 <div class="list-item-description">%courseDescription%</div>
                 <div id="list-item-buttons">
-                    <button id="toggle-course-button" class="btn-low-style" onclick="%onToggleCourse%">&#9660;</button>
-                    <button onclick="%onStartCourse%">%startCourse%</button>
+                    <button type="button" id="toggle-course-button" class="btn-low-style" onclick="%onToggleCourse%">&#9660;</button>
+                    <button type="button" onclick="%onStartCourse%">%startCourse%</button>
                     <div>
-                        <button id="course-option-button" class="btn-low-style" onclick="%onCourseOptions%">...</button>
+                        <button type="button" id="course-option-button" class="btn-low-style" onclick="%onCourseOptions%">...</button>
                         <div id="course-options" class="dropdown-menu hidden">
                             <a onclick="%onSortDecks%">%sortDecks%</a>
                             <div id="sort-deck-options" class=" dropdown-menu hidden">
@@ -96,9 +96,9 @@
                 <div class="list-item-title">%deckTitle%</div>
                 <div class="list-item-description">%deckDescription%</div>
                 <div style="display: flex">
-                    <button data-deck-id="%deckId%" onclick="%onStartDeck%">%startDeck%</button>
+                    <button type="button" data-deck-id="%deckId%" onclick="%onStartDeck%">%startDeck%</button>
                     <div>
-                        <button id="deck-option-button" class="btn-low-style" onclick="%onDeckOptions%">...</button>
+                        <button type="button" id="deck-option-button" class="btn-low-style" onclick="%onDeckOptions%">...</button>
                         <div id="deck-options" class="dropdown-menu hidden">
                             <a onclick="%onEditDeck%">%editDeck%</a>
                             <a onclick="%onExportDeck%">%exportDeck%</a>
@@ -124,8 +124,8 @@
             %courseSelectOptions%
         </select>
         <div class="modal-button-container">
-            <button onclick="%onChooseDeckFileToImport%">%chooseDeckFileToImport%</button>
-            <button onclick="%onCancelImportDeck%" class="cancel">%cancelImportDeck%</button>
+            <button type="button" onclick="%onChooseDeckFileToImport%">%chooseDeckFileToImport%</button>
+            <button type="button" onclick="%onCancelImportDeck%" class="cancel">%cancelImportDeck%</button>
         </div>
     </dialog>
 </ccm-template>
@@ -168,8 +168,8 @@
             <label for="count">%count%</label>
         </div>
         <div class="modal-button-container">
-            <button onclick="%onSubmitSettings%">%submitSettings%</button>
-            <button onclick="%onCancelSettings%" class="cancel">%cancelSettings%</button>
+            <button type="button" onclick="%onSubmitSettings%">%submitSettings%</button>
+            <button type="button" onclick="%onCancelSettings%" class="cancel">%cancelSettings%</button>
         </div>
     </dialog>
 </ccm-template>
@@ -187,8 +187,8 @@
         <label for="course-deadline">%courseDeadlineInput%</label><br>
         <input id="course-deadline-input" name="deadlineInput" type="date" class="hidden"/><br><br>
 
-        <button id="submit-course" onclick="%onSubmitCourse%">%submitCourse%</button>
-        <button class="cancel" onclick="%onCancelSubmitCourse%">%cancelCourse%</button>
+        <button type="button" id="submit-course" onclick="%onSubmitCourse%">%submitCourse%</button>
+        <button type="button" class="cancel" onclick="%onCancelSubmitCourse%">%cancelCourse%</button>
         <p class="submit-hint">%submitCourseHint%</p>
     </form>
 </ccm-template>
@@ -200,7 +200,7 @@
             <option disabled selected value>%selectCoursePlaceholder%</option>
             %courseOptions%
         </select><br>
-        <button class="btn-link-style" onclick="%onAddCourse%">%addCourse%</button>
+        <button type="button" class="btn-link-style" onclick="%onAddCourse%">%addCourse%</button>
         <br>
         <div id="add-course-container" class="hidden"></div>
         <br>
@@ -218,12 +218,12 @@
         <div id="cards-container">
             <h3>%cardsHeadline%</h3>
             <div id="cards"></div>
-            <button id="add-card" onclick="%onAddCard%">%addCard%</button>
+            <button type="button" id="add-card" onclick="%onAddCard%">%addCard%</button>
             <br>
         </div>
         <br>
-        <button id="submit-deck" onclick="%onSubmitDeck%">%submitDeck%</button>
-        <button class="cancel" onclick="%onCancelSubmitDeck%">%cancelDeck%</button>
+        <button type="button" id="submit-deck" onclick="%onSubmitDeck%">%submitDeck%</button>
+        <button type="button" class="cancel" onclick="%onCancelSubmitDeck%">%cancelDeck%</button>
         <p class="submit-hint">%submitDeckHint%</p>
     </form>
 </ccm-template>
@@ -238,7 +238,7 @@
             <label for="answer-input">%answer%</label>
             <div id="answer-input"></div>
         </div>
-        <button id="delete-card-button" onclick="%onDeleteCard%">%deleteCard%</button>
+        <button type="button" id="delete-card-button" onclick="%onDeleteCard%">%deleteCard%</button>
     </div>
 </ccm-template>
 
@@ -263,8 +263,8 @@
             </select>
         </div>
         <div class="modal-button-container">
-            <button onclick="%onStartLearning%">%startLearning%</button>
-            <button onclick="%onCancelLearning%" class="cancel">%cancelLearning%</button>
+            <button type="button" onclick="%onStartLearning%">%startLearning%</button>
+            <button type="button" onclick="%onCancelLearning%" class="cancel">%cancelLearning%</button>
         </div>
     </dialog>
 </ccm-template>
@@ -274,9 +274,9 @@
         <p id="description">%description%</p>
         <div id="card-content-container"></div>
         <div id="difficulty-buttons" class="unseen">
-            <button id="hard">%difficulty_hard%</button>
-            <button id="medium">%difficulty_medium%</button>
-            <button id="easy">%difficulty_easy%</button>
+            <button type="button" id="hard">%difficulty_hard%</button>
+            <button type="button" id="medium">%difficulty_medium%</button>
+            <button type="button" id="easy">%difficulty_easy%</button>
         </div>
     </a>
 </ccm-template>
@@ -295,9 +295,9 @@
             <span>%currentCardNumber%</span> / <span>%maxNumberOfCards%</span>
         </div>
         <div id="card-buttons">
-            <button class="btn-low-style %hidePrevBtn%" id="previous-card-button" onclick="%onPreviousCard%">&#8592;</button>
-            <button class="btn-low-style" id="turn-around-button" onclick="%onTurnAround%">&#8634;</button>
-            <button class="btn-low-style %hideNextBtn%" id="next-card-button" onclick="%onNextCard%">&#8594;</button>
+            <button type="button" class="btn-low-style %hidePrevBtn%" id="previous-card-button" onclick="%onPreviousCard%">&#8592;</button>
+            <button type="button" class="btn-low-style" id="turn-around-button" onclick="%onTurnAround%">&#8634;</button>
+            <button type="button" class="btn-low-style %hideNextBtn%" id="next-card-button" onclick="%onNextCard%">&#8594;</button>
         </div>
     </div>
 </ccm-template>

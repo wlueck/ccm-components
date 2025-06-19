@@ -308,18 +308,16 @@ ccm.files['ccm.flash_cards.js'] = {
                     this.initListView();
                 }
             },
-            onSubmitCourse: async (event, courseToEdit) => {
+            onSubmitCourse: async (courseToEdit) => {
                 const form = this.element.querySelector('#add-course-form');
                 if (!form.checkValidity()) {
-                    event.preventDefault();
                     alert(this.text.fill_all_fields_warning);
                     return false;
                 }
-                event.preventDefault();
                 return await this.addOrUpdateCourse(form, courseToEdit);
             },
-            onSubmitCourseInDeckEditor: async (event) => {
-                const isSubmitted = await this.events.onSubmitCourse(event);
+            onSubmitCourseInDeckEditor: async () => {
+                const isSubmitted = await this.events.onSubmitCourse();
                 if (!isSubmitted) return;
 
                 // Update the course select options
@@ -338,8 +336,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 this.element.querySelector('#course-deadline-input').classList.add('hidden');
                 form.reset();
             },
-            onDeleteCard: (event, htmlCard) => {
-                event.preventDefault();
+            onDeleteCard: (htmlCard) => {
                 // check if at least one card exists before removing
                 if (this.element.querySelectorAll('#cards > #card').length > 1) {
                     // remove editorInstance from cardEditorInstances
@@ -349,18 +346,15 @@ ccm.files['ccm.flash_cards.js'] = {
                     alert(this.text.minimum_card_warning);
                 }
             },
-            onSubmitDeck: async (event, deckToEdit) => {
+            onSubmitDeck: async (deckToEdit) => {
                 const form = this.element.querySelector('#add-deck-form');
                 if (!form.checkValidity()) {
-                    event.preventDefault();
                     alert(this.text.fill_all_fields_warning);
                     return;
                 }
-                event.preventDefault();
                 await this.addOrUpdateDeck(form, deckToEdit);
             },
-            onCancelSubmit: (event) => {
-                event.preventDefault();
+            onCancelSubmit: () => {
                 const confirmCancel = confirm(this.text.cancel_warning);
                 if (confirmCancel) {
                     this.initListView();
@@ -477,12 +471,12 @@ ccm.files['ccm.flash_cards.js'] = {
                 courseDescriptionInput: this.text.course_description_input,
                 onToggleDeadline: (event) => this.element.querySelector('#course-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 courseDeadlineInput: this.text.course_deadline_input,
-                onSubmitCourse: async (event) => {
-                    await this.events.onSubmitCourse(event, courseToEdit);
-                    this.initListView();
+                onSubmitCourse: async () => {
+                    const isSubmitted = await this.events.onSubmitCourse(courseToEdit);
+                    if (isSubmitted) this.initListView();
                 },
                 submitCourse: courseToEdit ? this.text.change : this.text.create,
-                onCancelSubmitCourse: (event) => this.events.onCancelSubmit(event),
+                onCancelSubmitCourse: () => this.events.onCancelSubmit(),
                 cancelCourse: this.text.cancel,
                 submitCourseHint: this.text.submit_course_hint,
             }));
@@ -512,10 +506,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 courseInput: this.text.select_course_input,
                 selectCoursePlaceholder: this.text.deck_course_placeholder,
                 courseOptions: dataset.courses?.length ? dataset.courses.map(course => `<option value="${course.id}">${course.title}</option>`).join('') : '',
-                onAddCourse: (event) => {
-                    event.preventDefault();
-                    this.element.querySelector('#add-course-container').classList.toggle('hidden');
-                },
+                onAddCourse: () => this.element.querySelector('#add-course-container').classList.toggle('hidden'),
                 addCourse: this.text.add_course,
 
                 deckTitleInput: this.text.deck_title_input,
@@ -523,14 +514,11 @@ ccm.files['ccm.flash_cards.js'] = {
                 onToggleDeadline: (event) => this.element.querySelector('#deck-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 deckDeadlineInput: this.text.deck_deadline_input,
                 cardsHeadline: this.text.deck_cards_container,
-                onAddCard: (event) => {
-                    event.preventDefault();
-                    addCardInEditor();
-                },
+                onAddCard: () => addCardInEditor(),
                 addCard: this.text.add_card,
-                onSubmitDeck: (event) => this.events.onSubmitDeck(event, deckToEdit),
+                onSubmitDeck: () => this.events.onSubmitDeck(deckToEdit),
                 submitDeck: deckToEdit ? this.text.change : this.text.create,
-                onCancelSubmitDeck: (event) => this.events.onCancelSubmit(event),
+                onCancelSubmitDeck: () => this.events.onCancelSubmit(),
                 cancelDeck: this.text.cancel,
                 submitDeckHint: deckToEdit ? '' : this.text.submit_deck_hint,
             }));
@@ -547,11 +535,9 @@ ccm.files['ccm.flash_cards.js'] = {
                 courseDescriptionInput: this.text.course_description_input,
                 onToggleDeadline: (event) => this.element.querySelector('#course-deadline-input').classList.toggle('hidden', !event.currentTarget.checked),
                 courseDeadlineInput: this.text.course_deadline_input,
-                onSubmitCourse: async (event) => {
-                    await this.events.onSubmitCourseInDeckEditor(event);
-                },
+                onSubmitCourse: async () => await this.events.onSubmitCourseInDeckEditor(),
                 submitCourse: this.text.create,
-                onCancelSubmitCourse: (event) => this.events.onResetCourseFormInDeckEditor(event),
+                onCancelSubmitCourse: () => this.events.onResetCourseFormInDeckEditor(),
                 cancelCourse: this.text.cancel,
                 submitCourseHint: this.text.submit_course_hint,
             }));
@@ -605,7 +591,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 current_question: card?.question || '',
                 answer: this.text.answer_input,
                 current_answer: card?.answer || '',
-                onDeleteCard: (event) => this.events.onDeleteCard(event, htmlCard),
+                onDeleteCard: () => this.events.onDeleteCard(htmlCard),
                 deleteCard: this.text.delete_card,
             });
             // Start editor component if available
@@ -996,7 +982,7 @@ ccm.files['ccm.flash_cards.js'] = {
                     filteredCards = filteredCards.filter(card => card.currentStatus === 'hard' || card.currentStatus === 'medium');
                     break;
             }
-            // Apply ordering
+            // Apply order
             switch (orderMode) {
                 case 'random':
                     filteredCards.sort(() => Math.random() - 0.5);
