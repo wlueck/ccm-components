@@ -198,7 +198,10 @@ ccm.files["ccm.learning_exchange.js"] = {
                     "data": {"store": this.data.store, "key": this.data.key + "_documents_" + course.id},
                     "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                     "hide_login": true,
-                    "onchange": async (event) => {console.log(event);}
+                    "onchange": async (event) => {
+                        console.log(event);
+                        await this.updateAccordion(tabMode === "saved" ? "all" : "saved", selectedCourseOfStudy, selectedSemester);
+                    }
                 });
                 $.setContent(courseItem.querySelector('#accordion-item-content-documents'), documentsComponent.root);
 
@@ -224,7 +227,10 @@ ccm.files["ccm.learning_exchange.js"] = {
                 // Initialize chat component
                 let chatComponent = await this.chat.start({
                     "data": {"store": this.data.store, "key": this.data.key + '_chat_' + course.id},
-                    "onchange": (event) => {console.log(event);},
+                    "onchange": async (event) => {
+                        console.log(event);
+                        await this.updateAccordion(tabMode === "saved" ? "all" : "saved", selectedCourseOfStudy, selectedSemester);
+                    },
                     "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
                     //"reload": true,
                 });
