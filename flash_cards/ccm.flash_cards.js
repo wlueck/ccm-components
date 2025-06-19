@@ -50,7 +50,6 @@ ccm.files['ccm.flash_cards.js'] = {
         this.init = async () => {
             $ = Object.assign({}, this.ccm.helper, this.helper);
             $.use(this.ccm);
-
             if (this.user) this.user.onchange = this.start;
         };
 
@@ -78,7 +77,7 @@ ccm.files['ccm.flash_cards.js'] = {
 
             dataset = await this.store.get(user.key);
             if (!dataset) {
-                console.log('No dataset found');
+                console.log('No dataset found for user:', user.key);
                 // initialize new dataset
                 await this.store.set({
                     key: user.key,
@@ -166,7 +165,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 this.text = await this.ccm.load({url: this.languages[newLanguage], type: "module"});
                 this.element.querySelector('#settings-dialog').close();
                 await this.store.set({key: user.key, value: dataset});
-                await this.start();
+                await this.initListView();
             },
             onSortCourses: async (sortPreference) => {
                 dataset.sortPreference = sortPreference;
@@ -285,7 +284,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 };
                 input.click();
             },
-            onDeleteDeck: async (courseId, deckToDelete) => {
+            onDeleteDeck: async (courseId, deckToDelete, cardDeckHtml) => {
                 const confirmDelete = confirm(this.text.delete_deck_warning.replace('%title%', deckToDelete.title));
                 if (confirmDelete) {
                     const course = dataset.courses.find(course => course.id === courseId);
@@ -296,16 +295,16 @@ ccm.files['ccm.flash_cards.js'] = {
                     course.cardDecks = course.cardDecks.filter(deck => deck.id !== deckToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
                     this.onchange && this.onchange({name: 'deletedDeck', instance: this, deletedDeck: deckToDelete, fromCourse: courseId});
-                    this.initListView();
+                    cardDeckHtml.remove();
                 }
             },
-            onDeleteCourse: async (courseToDelete) => {
+            onDeleteCourse: async (courseToDelete, courseHtml) => {
                 const confirmDelete = confirm(this.text.delete_course_warning.replace('%title%', courseToDelete.title));
                 if (confirmDelete) {
                     dataset.courses = dataset.courses.filter(course => course.id !== courseToDelete.id);
                     await this.store.set({key: user.key, value: dataset});
                     this.onchange && this.onchange({name: 'deletedCourse', instance: this, deletedCourse: courseToDelete});
-                    this.initListView();
+                    courseHtml.remove();
                 }
             },
             onSubmitCourse: async (courseToEdit) => {
@@ -326,7 +325,6 @@ ccm.files['ccm.flash_cards.js'] = {
                 newOption.value = dataset.courses.find(course => course.title === form.title.value).id;
                 newOption.textContent = form.title.value;
                 $.append(this.element.querySelector('#select-course'), newOption);
-
                 this.events.onResetCourseFormInDeckEditor();
             },
             onResetCourseFormInDeckEditor: () => {
@@ -377,11 +375,13 @@ ccm.files['ccm.flash_cards.js'] = {
                     learningContent = currentCardDeck;
                     mode = 'deck';
                 } else {
+                    // mode: learn entire course
                     learningContent = {cards: currentCourse.cardDecks.flatMap(deck => deck.cards)};
                     if (learningContent.cards.length === 0) {
                         alert(this.text.no_cards_warning);
                         return;
                     }
+                    mode = 'course';
                 }
                 await this.showLearningModeDialog(currentCourse, learningContent, mode);
             },
@@ -405,7 +405,6 @@ ccm.files['ccm.flash_cards.js'] = {
             $.setContent(this.element.querySelector('#content'), $.html(this.html.list_view, {
                 onAddDeckOrCourse: () => this.element.querySelector('#add-deck-course-options').classList.toggle('hidden'),
                 addDeckOrCourse: this.text.add_deck_or_course,
-
                 onCreateDeck: () => this.initDeckEditorView(),
                 createDeck: this.text.create_deck,
                 onImportDeck: this.initImportDeckDialog,
@@ -624,7 +623,8 @@ ccm.files['ccm.flash_cards.js'] = {
                 title: form.title.value,
                 description: form.description.value,
                 deadline: formattedDate,
-                cardDecks: courseToEdit?.cardDecks || []
+                cardDecks: courseToEdit?.cardDecks || [],
+                sortPreference: courseToEdit?.sortPreference || 'title'
             };
 
             if (!courseToEdit || courseToEdit.title !== course.title) {
@@ -882,8 +882,8 @@ ccm.files['ccm.flash_cards.js'] = {
         };
 
         const getStatusChartStyle = (status) => {
-            return `width: 30px; height: 30px;
-                    background-image: radial-gradient(circle, white 57%, transparent 57%),
+            return `width: 45px; height: 45px;
+                    background-image: radial-gradient(circle, #b9cce2 45%, transparent 45%),
                                       conic-gradient(#b3261e 0% ${status.hardPercent}%,
                                                      #e0cd00 ${status.hardPercent}% ${status.hardPercent + status.mediumPercent}%, 
                                                      #2b6c22 ${status.hardPercent + status.mediumPercent}% 100%);
@@ -937,7 +937,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 editCourse: this.text.edit_course,
                 onExportCourse: () => this.events.onExportCourseOrDeck(course, 'course'),
                 exportCourse: this.text.export_course,
-                onDeleteCourse: async () => await this.events.onDeleteCourse(course),
+                onDeleteCourse: async () => await this.events.onDeleteCourse(course, courseHtml),
                 deleteCourse: this.text.delete_course,
                 courseStatusChartStyle: getStatusChartStyle(courseStatus),
                 courseStatus: getStatusDisplay(courseStatus),
@@ -959,7 +959,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 editDeck: this.text.edit_deck,
                 onExportDeck: () => this.events.onExportCourseOrDeck(deck, 'deck'),
                 exportDeck: this.text.export_deck,
-                onDeleteDeck: async () => await this.events.onDeleteDeck(courseId, deck),
+                onDeleteDeck: async () => await this.events.onDeleteDeck(courseId, deck, cardDeckHtml),
                 deleteDeck: this.text.delete_deck,
                 deckStatusChartStyle: getStatusChartStyle(deckStatus),
                 deckStatus: getStatusDisplay(deckStatus),
@@ -999,5 +999,6 @@ ccm.files['ccm.flash_cards.js'] = {
             }
             return {...deck, cards: filteredCards};
         }
+        };
     },
 };
