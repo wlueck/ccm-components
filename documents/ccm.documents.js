@@ -30,10 +30,6 @@ ccm.files["ccm.documents.js"] = {
             $ = Object.assign({}, this.ccm.helper, this.helper);
             $.use(this.ccm);
             if (this.user) this.user.onchange = this.start;
-            this.data.store.onchange = async (document) => {
-                // todo not working
-                console.log("in onchange data");
-            };
         };
 
         this.start = async () => {
