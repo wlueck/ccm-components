@@ -25,5 +25,19 @@ export const de = {
  * @type {Object}
  */
 export const en = {
+// warning messages
+    "login_warning": "Please login to continue!",
 
+    // main template
+    "headline_main": "Learning Exchange",
+    "all_courses": "All Courses",
+    "saved_courses": "My Courses",
+    "course_of_study": "Course of Study:",
+    "semester": "Semester:",
+    "no_courses_available": "No courses available",
+
+    // course-item template
+    "documents": "📖 Learning Materials",
+    "chat": "💬 Chat",
+    "group": "👥 Study Groups",
 };
