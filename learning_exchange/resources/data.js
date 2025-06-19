@@ -125,28 +125,3 @@ await this.curriculum.set({
         }
     ]
 });
-
-
-await this.materials.set({
-    key: "materials",
-    value: [
-        {
-            id: "material_a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-            course_id: "course_40bd08c5-4fbf-4ebe-a19d-97a065317603",
-            title: "Klausurvorbereitung 2023",
-            description: "Zusammenfassung der wichtigsten Themen für die Klausur.",
-            file_url: "https://github.com/wlueck/ccm-components/blob/main/learning_exchange/resources/files/Lernunterlagen_Prog1.pdf",
-            uploader: "wlueck2s",
-            upload_date: "2025-05-21T10:00:00Z"
-        },
-        {
-            id: "material_9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f",
-            course_id: "course_1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
-            title: "Klausurvorbereitung",
-            description: "Alles wichtige",
-            file_url: "https://github.com/wlueck/ccm-components/blob/main/learning_exchange/resources/files/Klausurvorbereitung%20Systemnahe%20Programmierung.pdf",
-            uploader: "userrr2s",
-            upload_date: "2025-05-21T10:00:00Z"
-        }
-    ]
-});
