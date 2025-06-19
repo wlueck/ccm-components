@@ -12,8 +12,8 @@
 
 <ccm-template key="main_content">
     <div class="tabs">
-        <button class="tab-btn active" id="tab-all-button" onclick="%onTabAll%">%allCourses%</button>
-        <button class="tab-btn" id="tab-saved-button" onclick="%onTabSaved%">%savedCourses%</button>
+        <button type="button" class="tab-btn active" id="tab-all-button" onclick="%onTabAll%">%allCourses%</button>
+        <button type="button" class="tab-btn" id="tab-saved-button" onclick="%onTabSaved%">%savedCourses%</button>
     </div>
 
     <div class="tab-content" id="tab-all">
@@ -37,24 +37,24 @@
 
 <ccm-template key="course_item">
     <div id="course-item-%courseId%">
-        <button class="accordion-item-toggle" id="accordion-item-toggle-course" onclick="%onToggleAccItem%">
+        <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-course" onclick="%onToggleAccItem%">
             %courseTitle%
             <span id="favorite-%courseId%" class="favorite" onclick="%onFavorite%">
                 %star%
             </span>
         </button>
         <div class="accordion-item-content hidden" id="accordion-item-content-course">
-            <button class="accordion-item-toggle" id="accordion-item-toggle-documents" onclick="%onToggleAccItem%">
+            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-documents" onclick="%onToggleAccItem%">
                 %documents%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-documents"></div>
 
-            <button class="accordion-item-toggle" id="accordion-item-toggle-chat" onclick="%onToggleAccItem%">
+            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-chat" onclick="%onToggleAccItem%">
                 %chat%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-chat"></div>
 
-            <button class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItem%">
+            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItem%">
                 %group%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-group"></div>

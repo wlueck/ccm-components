@@ -73,8 +73,6 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
             curriculum = curriculum.value;
 
-            console.log(await this.data.store.get())
-
             await this.initMainContent();
         };
 
@@ -103,8 +101,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 const selectedSemester = parseInt(event.target.value);
                 await this.updateAccordion('all', selectedCourseOfStudy, selectedSemester);
             },
-            onFavorite: async (event, tabMode, course, courseItem) => {
-                event.stopPropagation();
+            onFavorite: async (tabMode, course, courseItem) => {
                 const isSaved = savedCourses?.some(savedCourse => savedCourse.course_id === course.id);
                 if (isSaved) {
                     savedCourses = savedCourses?.filter(savedCourse => savedCourse.course_id !== course.id);
@@ -127,7 +124,6 @@ ccm.files["ccm.learning_exchange.js"] = {
                 }
             },
             onToggleAccordionItem: (event) => {
-                event.stopPropagation();
                 const toggle = event.currentTarget.closest('.accordion-item-toggle');
                 const content = toggle.nextElementSibling;
                 if (content && content.classList.contains('accordion-item-content')) {
@@ -197,7 +193,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     addDocuments: this.text.add_documents,
                     chat: this.text.chat,
                     group: this.text.group,
-                    onFavorite: (event) => this.events.onFavorite(event, tabMode, course, courseItem),
+                    onFavorite: () => this.events.onFavorite(tabMode, course, courseItem),
                     onToggleAccItem: (event) => this.events.onToggleAccordionItem(event),
                 });
                 $.append(container, courseItem);
