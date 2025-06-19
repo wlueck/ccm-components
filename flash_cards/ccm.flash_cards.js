@@ -997,8 +997,7 @@ ccm.files['ccm.flash_cards.js'] = {
                     });
                     break;
             }
-            return {...deck, cards: filteredCards};
-        }
+            return filteredCards;
         };
     },
 };
