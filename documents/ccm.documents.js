@@ -131,7 +131,7 @@ ccm.files["ccm.documents.js"] = {
                 description: document.description || '',
                 uploadDate: new Date(document.upload_date).toLocaleDateString('de-DE'),
                 fileUrl: document.file_url,
-                deleteDocumentClass: document.uploader === user?.key ? 'delete-document' : 'unseen',
+                deleteDocumentClass: document.uploader === user?.key ? '' : 'unseen',
                 onDeleteDocument: () => this.events.onDeleteDocument(document, documentItem)
             });
             $.append(this.element.querySelector('#document-list'), documentItem);
