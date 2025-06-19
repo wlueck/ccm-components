@@ -359,41 +359,42 @@ ccm.files['ccm.flash_cards.js'] = {
                 }
             },
             onStartCourseOrDeck: async (courseId, deckId = null) => {
-                const currentCourse = dataset.courses.find(course => course.id === courseId);
+                const currentCourse = structuredClone(dataset.courses.find(course => course.id === courseId));
                 if (!currentCourse) {
                     console.error(this.text.course_not_found_warning);
                     return;
                 }
-                let learningContent, mode;
+                let learningContent, currentDeck, mode;
 
                 if (deckId) {
-                    const currentCardDeck = currentCourse.cardDecks.find(deck => deck.id === deckId);
-                    if (!currentCardDeck) {
+                    currentDeck = currentCourse.cardDecks.find(deck => deck.id === deckId);
+                    if (!currentDeck) {
                         console.error(this.text.deck_not_found_warning);
                         return;
                     }
-                    learningContent = currentCardDeck;
+                    learningContent = currentDeck.cards;
                     mode = 'deck';
                 } else {
                     // mode: learn entire course
-                    learningContent = {cards: currentCourse.cardDecks.flatMap(deck => deck.cards)};
-                    if (learningContent.cards.length === 0) {
+                    learningContent = currentCourse.cardDecks.flatMap(deck => deck.cards);
+                    if (learningContent.length === 0) {
                         alert(this.text.no_cards_warning);
                         return;
                     }
                     mode = 'course';
                 }
-                await this.showLearningModeDialog(currentCourse, learningContent, mode);
+                await this.showLearningModeDialog(currentCourse, currentDeck || null,  learningContent, mode);
             },
-            onStartLearning: async (course, deck, mode, order, selection) => {
-                const filteredCards = filterAndSortCardsForLearning(deck, order, selection);
-
-                if (!dataset.settings?.skipLearningDialog) this.element.querySelector('#learning-mode-dialog').close();
-                if (filteredCards.cards.length === 0) {
-                    alert('Keine Karten zum Lernen gefunden!');
+            onStartLearning: async (course, deck, cards, mode, order, selection) => {
+                const filteredCards = filterAndSortCardsForLearning(cards,
+                    order || this.element.querySelector('#card-order').value,
+                    selection || this.element.querySelector('#card-selection').value);
+                if (filteredCards.length === 0) {
+                    alert(this.text.no_cards_for_filter_warning);
                     return;
                 }
-                this.initLearningView(course, deck, mode, filteredCards.cards);
+                if (!dataset.settings?.skipLearningDialog) this.element.querySelector('#learning-mode-dialog').close();
+                this.initLearningView(course, deck, filteredCards, mode);
             }
         };
 
@@ -448,13 +449,15 @@ ccm.files['ccm.flash_cards.js'] = {
         };
 
         this.fillCourseList = () => {
+            // deep copy to avoid modifying the original dataset
+            let courses = structuredClone(dataset.courses);
             // apply sort preference for courses
-            if (dataset.sortPreference) sortCourses();
+            if (dataset.sortPreference) courses = sortItems(courses, dataset.sortPreference, this.getCourseStatus);
 
-            for (const course of dataset.courses) {
+            for (let course of courses) {
                 const courseHtml = createCourseListItemHtml(course);
                 // apply sort preference for decks
-                if (course.sortPreference) sortDecks(course);
+                if (course.sortPreference) course.cardDecks = sortItems(course.cardDecks, course.sortPreference, this.getDeckStatus);
 
                 for (const deck of course.cardDecks) {
                     const cardDeckHtml = createDeckListItemHtml(course.id, deck);
@@ -722,12 +725,12 @@ ccm.files['ccm.flash_cards.js'] = {
             }
         };
 
-        this.showLearningModeDialog = async (course, deck, mode) => {
+        this.showLearningModeDialog = async (course, deck, cards, mode) => {
             // skip if settings are enabled
             if (dataset.settings?.skipLearningDialog) {
-                const order = dataset.settings.defaultCardOrder || 'original';
-                const selection = dataset.settings.defaultCardSelection || 'all';
-                await this.events.onStartLearning(course, deck, mode, order, selection);
+                const order = dataset.settings?.defaultCardOrder || 'original';
+                const selection = dataset.settings?.defaultCardSelection || 'all';
+                await this.events.onStartLearning(course, deck, cards, mode, order, selection);
                 return;
             }
             const modal = this.element.querySelector('#learning-mode-dialog') || $.html(this.html.learning_mode_dialog, {
@@ -740,7 +743,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 selectCardsAll: this.text.select_cards_all,
                 selectCardsHard: this.text.select_cards_hard,
                 selectCardsMediumHard: this.text.select_cards_medium_hard,
-                onStartLearning: () => this.events.onStartLearning(course, deck, mode),
+                onStartLearning: async () => await this.events.onStartLearning(course, deck, cards, mode),
                 startLearning: this.text.start_learning,
                 onCancelLearning: () => modal.close(),
                 cancelLearning: this.text.cancel_learning
@@ -748,10 +751,13 @@ ccm.files['ccm.flash_cards.js'] = {
             if (!this.element.querySelector('#learning-mode-dialog')) {
                 $.append(this.element.querySelector('#main'), modal);
             }
+            // populate dialog with default settings
+            modal.querySelector('#card-order').value = dataset.settings?.defaultCardOrder || 'original';
+            modal.querySelector('#card-selection').value = dataset.settings?.defaultCardSelection || 'all';
             modal.showModal();
         };
 
-        this.initLearningView = (course, deck, mode, cards) => {
+        this.initLearningView = (course, deck, cards, mode) => {
             $.setContent(this.element.querySelector('#content'), $.html(this.html.learning_view, {
                 description: mode === 'deck' ? deck.description || '' : course.description || '',
                 difficulty_hard: this.text.difficulty_hard,
@@ -834,12 +840,13 @@ ccm.files['ccm.flash_cards.js'] = {
 
         // helper functions
         const sortItems = (items, sortPreference, getStatus) => {
+            let sortedItems = [...items];
             switch (sortPreference) {
                 case 'title':
-                    items.sort((a, b) => a.title.localeCompare(b.title));
+                    sortedItems.sort((a, b) => a.title.localeCompare(b.title));
                     break;
                 case 'deadline':
-                    items.sort((a, b) => {
+                    sortedItems.sort((a, b) => {
                         const dateA = a.deadline ? new Date(a.deadline.split('.').reverse().join('-')) : null;
                         const dateB = b.deadline ? new Date(b.deadline.split('.').reverse().join('-')) : null;
                         if (!dateA) return 1;
@@ -848,10 +855,10 @@ ccm.files['ccm.flash_cards.js'] = {
                     });
                     break;
                 case 'cardCount':
-                    items.sort((a, b) => getStatus(a).totalCards - getStatus(b).totalCards);
+                    sortedItems.sort((a, b) => getStatus(a).totalCards - getStatus(b).totalCards);
                     break;
                 case 'status':
-                    items.sort((a, b) => {
+                    sortedItems.sort((a, b) => {
                         const statusA = getStatus(a);
                         const statusB = getStatus(b);
                         return statusB.hardPercent - statusA.hardPercent ||
@@ -860,11 +867,8 @@ ccm.files['ccm.flash_cards.js'] = {
                     });
                     break;
             }
+            return sortedItems;
         };
-
-        const sortCourses = () => sortItems(dataset.courses, dataset.sortPreference, this.getCourseStatus);
-
-        const sortDecks = (course) => sortItems(course.cardDecks, course.sortPreference, this.getDeckStatus);
 
         const getDeadlineHtml = (deadline) => {
             if (!deadline) return '';
@@ -881,9 +885,9 @@ ccm.files['ccm.flash_cards.js'] = {
                 : `${status.easyCount} / ${status.mediumCount} / ${status.hardCount}`;
         };
 
-        const getStatusChartStyle = (status) => {
+        const getStatusChartStyle = (status, backgroundColor) => {
             return `width: 45px; height: 45px;
-                    background-image: radial-gradient(circle, #b9cce2 45%, transparent 45%),
+                    background-image: radial-gradient(circle, ${backgroundColor} 45%, transparent 45%),
                                       conic-gradient(#b3261e 0% ${status.hardPercent}%,
                                                      #e0cd00 ${status.hardPercent}% ${status.hardPercent + status.mediumPercent}%, 
                                                      #2b6c22 ${status.hardPercent + status.mediumPercent}% 100%);
@@ -939,7 +943,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 exportCourse: this.text.export_course,
                 onDeleteCourse: async () => await this.events.onDeleteCourse(course, courseHtml),
                 deleteCourse: this.text.delete_course,
-                courseStatusChartStyle: getStatusChartStyle(courseStatus),
+                courseStatusChartStyle: getStatusChartStyle(courseStatus, "#b9cce2"),
                 courseStatus: getStatusDisplay(courseStatus),
                 courseDeadline: getDeadlineHtml(course.deadline),
             });
@@ -961,39 +965,33 @@ ccm.files['ccm.flash_cards.js'] = {
                 exportDeck: this.text.export_deck,
                 onDeleteDeck: async () => await this.events.onDeleteDeck(courseId, deck, cardDeckHtml),
                 deleteDeck: this.text.delete_deck,
-                deckStatusChartStyle: getStatusChartStyle(deckStatus),
+                deckStatusChartStyle: getStatusChartStyle(deckStatus, "#f1f1e6"),
                 deckStatus: getStatusDisplay(deckStatus),
                 deckDeadline: getDeadlineHtml(deck.deadline),
             });
             return cardDeckHtml;
         };
 
-        const filterAndSortCardsForLearning = (deck, order, selection) => {
-            const orderMode = order || this.element.querySelector('#card-order').value;
-            const selectionMode = selection || this.element.querySelector('#card-selection').value;
-            let filteredCards = deck.cards;
-
+        const filterAndSortCardsForLearning = (cards, order, selection) => {
+            let filteredCards = cards;
             // Apply card selection
-            switch (selectionMode) {
+            switch (selection) {
                 case 'hard':
-                    filteredCards = filteredCards.filter(card => card.currentStatus === 'hard');
+                    filteredCards = filteredCards.filter(card => card?.currentStatus === 'hard');
                     break;
                 case 'medium-hard':
-                    filteredCards = filteredCards.filter(card => card.currentStatus === 'hard' || card.currentStatus === 'medium');
+                    filteredCards = filteredCards.filter(card => card?.currentStatus === 'hard' || card?.currentStatus === 'medium');
                     break;
             }
             // Apply order
-            switch (orderMode) {
+            switch (order) {
                 case 'random':
                     filteredCards.sort(() => Math.random() - 0.5);
                     break;
                 case 'status':
                     filteredCards.sort((a, b) => {
-                        const statusA = this.getDeckStatus(a);
-                        const statusB = this.getDeckStatus(b);
-                        return statusB.hardPercent - statusA.hardPercent ||
-                            statusB.mediumPercent - statusA.mediumPercent ||
-                            statusA.easyPercent - statusB.easyPercent;
+                        const statusPriority = {hard: 3, medium: 2, easy: 1};
+                        return statusPriority[b.currentStatus] - statusPriority[a.currentStatus];
                     });
                     break;
             }
