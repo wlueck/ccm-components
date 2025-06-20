@@ -59,7 +59,7 @@
             <div class="list-item-content">
                 <div class="list-item-title">%courseTitle%</div>
                 <div class="list-item-description">%courseDescription%</div>
-                <div id="list-item-buttons">
+                <div class="list-item-buttons">
                     <button type="button" id="toggle-course-button" class="btn-low-style" onclick="%onToggleCourse%">&#9660;</button>
                     <button type="button" onclick="%onStartCourse%">%startCourse%</button>
                     <div>
@@ -79,11 +79,11 @@
                     </div>
                 </div>
             </div>
+            <div class="list-item-deadline">%courseDeadline%</div>
             <div class="list-item-stats">
                 <div style="%courseStatusChartStyle%"></div>
                 <div>%courseStatus%</div>
             </div>
-            <div class="list-item-deadline">%courseDeadline%</div>
         </div>
         <div id="card-decks" class="hidden"></div>
     </div>
@@ -95,7 +95,7 @@
             <div class="list-item-content">
                 <div class="list-item-title">%deckTitle%</div>
                 <div class="list-item-description">%deckDescription%</div>
-                <div style="display: flex">
+                <div class="list-item-buttons">
                     <button type="button" data-deck-id="%deckId%" onclick="%onStartDeck%">%startDeck%</button>
                     <div>
                         <button type="button" id="deck-option-button" class="btn-low-style" onclick="%onDeckOptions%">...</button>
@@ -107,11 +107,11 @@
                     </div>
                 </div>
             </div>
+            <div class="list-item-deadline">%deckDeadline%</div>
             <div class="list-item-stats">
                 <div id="card-stats-chart" style="%deckStatusChartStyle%"></div>
                 <div id="card-stats-text">%deckStatus%</div>
             </div>
-            <div class="list-item-deadline">%deckDeadline%</div>
         </div>
     </div>
 </ccm-template>

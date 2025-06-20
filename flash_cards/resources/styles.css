@@ -2,19 +2,18 @@
     /* colors */
     --primary-color: #2c3e50;
     --primary-font: #fff;
-
     --secondary-color: #efefef;
     --secondary-font: #000;
-
     --border: #ccc;
     --card-bg: #ffffff;
-
     --course-item-bg: #b9cce2;
     --deck-item-bg: #f1f1e6;
 
     /* fonts */
     font-family: Montserrat, sans-serif;
     font-weight: 100;
+    font-size: 17px;
+    background-color: #f0f2f5;
 }
 
 /*region general */
@@ -27,12 +26,13 @@
 }
 
 button {
-    padding: 8px;
+    padding: 10px 13px;
     cursor: pointer;
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: var(--primary-color);
     color: var(--primary-font);
+    font-size: 15px;
 
     &.btn-low-style {
         background: none;
@@ -59,7 +59,7 @@ input[type="checkbox"] {
 
 .modal-dialog {
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 10px;
 
     & h3 {
         margin-top: 0;
@@ -71,7 +71,6 @@ input[type="checkbox"] {
         margin-top: 15px;
     }
 }
-
 /*endregion */
 
 /*region main template */
@@ -84,13 +83,13 @@ input[type="checkbox"] {
         background-color: var(--primary-color);
         margin-bottom: 15px;
         color: var(--primary-font);
+        border-radius: 10px;
     }
 
     #headline {
-        margin: 0;
+        margin: 10px 0;
     }
 }
-
 /*endregion */
 
 /*region settings-dialog template */
@@ -105,8 +104,6 @@ input[type="checkbox"] {
         margin-bottom: 3px;
     }
 }
-
-
 /*endregion */
 
 /*region list-view template */
@@ -140,7 +137,7 @@ input[type="checkbox"] {
     }
 
     #add-deck-course-options, #sort-courses-options {
-        top: 39px;
+        top: 47px;
     }
 
     #right-button {
@@ -150,11 +147,12 @@ input[type="checkbox"] {
     }
 
     #settings-button {
-        font-size: 25px;
+        font-size: 33px;
     }
 
     #sort-courses-button {
         position: relative;
+        font-size: 16px;
     }
 
     #sort-courses-options {
@@ -163,6 +161,7 @@ input[type="checkbox"] {
 
     #course-option-button, #deck-option-button {
         font-weight: bold;
+        font-size: 25px;
     }
 
     #sort-deck-options {
@@ -170,18 +169,19 @@ input[type="checkbox"] {
         top: 0;
     }
 
-    #list-item-buttons {
+    .list-item-buttons {
         display: flex;
         gap: 10px;
         align-items: center;
     }
 
     .list-item {
-        border: 2px solid var(--border);
-        border-radius: 5px;
-        padding: 10px;
-        margin: 10px 0;
-        background-color: var(--course-item-bg);
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        margin: 15px 0;
+        background-color: #ffffff;
+        padding: 15px 20px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     }
 
     .list-item-header {
@@ -201,6 +201,7 @@ input[type="checkbox"] {
 
     .list-item-description {
         padding: 10px 0;
+        color: #636363;
     }
 
     .list-item-deadline {
@@ -208,11 +209,23 @@ input[type="checkbox"] {
         display: flex;
         flex-direction: column;
         align-items: center;
+
+        & a {
+            color: #5e5e5e;
+            border: 1px solid #5e5e5e;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        & a.expired {
+            color: red;
+            border-color: red;
+        }
     }
 
     #card-decks {
         .list-item {
-            background-color: var(--deck-item-bg);
+            background-color: #f9f9f9;
         }
     }
 
@@ -237,14 +250,12 @@ input[type="checkbox"] {
         background-color: #f9f9f9;
     }
 }
-
 /*endregion */
 
 /*region import-deck-dialog template */
 #import-deck-course-select {
     margin: 10px 0;
 }
-
 /*endregion */
 
 /*region editor template */
@@ -318,7 +329,6 @@ input[type="checkbox"] {
         color: #555;
     }
 }
-
 /*endregion */
 
 /*region learning-view template */
@@ -401,34 +411,33 @@ input[type="checkbox"] {
     #difficulty-buttons {
         display: flex;
         justify-content: center;
+
+        & button {
+            margin-top: 5px;
+            color: black;
+        }
     }
 
     #hard {
-        background-color: red;
-        padding: 10px;
-        border-radius: 5px;
-        margin-top: 5px;
+        background-color: #fef3f2;
+        border: 1px solid #f04438;
     }
 
     #medium {
-        background-color: orange;
-        padding: 10px;
-        border-radius: 5px;
+        background-color: #fefbe8;
+        border: 1px solid #eaaa08;
         margin: 5px 10px 0 10px;
     }
 
     #easy {
-        background-color: green;
-        padding: 10px;
-        border-radius: 5px;
-        margin-top: 5px;
+        background-color: #ecfdf3;
+        border: 1px solid #17b26a;
     }
 
     .selected-difficulty {
-        border: 3px solid black;
+        border-width: 4px !important;
     }
 }
-
 /*endregion */
 
 /* region learning-mode-dialog template */
@@ -441,5 +450,4 @@ input[type="checkbox"] {
     margin: 10px 0;
     width: 200px;
 }
-
 /* endregion */

@@ -869,7 +869,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 const [day, month, year] = deadline.split('.');
                 return new Date(year, month - 1, day) < new Date();
             })();
-            return `<a style="color: ${isDeadlineExpired ? 'red' : 'inherit'};">Deadline: <br> ${deadline}</a>`;
+            return `<a class="${isDeadlineExpired? "expired": ""}">Deadline: <br> ${deadline}</a>`;
         };
 
         const getStatusDisplay = (status) => {
@@ -912,10 +912,9 @@ ccm.files['ccm.flash_cards.js'] = {
                 courseTitle: course.title,
                 courseDescription: course.description || '',
                 onToggleCourse: () => {
-                    const toggleCardButton = courseHtml.querySelector('#toggle-course-button');
                     const decks = courseHtml.querySelector('#card-decks');
                     decks.classList.toggle('hidden');
-                    toggleCardButton.innerHTML = decks.classList.contains('hidden') ? '&#9660;' : '&#9650;';
+                    courseHtml.querySelector('#toggle-course-button').innerHTML = decks.classList.contains('hidden') ? '&#9660;' : '&#9650;';
                 },
                 onStartCourse: async () => await this.events.onStartCourseOrDeck(course.id),
                 startCourse: this.text.start_course,
@@ -936,7 +935,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 exportCourse: this.text.export_course,
                 onDeleteCourse: async () => await this.events.onDeleteCourse(course, courseHtml),
                 deleteCourse: this.text.delete_course,
-                courseStatusChartStyle: getStatusChartStyle(courseStatus, "#b9cce2"),
+                courseStatusChartStyle: getStatusChartStyle(courseStatus, "#ffffff"),
                 courseStatus: getStatusDisplay(courseStatus),
                 courseDeadline: getDeadlineHtml(course.deadline),
             });
@@ -958,7 +957,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 exportDeck: this.text.export_deck,
                 onDeleteDeck: async () => await this.events.onDeleteDeck(courseId, deck, cardDeckHtml),
                 deleteDeck: this.text.delete_deck,
-                deckStatusChartStyle: getStatusChartStyle(deckStatus, "#f1f1e6"),
+                deckStatusChartStyle: getStatusChartStyle(deckStatus, "#f9f9f9"),
                 deckStatus: getStatusDisplay(deckStatus),
                 deckDeadline: getDeadlineHtml(deck.deadline),
             });
