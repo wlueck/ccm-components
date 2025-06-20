@@ -1,9 +1,7 @@
 <ccm-template key="main">
     <div id="main">
         <div id="header">
-            <div id="headline-wrapper">
-                <h1 id="headline">%headlineMain%</h1>
-            </div>
+            <h1 id="headline">%headlineMain%</h1>
             <div id="user"></div>
         </div>
         <div id="content"></div>
@@ -17,14 +15,14 @@
     </div>
 
     <div class="tab-content" id="tab-all">
-        <div class="form-container" id="course-semester-select">
+        <div class="form-container">
             <div class="form-group">
                 <label for="course-of-study">%courseOfStudy%</label>
-                <select id="course-of-study" name="course-of-study" onchange="%onChangeCourseOfStudy%">%courseOfStudyOptions%</select>
+                <select id="course-of-study" onchange="%onChangeCourseOfStudy%">%courseOfStudyOptions%</select>
             </div>
             <div class="form-group">
                 <label for="semester">%semester%</label>
-                <select id="semester" name="semester" onchange="%onChangeSemester%"></select>
+                <select id="semester" onchange="%onChangeSemester%"></select>
             </div>
         </div>
         <div class="accordion"></div>
@@ -44,20 +42,20 @@
             </span>
         </button>
         <div class="accordion-item-content accordion-item-content-course hidden">
-            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-documents" onclick="%onToggleAccItemContent%">
+            <button type="button" class="accordion-item-toggle" onclick="%onToggleAccItemContent%">
                 %documents%
             </button>
-            <div class="accordion-item-content hidden" id="accordion-item-content-documents"></div>
+            <div class="accordion-item-content accordion-item-content-item hidden" id="accordion-item-content-documents"></div>
 
-            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-chat" onclick="%onToggleAccItemContent%">
+            <button type="button" class="accordion-item-toggle" onclick="%onToggleAccItemContent%">
                 %chat%
             </button>
-            <div class="accordion-item-content hidden" id="accordion-item-content-chat"></div>
+            <div class="accordion-item-content accordion-item-content-item hidden" id="accordion-item-content-chat"></div>
 
-            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItemContent%">
+            <button type="button" class="accordion-item-toggle" onclick="%onToggleAccItemContent%">
                 %group%
             </button>
-            <div class="accordion-item-content hidden" id="accordion-item-content-group"></div>
+            <div class="accordion-item-content accordion-item-content-item hidden" id="accordion-item-content-group"></div>
         </div>
     </div>
 </ccm-template>
