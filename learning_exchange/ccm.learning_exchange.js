@@ -18,17 +18,17 @@ ccm.files["ccm.learning_exchange.js"] = {
         "documents": ["ccm.component", "https://wlueck.github.io/ccm-components/documents/ccm.documents.js"],
         //"documents": ["ccm.component", "../documents/ccm.documents.js"],
         "team_project": ["ccm.component", "https://ccmjs.github.io/akless-components/team_project/ccm.team_project.js"],
+        "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"],
 
         "css": ["ccm.load", "./resources/styles.css"],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
         "html": ["ccm.load", "./resources/templates.html"],
         "onchange": event => console.log(event),
-        "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"],
         "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}]
     },
 
     Instance: function () {
-        let user, curriculum, savedCourses, $;
+        let user, curriculum, savedCourses, courseMap, $;
 
         this.init = async () => {
             $ = Object.assign({}, this.ccm.helper, this.helper);
@@ -66,6 +66,11 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
             curriculum = curriculum.value;
 
+            courseMap = new Map(
+                curriculum.flatMap(courseOfStudy => courseOfStudy.courses)
+                    .map(course => [course.id, course])
+            );
+
             await this.initMainContent();
         };
 
@@ -91,7 +96,8 @@ ccm.files["ccm.learning_exchange.js"] = {
                 const selectedCourseOfStudy = curriculum.find(c => c.course_of_study_abbreviation === this.element.querySelector('#course-of-study').value);
                 await this.updateAccordion('all', selectedCourseOfStudy, parseInt(event.target.value));
             },
-            onFavorite: async (tabMode, course, courseItem) => {
+            onFavorite: async (event, tabMode, course, courseItem) => {
+                event.stopPropagation();
                 const savedCourseIndex = savedCourses.findIndex(saved => saved.course_id === course.id);
                 const isSaved = savedCourseIndex !== -1;
 
@@ -100,7 +106,6 @@ ccm.files["ccm.learning_exchange.js"] = {
                 } else {
                     savedCourses.push({course_id: course.id});
                 }
-
                 await this.data.store.set({key: user.key, value: savedCourses});
                 this.onchange?.({name: isSaved ? 'removedCourseFromFavorite' : 'addedCourseToFavorite', instance: this, course});
 
@@ -114,7 +119,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                         this.element.querySelector(`#tab-saved #course-item-${course.id}`)?.remove();
                     }
                 } else {
-                    await this.updateAccordion('saved');
+                    await this.renderCourseItem('saved', course);
                 }
             },
             onToggleAccItemContent: (event) => {
@@ -142,18 +147,12 @@ ccm.files["ccm.learning_exchange.js"] = {
                             "hide_login": true,
                             "onchange": async (event) => {
                                 console.log(event);
-                                await this.renderCourseItem(container, tabMode === "saved" ? "all" : "saved", course);
+                                await this.renderCourseItem(tabMode === "saved" ? "all" : "saved", course);
                             }
                         });
                         const teamProjectComponent = await this.team_project.start({
-                            "data": {
-                                store: this.data.store,
-                                key: this.getSubComponentStoreKey("group_project", course.id)
-                            },
+                            "data": {store: this.data.store, key: this.getSubComponentStoreKey("group_project", course.id)},
                             "user": userConfig,
-                            "onchange": (event) => {
-                                console.log(event);
-                            },
                             "teambuild": {
                                 "title": "Gruppen",
                                 "app": ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js", {"text.team": "Gruppe"}]
@@ -171,7 +170,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                             "user": userConfig,
                             "onchange": async (event) => {
                                 console.log(event);
-                                await this.renderCourseItem(container, tabMode === "saved" ? "all" : "saved", course);
+                                await this.renderCourseItem( tabMode === "saved" ? "all" : "saved", course);
                             },
                         });
                         $.setContent(content.querySelector('#accordion-item-content-documents'), documentsComponent.root);
@@ -217,9 +216,7 @@ ccm.files["ccm.learning_exchange.js"] = {
 
             let courses = [];
             if (tabMode === 'saved') {
-                courses = savedCourses?.map(savedCourse => {
-                    return curriculum.flatMap(courseOfStudy => courseOfStudy.courses).find(course => course.id === savedCourse.course_id);
-                }).filter(course => course);
+                courses = savedCourses?.map(savedCourse => courseMap.get(savedCourse.course_id)).filter(Boolean) ?? [];
             } else if (tabMode === 'all') {
                 courses = selectedCourseOfStudy.courses.filter(c => c.semester === selectedSemester);
             }
@@ -230,13 +227,12 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
 
             for (const course of courses) {
-                await this.renderCourseItem(container, tabMode, course);
+                await this.renderCourseItem(tabMode, course);
             }
         };
 
-        this.renderCourseItem = async (container, tabMode, course) => {
-            container = this.element.querySelector(`#tab-${tabMode} .accordion`);
-
+        this.renderCourseItem = async (tabMode, course) => {
+            let container = this.element.querySelector(`#tab-${tabMode} .accordion`);
             const isSaved = savedCourses.some(saved => saved.course_id === course.id);
             const courseItem = $.html(this.html.course_item, {
                 courseTitle: course.title,
@@ -245,7 +241,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 documents: this.text.documents,
                 chat: this.text.chat,
                 group: this.text.group,
-                onFavorite: () => this.events.onFavorite(tabMode, course, courseItem),
+                onFavorite: (event) => this.events.onFavorite(event, tabMode, course, courseItem),
                 onToggleAccItem: (event) => this.events.onToggleAccItem(event, container, tabMode, course),
                 onToggleAccItemContent: this.events.onToggleAccItemContent,
             });

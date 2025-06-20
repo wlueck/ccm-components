@@ -37,24 +37,24 @@
 
 <ccm-template key="course_item">
     <div id="course-item-%courseId%">
-        <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-course" onclick="%onToggleAccItem%">
+        <button type="button" class="accordion-item-toggle accordion-item-toggle-course" onclick="%onToggleAccItem%">
             %courseTitle%
             <span id="favorite-%courseId%" class="favorite" onclick="%onFavorite%">
                 %star%
             </span>
         </button>
-        <div class="accordion-item-content hidden" id="accordion-item-content-course">
-            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-documents" onclick="%onToggleAccItem%">
+        <div class="accordion-item-content accordion-item-content-course hidden">
+            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-documents" onclick="%onToggleAccItemContent%">
                 %documents%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-documents"></div>
 
-            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-chat" onclick="%onToggleAccItem%">
+            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-chat" onclick="%onToggleAccItemContent%">
                 %chat%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-chat"></div>
 
-            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItem%">
+            <button type="button" class="accordion-item-toggle" id="accordion-item-toggle-group" onclick="%onToggleAccItemContent%">
                 %group%
             </button>
             <div class="accordion-item-content hidden" id="accordion-item-content-group"></div>

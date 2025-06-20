@@ -121,11 +121,14 @@ select {
 /*endregion */
 
 /*region course-item template */
-#accordion-item-toggle-course {
+.accordion-item-toggle-course {
     background-color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-#accordion-item-toggle-course, .accordion-item-toggle, .accordion-item-content-documents, .accordion-item-content-chat, .accordion-item-content-group, .accordion-item-content-documents{
+.accordion-item-toggle-course, .accordion-item-toggle {
     width: 90%;
     border-radius: 0;
     text-align: left;
@@ -134,8 +137,6 @@ select {
 
 .accordion-item-content-course > .accordion-item-toggle {
     background-color: #f1f1f1;
-    margin-left: 10px;
-    width: calc(90% - 10px);
 }
 
 #accordion-item-content-chat, #accordion-item-content-group, #accordion-item-content-documents {
@@ -146,6 +147,6 @@ select {
 }
 
 .favorite {
-    float: right;
+    padding: 5px;
 }
 /*endregion */

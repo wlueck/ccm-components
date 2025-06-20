@@ -8,11 +8,11 @@ export const de = {
 
     // main template
     "headline_main": "Lernaustausch",
-    "all_courses": "Alle Kurse",
-    "saved_courses": "Meine Kurse",
+    "all_courses": "Alle Lehrveranstaltungen",
+    "saved_courses": "Meine Lehrveranstaltungen",
     "course_of_study": "Studiengang:",
     "semester": "Semester:",
-    "no_courses_available": "Keine Kurse vorhanden",
+    "no_courses_available": "Keine Lehrveranstaltungen vorhanden",
 
     // course-item template
     "documents": "📖 Lernunterlagen",
