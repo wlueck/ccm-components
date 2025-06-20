@@ -37,9 +37,7 @@ ccm.files["ccm.learning_exchange.js"] = {
         };
 
         this.start = async () => {
-            $.setContent(this.element, $.html(this.html.main, {
-                headlineMain: this.text.headline_main
-            }));
+            $.setContent(this.element, $.html(this.html.main, {headlineMain: this.text.headline_main}));
 
             if (this.user) {
                 this.element.querySelector('#user').append(this.user.root);
@@ -79,52 +77,109 @@ ccm.files["ccm.learning_exchange.js"] = {
         this.events = {
             onSwitchTab: (tabId) => {
                 const otherTabId = tabId === 'all' ? 'saved' : 'all';
-                // Update buttons
                 this.element.querySelector(`#tab-${tabId}-button`).classList.add('active');
                 this.element.querySelector(`#tab-${otherTabId}-button`).classList.remove('active');
-                // Update content
                 this.element.querySelector(`#tab-${tabId}`).classList.remove('hidden');
                 this.element.querySelector(`#tab-${otherTabId}`).classList.add('hidden');
             },
             onChangeCourseOfStudy: async (event) => {
-                const selectedCourseOfStudy = curriculum.find(courseOfStudy => courseOfStudy.course_of_study_abbreviation === event.target.value);
+                const selectedCourseOfStudy = curriculum.find(c => c.course_of_study_abbreviation === event.target.value);
                 this.updateSemesterOptions(selectedCourseOfStudy);
                 await this.updateAccordion('all', selectedCourseOfStudy, 1);
             },
             onChangeSemester: async (event) => {
-                const selectedCourseOfStudy = curriculum.find(courseOfStudy => courseOfStudy.course_of_study_abbreviation === this.element.querySelector('#course-of-study').value);
-                const selectedSemester = parseInt(event.target.value);
-                await this.updateAccordion('all', selectedCourseOfStudy, selectedSemester);
+                const selectedCourseOfStudy = curriculum.find(c => c.course_of_study_abbreviation === this.element.querySelector('#course-of-study').value);
+                await this.updateAccordion('all', selectedCourseOfStudy, parseInt(event.target.value));
             },
             onFavorite: async (tabMode, course, courseItem) => {
-                const removeFavorite = savedCourses?.some(savedCourse => savedCourse.course_id === course.id);
-                if (removeFavorite) {
-                    savedCourses = savedCourses?.filter(savedCourse => savedCourse.course_id !== course.id);
+                const savedCourseIndex = savedCourses.findIndex(saved => saved.course_id === course.id);
+                const isSaved = savedCourseIndex !== -1;
+
+                if (isSaved) {
+                    savedCourses.splice(savedCourseIndex, 1);
                 } else {
                     savedCourses.push({course_id: course.id});
                 }
+
                 await this.data.store.set({key: user.key, value: savedCourses});
-                this.onchange && this.onchange({
-                    name: removeFavorite ? 'removedCourseFromFavorite' : 'addedCourseToFavorite',
-                    instance: this,
-                    course: course
-                });
-                if (tabMode === 'saved') {
-                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), removeFavorite ? '☆' : '★');
-                    if (removeFavorite) courseItem.remove();
+                this.onchange?.({name: isSaved ? 'removedCourseFromFavorite' : 'addedCourseToFavorite', instance: this, course});
+
+                const favoriteIcon = this.element.querySelector(`#tab-all #favorite-${course.id}`);
+                if (favoriteIcon) $.setContent(favoriteIcon, isSaved ? '☆' : '★');
+
+                if (isSaved) {
+                    if (tabMode === 'saved') {
+                        courseItem.remove();
+                    } else {
+                        this.element.querySelector(`#tab-saved #course-item-${course.id}`)?.remove();
+                    }
                 } else {
-                    $.setContent(this.element.querySelector(`#tab-all #favorite-${course.id}`), removeFavorite ? '☆' : '★');
-                    if (removeFavorite) this.element.querySelector(`#tab-saved #course-item-${course.id}`).remove();
-                    else await this.updateAccordion('saved')
+                    await this.updateAccordion('saved');
                 }
             },
-            onToggleAccordionItem: (event) => {
-                const toggle = event.currentTarget.closest('.accordion-item-toggle');
-                const content = toggle.nextElementSibling;
+            onToggleAccItemContent: (event) => {
+                const content = event.currentTarget.closest('.accordion-item-toggle').nextElementSibling;
                 if (content && content.classList.contains('accordion-item-content')) {
                     content.classList.toggle('hidden');
                 }
             },
+            onToggleAccItem: async (event, container, tabMode, course) => {
+                const toggle = event.currentTarget.closest('.accordion-item-toggle');
+                const content = toggle.nextElementSibling;
+
+                if (content && content.classList.contains('accordion-item-content')) {
+                    const isHidden = content.classList.contains('hidden');
+                    content.classList.toggle('hidden');
+
+                    const isLoaded = toggle.getAttribute('data-loaded') === 'true';
+                    if (isHidden && !isLoaded) {
+                        toggle.setAttribute('data-loaded', 'true');
+
+                        const userConfig = this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '';
+                        const documentsComponent = await this.documents.start({
+                            "data": {store: this.data.store, key: this.getSubComponentStoreKey("documents", course.id)},
+                            "user": userConfig,
+                            "hide_login": true,
+                            "onchange": async (event) => {
+                                console.log(event);
+                                await this.renderCourseItem(container, tabMode === "saved" ? "all" : "saved", course);
+                            }
+                        });
+                        const teamProjectComponent = await this.team_project.start({
+                            "data": {
+                                store: this.data.store,
+                                key: this.getSubComponentStoreKey("group_project", course.id)
+                            },
+                            "user": userConfig,
+                            "onchange": (event) => {
+                                console.log(event);
+                            },
+                            "teambuild": {
+                                "title": "Gruppen",
+                                "app": ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js", {"text.team": "Gruppe"}]
+                            },
+                            "tools.1.app.2": {
+                                "ignore": {
+                                    "card": {
+                                        "component": "https://ccmjs.github.io/akless-components/kanban_card/versions/ccm.kanban_card-4.1.0.js"
+                                    }
+                                }
+                            }
+                        });
+                        const chatComponent = await this.chat.start({
+                            "data": {store: this.data.store, key: this.getSubComponentStoreKey("chat", course.id)},
+                            "user": userConfig,
+                            "onchange": async (event) => {
+                                console.log(event);
+                                await this.renderCourseItem(container, tabMode === "saved" ? "all" : "saved", course);
+                            },
+                        });
+                        $.setContent(content.querySelector('#accordion-item-content-documents'), documentsComponent.root);
+                        $.setContent(content.querySelector('#accordion-item-content-group'), teamProjectComponent.root);
+                        $.setContent(content.querySelector('#accordion-item-content-chat'), chatComponent.root);
+                    }
+                }
+            }
         };
 
         this.initMainContent = async () => {
@@ -135,9 +190,9 @@ ccm.files["ccm.learning_exchange.js"] = {
                 onTabSaved: () => this.events.onSwitchTab('saved'),
                 courseOfStudy: this.text.course_of_study,
                 courseOfStudyOptions: curriculum.map(c => `<option value="${c.course_of_study_abbreviation}">${c.course_of_study_title}</option>`).join(''),
-                onChangeCourseOfStudy: (event) => this.events.onChangeCourseOfStudy(event),
+                onChangeCourseOfStudy: this.events.onChangeCourseOfStudy,
                 semester: this.text.semester,
-                onChangeSemester: (event) => this.events.onChangeSemester(event)
+                onChangeSemester: this.events.onChangeSemester
             }));
 
             this.updateSemesterOptions(curriculum[0]);
@@ -148,94 +203,61 @@ ccm.files["ccm.learning_exchange.js"] = {
         this.updateSemesterOptions = (selectedCourseOfStudy) => {
             const semesterSelect = this.element.querySelector('#semester');
             semesterSelect.innerHTML = '';
-            for (let i = 0; i < selectedCourseOfStudy.semesters; i++) {
+            for (let i = 1; i <= selectedCourseOfStudy.semesters; i++) {
                 const option = document.createElement('option');
-                option.value = (i + 1).toString();
-                option.textContent = 'Semester ' + (i + 1);
+                option.value = i.toString();
+                option.textContent = `Semester ${i}`;
                 semesterSelect.appendChild(option);
             }
         };
 
         this.updateAccordion = async (tabMode, selectedCourseOfStudy, selectedSemester) => {
+            const container = this.element.querySelector(`#tab-${tabMode} .accordion`);
+            container.innerHTML = '';
+
             let courses = [];
             if (tabMode === 'saved') {
-                this.element.querySelector('#tab-saved .accordion').innerHTML = '';
                 courses = savedCourses?.map(savedCourse => {
-                    return curriculum.flatMap(courseOfStudy => courseOfStudy.courses)
-                        .find(course => course.id === savedCourse.course_id);
+                    return curriculum.flatMap(courseOfStudy => courseOfStudy.courses).find(course => course.id === savedCourse.course_id);
                 }).filter(course => course);
             } else if (tabMode === 'all') {
-                this.element.querySelector('#tab-all .accordion').innerHTML = '';
                 courses = selectedCourseOfStudy.courses.filter(c => c.semester === selectedSemester);
             }
 
-            if (!courses || courses.length < 1) {
-                if (tabMode === 'saved') {
-                    $.setContent(this.element.querySelector('#tab-saved .accordion'), this.text.no_courses_available);
-                } else {
-                    $.setContent(this.element.querySelector('#tab-all .accordion'), this.text.no_courses_available);
-                }
+            if (courses.length === 0) {
+                $.setContent(container, this.text.no_courses_available);
                 return;
             }
 
-            const container = this.element.querySelector(`#tab-${tabMode} .accordion`);
             for (const course of courses) {
-                const courseItem = $.html(this.html.course_item, {
-                    courseTitle: course.title,
-                    courseId: course.id,
-                    star: savedCourses?.some(savedCourse => savedCourse.course_id === course.id) ? '★' : '☆',
-                    documents: this.text.documents,
-                    addDocuments: this.text.add_documents,
-                    chat: this.text.chat,
-                    group: this.text.group,
-                    onFavorite: () => this.events.onFavorite(tabMode, course, courseItem),
-                    onToggleAccItem: (event) => this.events.onToggleAccordionItem(event),
-                });
-                $.append(container, courseItem);
-
-                // Initialize documents component
-                let documentsComponent = await this.documents.start({
-                    "data": {"store": this.data.store, "key": this.data.key + "_documents_" + course.id},
-                    "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
-                    "hide_login": true,
-                    "onchange": async (event) => {
-                        console.log(event);
-                        await this.updateAccordion(tabMode === "saved" ? "all" : "saved", selectedCourseOfStudy, selectedSemester);
-                    }
-                });
-                $.setContent(courseItem.querySelector('#accordion-item-content-documents'), documentsComponent.root);
-
-                // Initialize team-project component
-                let teamProjectComponent = await this.team_project.start({
-                    "data": {"store": this.data.store, "key": this.data.key + "_group_project_" + course.id},
-                    "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
-                    "onchange": (event) => {console.log(event);},
-                    "teambuild": {
-                        "title": "Gruppen",
-                        "app": ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js", {"text.team": "Gruppe"}]
-                    },
-                    "tools.1.app.2": {
-                        "ignore": {
-                            "card": {
-                                "component": "https://ccmjs.github.io/akless-components/kanban_card/versions/ccm.kanban_card-4.1.0.js"
-                            }
-                        }
-                    }
-                });
-                $.setContent(courseItem.querySelector('#accordion-item-content-group'), teamProjectComponent.root);
-
-                // Initialize chat component
-                let chatComponent = await this.chat.start({
-                    "data": {"store": this.data.store, "key": this.data.key + '_chat_' + course.id},
-                    "onchange": async (event) => {
-                        console.log(event);
-                        await this.updateAccordion(tabMode === "saved" ? "all" : "saved", selectedCourseOfStudy, selectedSemester);
-                    },
-                    "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
-                    //"reload": true,
-                });
-                $.setContent(courseItem.querySelector('#accordion-item-content-chat'), chatComponent.root);
+                await this.renderCourseItem(container, tabMode, course);
             }
         };
+
+        this.renderCourseItem = async (container, tabMode, course) => {
+            container = this.element.querySelector(`#tab-${tabMode} .accordion`);
+
+            const isSaved = savedCourses.some(saved => saved.course_id === course.id);
+            const courseItem = $.html(this.html.course_item, {
+                courseTitle: course.title,
+                courseId: course.id,
+                star: isSaved ? '★' : '☆',
+                documents: this.text.documents,
+                chat: this.text.chat,
+                group: this.text.group,
+                onFavorite: () => this.events.onFavorite(tabMode, course, courseItem),
+                onToggleAccItem: (event) => this.events.onToggleAccItem(event, container, tabMode, course),
+                onToggleAccItemContent: this.events.onToggleAccItemContent,
+            });
+            const existingItem = container.querySelector(`#course-item-${course.id}`);
+            if (existingItem) {
+                existingItem.replaceWith(courseItem);
+            } else {
+                $.append(container, courseItem);
+            }
+        };
+
+        // Hilfsmethode zur Erzeugung von Store-Keys für Unterkomponenten
+        this.getSubComponentStoreKey = (keyPrefix, courseId) => `${this.data.key}_${keyPrefix}_${courseId}`;
     }
 };
