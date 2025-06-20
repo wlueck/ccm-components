@@ -10,11 +10,6 @@ ccm.files['ccm.flash_cards.js'] = {
     config: {
         "css": ["ccm.load", "./resources/styles.css"],
         "editor": ["ccm.component", "https://ccmjs.github.io/tkless-components/editor/versions/ccm.editor-4.0.0.js", {
-            "editor": ["ccm.load",
-                "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js",
-                "https://ccmjs.github.io/tkless-components/libs/quill/quill.js",
-                "https://cdn.quilljs.com/1.2.0/quill.snow.css"
-            ],
             "settings": {
                 "modules": {
                     "syntax": true,
@@ -393,7 +388,7 @@ ccm.files['ccm.flash_cards.js'] = {
                     alert(this.text.no_cards_for_filter_warning);
                     return;
                 }
-                if (!dataset.settings?.skipLearningDialog) this.element.querySelector('#learning-mode-dialog').close();
+                if (!dataset.settings?.skipLearningDialog) this.element.querySelector('#learning-mode-dialog').remove();
                 this.initLearningView(course, deck, filteredCards, mode);
             }
         };
@@ -733,7 +728,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 await this.events.onStartLearning(course, deck, cards, mode, order, selection);
                 return;
             }
-            const modal = this.element.querySelector('#learning-mode-dialog') || $.html(this.html.learning_mode_dialog, {
+            const modal = $.html(this.html.learning_mode_dialog, {
                 learningMode: this.text.learning_mode,
                 cardsOrder: this.text.cards_order,
                 cardsOrderOriginal: this.text.cards_order_original,
@@ -745,12 +740,12 @@ ccm.files['ccm.flash_cards.js'] = {
                 selectCardsMediumHard: this.text.select_cards_medium_hard,
                 onStartLearning: async () => await this.events.onStartLearning(course, deck, cards, mode),
                 startLearning: this.text.start_learning,
-                onCancelLearning: () => modal.close(),
+                onCancelLearning: () => modal.remove(),
                 cancelLearning: this.text.cancel_learning
             });
-            if (!this.element.querySelector('#learning-mode-dialog')) {
-                $.append(this.element.querySelector('#main'), modal);
-            }
+            this.element.querySelector('#learning-mode-dialog')?.remove();
+            $.append(this.element.querySelector('#main'), modal);
+
             // populate dialog with default settings
             modal.querySelector('#card-order').value = dataset.settings?.defaultCardOrder || 'original';
             modal.querySelector('#card-selection').value = dataset.settings?.defaultCardSelection || 'all';
@@ -819,19 +814,17 @@ ccm.files['ccm.flash_cards.js'] = {
                     button.classList.add('selected-difficulty');
 
                     const courseIndex = dataset.courses.findIndex(c => c.id === course.id);
-                    const deckIndex = cardDeck.title === course.title ? -1 :
-                        dataset.courses[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
-
-                    if (deckIndex === -1) {
+                    let deckIndex, cardIndex;
+                    if (!cardDeck) {
                         // Mode: entire course
-                        const cardIndex = cards.findIndex(c => c.id === currentCard.id);
-                        cards[cardIndex].currentStatus = difficulty;
-                        cards[cardIndex].status.push(difficulty);
+                        deckIndex = dataset.courses[courseIndex].cardDecks.findIndex(deck => deck.cards.some(card => card.id === currentCard.id));
+                        cardIndex = cards.findIndex(c => c.id === currentCard.id);
                     } else {
-                        const cardIndex = dataset.courses[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
-                        dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].currentStatus = difficulty;
-                        dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].status.push(difficulty);
+                        deckIndex = dataset.courses[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
+                        cardIndex = dataset.courses[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
                     }
+                    dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].currentStatus = difficulty;
+                    dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].status.push(difficulty);
                     await this.store.set({key: user.key, value: dataset});
                 };
             }
