@@ -818,17 +818,19 @@ ccm.files['ccm.flash_cards.js'] = {
                     if (!cardDeck) {
                         // Mode: entire course
                         deckIndex = dataset.courses[courseIndex].cardDecks.findIndex(deck => deck.cards.some(card => card.id === currentCard.id));
-                        cardIndex = cards.findIndex(c => c.id === currentCard.id);
+                        cardIndex = dataset.courses[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
                     } else {
+                        // Mode: single deck
                         deckIndex = dataset.courses[courseIndex].cardDecks.findIndex(d => d.id === cardDeck.id);
                         cardIndex = dataset.courses[courseIndex].cardDecks[deckIndex].cards.findIndex(c => c.id === currentCard.id);
                     }
+                    // Update card status
                     dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].currentStatus = difficulty;
                     dataset.courses[courseIndex].cardDecks[deckIndex].cards[cardIndex].status.push(difficulty);
                     await this.store.set({key: user.key, value: dataset});
                 };
             }
-        }
+        };
 
 
         // helper functions
@@ -881,9 +883,9 @@ ccm.files['ccm.flash_cards.js'] = {
         const getStatusChartStyle = (status, backgroundColor) => {
             return `width: 45px; height: 45px;
                     background-image: radial-gradient(circle, ${backgroundColor} 45%, transparent 45%),
-                                      conic-gradient(#b3261e 0% ${status.hardPercent}%,
-                                                     #e0cd00 ${status.hardPercent}% ${status.hardPercent + status.mediumPercent}%, 
-                                                     #2b6c22 ${status.hardPercent + status.mediumPercent}% 100%);
+                                      conic-gradient(#d9534f 0% ${status.hardPercent}%,
+                                                     #f0e54e ${status.hardPercent}% ${status.hardPercent + status.mediumPercent}%, 
+                                                     #5cb85c ${status.hardPercent + status.mediumPercent}% 100%);
                     border-radius: 50%;`;
         };
 
