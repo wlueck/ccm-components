@@ -1,4 +1,39 @@
 /**
+ * local app configuration
+ * @type {Object}
+ */
+export const config = {
+    "css": ["ccm.load", "./resources/styles.css"],
+    "editor": ["ccm.component", "https://ccmjs.github.io/tkless-components/editor/versions/ccm.editor-4.0.0.js", {
+        "settings": {
+            "modules": {
+                "syntax": true,
+                "toolbar": [
+                    [{'header': [1, 2, 3, false]}],
+                    ['bold', 'italic', 'underline', {'color': []}],
+                    [{'list': 'ordered'}, {'list': 'bullet'}],
+                    ['link', 'image', 'code-block'],
+                    [{'script': 'sub'}, {'script': 'super'}]
+                ]
+            },
+            "placeholder": "",
+            "theme": "snow"
+        }
+    }],
+    "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
+    "html": ["ccm.load", "./resources/templates.html"],
+    "languages": {
+        "de": "./resources/resources.js#de",
+        "en": "./resources/resources.js#en"
+    },
+    "defaultLanguage": "de",
+    "onchange": event => console.log(event),
+    "store": ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_flash_cards"}],
+    "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}],
+    "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"]
+};
+
+/**
  * german texts and labels
  * @type {Object}
  */

@@ -7,6 +7,6 @@
 <script src="https://ccmjs.github.io/ccm/ccm.js"></script>
 <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 <script>
-    ccm.start("./ccm.flash_cards.js", {}, document.body);
+    ccm.start("./ccm.flash_cards.js", {root: document.body, src: ccm.load({url: "./resources/resources.js#config", "type": "module"})});
 </script>
 </body>

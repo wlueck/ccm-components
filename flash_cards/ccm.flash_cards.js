@@ -8,7 +8,7 @@ ccm.files['ccm.flash_cards.js'] = {
     name: 'flash_cards',
     ccm: 'https://ccmjs.github.io/ccm/ccm.js',
     config: {
-        "css": ["ccm.load", "./resources/styles.css"],
+        "css": ["ccm.load", "https://wlueck.github.io/ccm-components/flash_cards/resources/styles.css"],
         "editor": ["ccm.component", "https://ccmjs.github.io/tkless-components/editor/versions/ccm.editor-4.0.0.js", {
             "settings": {
                 "modules": {
@@ -26,15 +26,15 @@ ccm.files['ccm.flash_cards.js'] = {
             }
         }],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
-        "html": ["ccm.load", "./resources/templates.html"],
+        "html": ["ccm.load", "https://wlueck.github.io/ccm-components/flash_cards/resources/templates.html"],
         "languages": {
-            "de": "./resources/resources.js#de",
-            "en": "./resources/resources.js#en"
+            "de": "https://wlueck.github.io/ccm-components/flash_cards/resources/resources.js#de",
+            "en": "https://wlueck.github.io/ccm-components/flash_cards/resources/resources.js#en"
         },
         "defaultLanguage": "de",
         "onchange": event => console.log(event),
         "store": ["ccm.store", {url: "https://ccm2.inf.h-brs.de", name: "wlueck2s_flash_cards"}],
-        "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}],
+        "text": ["ccm.load", {"url": "https://wlueck.github.io/ccm-components/flash_cards/resources/resources.js#de", "type": "module"}],
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"]
     },
 
