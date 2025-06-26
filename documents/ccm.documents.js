@@ -9,13 +9,10 @@ ccm.files["ccm.documents.js"] = {
     ccm: "https://ccmjs.github.io/ccm/ccm.js",
     config: {
         "css": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/styles.css"],
-        //"css": ["ccm.load", "././resources/styles.css"],
         "data": {"store": ["ccm.store", {"url": "wss://ccm2.inf.h-brs.de", "name": "wlueck2s_documents"}], "key": "documents"},
-        //"data": {"store": [ "ccm.store" ]},
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
-        //"hide_login": "true",
+        "hide_login": false,
         "html": ["ccm.load", "https://wlueck.github.io/ccm-components/documents/resources/templates.html"],
-        //"html": ["ccm.load", " ././resources/templates.html"],
         "onchange": event => console.log(event),
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"],
         "star_rating": ["ccm.component", "https://ccmjs.github.io/tkless-components/star_rating/versions/ccm.star_rating-5.0.0.js"],
@@ -59,7 +56,7 @@ ccm.files["ccm.documents.js"] = {
             }
             if (this.user && this.user.isLoggedIn()) {
                 $.setContent(this.element.querySelector('#add-document'), $.html(this.html.upload_button, {
-                    addDocument: this.text.add_documents,
+                    addDocument: this.text.add_document,
                     onAddDocument: this.events.onAddDocument
                 }));
             }
@@ -132,6 +129,7 @@ ccm.files["ccm.documents.js"] = {
                 uploadDate: new Date(document.upload_date).toLocaleDateString('de-DE'),
                 fileUrl: document.file_url,
                 deleteDocumentClass: document.uploader === user?.key ? '' : 'unseen',
+                deleteDocumentIcon: this.text.deleteDocumentIcon,
                 onDeleteDocument: () => this.events.onDeleteDocument(document, documentItem)
             });
             $.append(this.element.querySelector('#document-list'), documentItem);
