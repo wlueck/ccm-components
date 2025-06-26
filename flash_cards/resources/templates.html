@@ -24,7 +24,8 @@
                 <a id="import-course" onclick="%onImportCourse%">%importCourse%</a>
             </div>
             <div id="right-button">
-                <button type="button" id="sort-courses-button" class="btn-low-style" onclick="%onSortCourses%">↓ %sortCourses%
+                <button type="button" id="sort-courses-button" class="btn-low-style" onclick="%onSortCourses%">
+                    %sortCourses%
                 </button>
                 <div id="sort-courses-options" class="dropdown-menu hidden">
                     <a id="sort-courses-title" onclick="%onSortCoursesTitle%">%sortCoursesTitle%</a>
@@ -32,7 +33,7 @@
                     <a id="sort-courses-cardCount" onclick="%onSortCoursesCardCount%">%sortCoursesCardCount%</a>
                     <a id="sort-courses-status" onclick="%onSortCoursesStatus%">%sortCoursesStatus%</a>
                 </div>
-                <button type="button" id="settings-button" class="btn-low-style" onclick="%onOpenSettings%">⚙</button>
+                <button type="button" id="settings-button" class="btn-low-style" onclick="%onOpenSettings%">%settingsIcon%</button>
             </div>
         </div>
 
@@ -66,7 +67,7 @@
                         <button type="button" id="course-option-button" class="btn-low-style" onclick="%onCourseOptions%">...</button>
                         <div id="course-options" class="dropdown-menu hidden">
                             <a onclick="%onSortDecks%">%sortDecks%</a>
-                            <div id="sort-deck-options" class=" dropdown-menu hidden">
+                            <div id="sort-deck-options" class="dropdown-menu hidden">
                                 <a onclick="%onSortDeckTitle%">%sortDeckTitle%</a>
                                 <a onclick="%onSortDeckDeadline%">%sortDeckDeadline%</a>
                                 <a onclick="%onSortDeckCardCount%">%sortDeckCardCount%</a>

@@ -410,6 +410,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 onImportCourse: this.events.onImportCourse,
                 importCourse: this.text.import_course,
                 onOpenSettings: () => this.events.onOpenSettings(),
+                settingsIcon: this.text.settings_Icon,
                 settings: this.text.settings,
                 onSortCourses: () => this.element.querySelector('#sort-courses-options').classList.toggle('hidden'),
                 sortCourses: this.text.sort_courses,
@@ -791,12 +792,12 @@ ccm.files['ccm.flash_cards.js'] = {
                     currentCardNumber: (index + 1).toString(),
                     maxNumberOfCards: cards.length.toString()
                 }));
-                this.updateDifficultyButtons(course, deck, currentCard, cards);
+                this.updateDifficultyButtons(course, deck, currentCard);
             };
             updateCardContent(0);
         };
 
-        this.updateDifficultyButtons = (course, cardDeck, currentCard, cards) => {
+        this.updateDifficultyButtons = (course, cardDeck, currentCard) => {
             const difficultyButtons = {
                 easy: this.element.querySelector('#easy'),
                 medium: this.element.querySelector('#medium'),
@@ -865,13 +866,22 @@ ccm.files['ccm.flash_cards.js'] = {
             return sortedItems;
         };
 
-        const getDeadlineHtml = (deadline) => {
+        const getDeadlineHtml = (totalCards, deadline) => {
             if (!deadline) return '';
-            const isDeadlineExpired = (() => {
-                const [day, month, year] = deadline.split('.');
-                return new Date(year, month - 1, day) < new Date();
-            })();
-            return `<a class="${isDeadlineExpired? "expired": ""}">Deadline: <br> ${deadline}</a>`;
+
+            const [day, month, year] = deadline.split('.');
+            const deadlineDate = new Date(year, month - 1, day);
+            const today = new Date();
+            const isDeadlineExpired = deadlineDate < today;
+            let additionalInfo;
+            if (!isDeadlineExpired) {
+                const daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+                const cardsPerDay = daysLeft > 0 ? Math.ceil(totalCards / daysLeft) : '';
+                additionalInfo = `(Karten pro Tag: ${cardsPerDay})`;
+            } else {
+                additionalInfo = '(Abgelaufen)';
+            }
+            return `<a class="${isDeadlineExpired ? "expired" : ""}"><b>Deadline:<br>${deadline}</b><br>${additionalInfo}</a>`;
         };
 
         const getStatusDisplay = (status) => {
@@ -939,7 +949,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 deleteCourse: this.text.delete_course,
                 courseStatusChartStyle: getStatusChartStyle(courseStatus, "#ffffff"),
                 courseStatus: getStatusDisplay(courseStatus),
-                courseDeadline: getDeadlineHtml(course.deadline),
+                courseDeadline: getDeadlineHtml(courseStatus.hardCount + courseStatus.mediumCount, course.deadline),
             });
             return courseHtml;
         };
@@ -961,7 +971,7 @@ ccm.files['ccm.flash_cards.js'] = {
                 deleteDeck: this.text.delete_deck,
                 deckStatusChartStyle: getStatusChartStyle(deckStatus, "#f9f9f9"),
                 deckStatus: getStatusDisplay(deckStatus),
-                deckDeadline: getDeadlineHtml(deck.deadline),
+                deckDeadline: getDeadlineHtml(deckStatus.hardCount + deckStatus.mediumCount, deck.deadline),
             });
             return cardDeckHtml;
         };

@@ -216,6 +216,8 @@ input[type="checkbox"] {
             border: 1px solid #5e5e5e;
             border-radius: 5px;
             padding: 5px;
+            min-width: 120px;
+            text-align: center;
         }
 
         & a.expired {
