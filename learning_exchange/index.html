@@ -5,8 +5,8 @@
 <meta name="license" content="The MIT License (MIT)">
 <body>
 <script src="https://ccmjs.github.io/ccm/ccm.js"></script>
-<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 <script>
-    ccm.start("./ccm.learning_exchange.js", {}, document.body);
+    ccm.start("./ccm.learning_exchange.js", {root: document.body, src: ccm.load({url: "./resources/resources.js#config", "type": "module"})});
 </script>
 </body>

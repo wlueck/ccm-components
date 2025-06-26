@@ -10,21 +10,19 @@ ccm.files["ccm.learning_exchange.js"] = {
     config: {
         // stores
         "curriculum": {"store": ["ccm.store", {"url": "https://ccm2.inf.h-brs.de", "name": "wlueck2s_curriculum"}], "key": "curriculum"},
-        //"data": {"store": [ "ccm.store" ]},
         "data": {"store": ["ccm.store", {"url": "wss://ccm2.inf.h-brs.de", "name": "wlueck2s_learning_exchange"}], "key": "learning_exchange"},
 
         // components
         "chat": ["ccm.component", "https://ccmjs.github.io/akless-components/chat/ccm.chat.js"],
         "documents": ["ccm.component", "https://wlueck.github.io/ccm-components/documents/ccm.documents.js"],
-        //"documents": ["ccm.component", "../documents/ccm.documents.js"],
         "team_project": ["ccm.component", "https://ccmjs.github.io/akless-components/team_project/ccm.team_project.js"],
         "user": ["ccm.instance", "https://ccmjs.github.io/akless-components/user/ccm.user.js"],
 
-        "css": ["ccm.load", "./resources/styles.css"],
+        "css": ["ccm.load", "https://wlueck.github.io/ccm-components/learning_exchange/resources/styles.css"],
         "helper": ["ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs"],
-        "html": ["ccm.load", "./resources/templates.html"],
+        "html": ["ccm.load", "https://wlueck.github.io/ccm-components/learning_exchange/resources/templates.html"],
         "onchange": event => console.log(event),
-        "text": ["ccm.load", {"url": "./resources/resources.js#de", "type": "module"}]
+        "text": ["ccm.load", {"url": "https://wlueck.github.io/ccm-components/learning_exchange/resources/resources.js#de", "type": "module"}]
     },
 
     Instance: function () {
@@ -237,7 +235,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             const courseItem = $.html(this.html.course_item, {
                 courseTitle: course.title,
                 courseId: course.id,
-                star: isSaved ? '★' : '☆',
+                star: isSaved ? this.text.filled_star : this.text.empty_star,
                 documents: this.text.documents,
                 chat: this.text.chat,
                 group: this.text.group,
@@ -253,7 +251,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
         };
 
-        // Hilfsmethode zur Erzeugung von Store-Keys für Unterkomponenten
+        // Helper method for generating store keys for subcomponents
         this.getSubComponentStoreKey = (keyPrefix, courseId) => `${this.data.key}_${keyPrefix}_${courseId}`;
     }
 };
