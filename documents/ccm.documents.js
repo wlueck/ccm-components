@@ -114,7 +114,7 @@ ccm.files["ccm.documents.js"] = {
                     documents = documents.filter(m => m.id !== document.id);
                     // remove document and stars from db
                     await this.data.store.set({key: this.data.key, value: documents});
-                    await this.data.store.del(this.data.key + document.id);
+                    await this.data.store.del(this.data.key + "_" + document.id);
                     this.onchange && this.onchange({name: 'deletedDocument', instance: this, deletedDocument: document});
                     documentItem.remove();
                 }
@@ -136,12 +136,12 @@ ccm.files["ccm.documents.js"] = {
 
             // Initialize star-rating components
             const result = await this.star_rating_result.start({
-                "data": {"store": this.data.store, "key": this.data.key + document.id},
+                "data": {"store": this.data.store, "key": this.data.key + "_" + document.id},
                 "detailed": false,
                 "user": this.user ? ['ccm.instance', this.user.component.url, JSON.parse(this.user.config)] : '',
             });
             const star = await this.star_rating.start({
-                "data": {"store": this.data.store, "key": this.data.key + document.id},
+                "data": {"store": this.data.store, "key": this.data.key + "_" + document.id},
                 "onchange": (event) => {
                     result.start();
                     this.onchange && this.onchange({name: 'addNewRatingForDocument', instance: this, newRating: event, document: document});
