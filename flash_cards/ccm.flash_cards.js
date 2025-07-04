@@ -873,15 +873,13 @@ ccm.files['ccm.flash_cards.js'] = {
             const deadlineDate = new Date(year, month - 1, day);
             const today = new Date();
             const isDeadlineExpired = deadlineDate < today;
-            let additionalInfo;
+            let additionalInfo = '';
             if (!isDeadlineExpired) {
                 const daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
                 const cardsPerDay = daysLeft > 0 ? Math.ceil(totalCards / daysLeft) : '';
                 additionalInfo = `(Karten pro Tag: ${cardsPerDay})`;
-            } else {
-                additionalInfo = '(Abgelaufen)';
             }
-            return `<a class="${isDeadlineExpired ? "expired" : ""}"><b>Deadline:<br>${deadline}</b><br>${additionalInfo}</a>`;
+            return `<a class="${isDeadlineExpired ? "expired" : ""}"><b>Deadline: ${deadline}</b><br>${additionalInfo}</a>`;
         };
 
         const getStatusDisplay = (status) => {

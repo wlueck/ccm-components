@@ -89,6 +89,10 @@ input[type="checkbox"] {
     #headline {
         margin: 10px 0;
     }
+
+    #content {
+        margin: 10px;
+    }
 }
 /*endregion */
 
@@ -212,17 +216,17 @@ input[type="checkbox"] {
         font-size: 14px;
 
         & a {
-            color: #5e5e5e;
-            border: 1px solid #5e5e5e;
+            color: #009bff;
             border-radius: 5px;
             padding: 5px;
-            min-width: 120px;
+            min-width: 143px;
             text-align: center;
+            background-color: #ecf7fe;
         }
 
         & a.expired {
             color: red;
-            border-color: red;
+            background-color: #ff00001c;
         }
     }
 
@@ -317,6 +321,9 @@ input[type="checkbox"] {
 
     & input[type="text"], & select, & textarea {
         width: 30%;
+    }
+    #question-input, #answer-input {
+        background-color: white;
     }
 
     #submit-deck {
