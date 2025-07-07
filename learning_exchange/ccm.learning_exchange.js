@@ -116,6 +116,9 @@ ccm.files["ccm.learning_exchange.js"] = {
                     } else {
                         this.element.querySelector(`#tab-saved #course-item-${course.id}`)?.remove();
                     }
+                    if (savedCourses.length === 0) {
+                        await this.updateAccordion('saved');
+                    }
                 } else {
                     await this.renderCourseItem('saved', course);
                 }
@@ -220,7 +223,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
 
             if (courses.length === 0) {
-                $.setContent(container, this.text.no_courses_available);
+                $.setContent(container, `<div class="no-courses-hint">${this.text.no_courses_available}</div>`);
                 return;
             }
 
@@ -247,6 +250,8 @@ ccm.files["ccm.learning_exchange.js"] = {
             if (existingItem) {
                 existingItem.replaceWith(courseItem);
             } else {
+                const noCoursesHint = container.querySelector('.no-courses-hint');
+                if (noCoursesHint) noCoursesHint.remove();
                 $.append(container, courseItem);
             }
         };
