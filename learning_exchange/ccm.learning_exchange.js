@@ -49,7 +49,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 return;
             }
 
-            // init savedCourses and curriculum
+            // initialize savedCourses and curriculum
             savedCourses = await this.data.store.get(user.key);
             if (!savedCourses) {
                 console.error('Saved courses not found in store');
@@ -64,6 +64,7 @@ ccm.files["ccm.learning_exchange.js"] = {
             }
             curriculum = curriculum.value;
 
+            // maps course IDs to course objects for fast access by ID
             courseMap = new Map(
                 curriculum.flatMap(courseOfStudy => courseOfStudy.courses)
                     .map(course => [course.id, course])
@@ -110,6 +111,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                 const favoriteIcon = this.element.querySelector(`#tab-all #favorite-${course.id}`);
                 if (favoriteIcon) $.setContent(favoriteIcon, isSaved ? '☆' : '★');
 
+                // Remove course from "saved" tab if unfavorited, add to "saved" tab if newly favorited
                 if (isSaved) {
                     if (tabMode === 'saved') {
                         courseItem.remove();
@@ -137,6 +139,7 @@ ccm.files["ccm.learning_exchange.js"] = {
                     const isHidden = content.classList.contains('hidden');
                     content.classList.toggle('hidden');
 
+                    // Lazy-load subcomponents (documents, group project, chat) only once, when accordion item is opened for the first time
                     const isLoaded = toggle.getAttribute('data-loaded') === 'true';
                     if (isHidden && !isLoaded) {
                         toggle.setAttribute('data-loaded', 'true');
@@ -246,6 +249,8 @@ ccm.files["ccm.learning_exchange.js"] = {
                 onToggleAccItem: (event) => this.events.onToggleAccItem(event, container, tabMode, course),
                 onToggleAccItemContent: this.events.onToggleAccItemContent,
             });
+            // If the course item already exists, replace it.
+            // Otherwise, remove the "no courses" hint (if present) and append the new course item.
             const existingItem = container.querySelector(`#course-item-${course.id}`);
             if (existingItem) {
                 existingItem.replaceWith(courseItem);

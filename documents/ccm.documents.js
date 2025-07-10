@@ -42,7 +42,7 @@ ccm.files["ccm.documents.js"] = {
                 console.log('User is not logged in');
             }
 
-            // init documents
+            // initialize documents
             documents = await this.data.store.get(this.data.key);
             if (!documents) {
                 console.error('Documents not found in store');
@@ -134,7 +134,7 @@ ccm.files["ccm.documents.js"] = {
             });
             $.append(this.element.querySelector('#document-list'), documentItem);
 
-            // Initialize star-rating components
+            // initialize star-rating components
             const result = await this.star_rating_result.start({
                 "data": {"store": this.data.store, "key": this.data.key + "_" + document.id},
                 "detailed": false,
