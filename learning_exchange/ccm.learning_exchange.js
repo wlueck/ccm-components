@@ -151,7 +151,12 @@ ccm.files["ccm.learning_exchange.js"] = {
                             "hide_login": true,
                             "onchange": async (event) => {
                                 console.log(event);
-                                await this.renderCourseItem(tabMode === "saved" ? "all" : "saved", course);
+                                // Refresh course item in other tab if document is updated
+                                if (tabMode === "saved") {
+                                    await this.renderCourseItem("all", course);
+                                } else if (tabMode === "all" && savedCourses.some(saved => saved.course_id === course.id)) {
+                                    await this.renderCourseItem("saved", course);
+                                }
                             }
                         });
                         const teamProjectComponent = await this.team_project.start({
@@ -174,7 +179,12 @@ ccm.files["ccm.learning_exchange.js"] = {
                             "user": userConfig,
                             "onchange": async (event) => {
                                 console.log(event);
-                                await this.renderCourseItem( tabMode === "saved" ? "all" : "saved", course);
+                                // Refresh course item in other tab if chat is updated
+                                if (tabMode === "saved") {
+                                    await this.renderCourseItem("all", course);
+                                } else if (tabMode === "all" && savedCourses.some(saved => saved.course_id === course.id)) {
+                                    await this.renderCourseItem("saved", course);
+                                }
                             },
                         });
                         $.setContent(content.querySelector('#accordion-item-content-documents'), documentsComponent.root);
