@@ -155,8 +155,8 @@ ccm.files["ccm.learning_exchange.js"] = {
                             "data": {store: this.data.store, key: this.getSubComponentStoreKey("group_project", course.id)},
                             "user": userConfig,
                             "teambuild": {
-                                "title": "Gruppen",
-                                "app": ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js", {"text.team": "Gruppe"}]
+                                "title": this.text.group_label,
+                                "app": ["ccm.component", "https://ccmjs.github.io/akless-components/teambuild/versions/ccm.teambuild-5.2.0.js", {"text.team": this.text.group_label}]
                             },
                             "tools.1.app.2": {
                                 "ignore": {

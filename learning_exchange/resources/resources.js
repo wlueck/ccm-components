@@ -43,6 +43,7 @@ export const de = {
     "documents": "📖 Lernunterlagen",
     "chat": "💬 Chat",
     "group": "👥 Lerngruppen",
+    "group_label": "Lerngruppe",
 };
 
 /**
@@ -67,4 +68,5 @@ export const en = {
     "documents": "📖 Learning Materials",
     "chat": "💬 Chat",
     "group": "👥 Study Groups",
+    "group_label": "Study Group",
 };
