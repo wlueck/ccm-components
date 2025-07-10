@@ -2,7 +2,7 @@ await this.store.set({
     key: "wlueck2s", value: {
         sortPreference: "title",
         settings: {
-            language: this.defaultLanguage,
+            language: 'de',
             statusDisplay: 'count',
             defaultCardOrder: 'original',
             defaultCardSelection: 'all',
